@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-Command caveman -ErrorAction SilentlyContinue)",
+      "PowerShell(caveman --version 2>&1)",
+      "PowerShell(caveman --help 2>&1)",
+      "PowerShell(npx caveman --version)",
+      "PowerShell(& \"C:\\\\Users\\\\dgoul\\\\OneDrive\\\\Documentos\\\\Gerenciamento Felino\\\\.agents\\\\skills\\\\caveman\" --version 2>&1)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\dgoul\\\\OneDrive\\\\Documentos\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\dgoul\\\\OneDrive\\\\Documentos\\\\Gerenciamento Felino\")",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(ls -la \"/c/Users/dgoul/OneDrive/Documentos/\" | head -20)",
+      "Bash(find \"/c/Users/dgoul\" -maxdepth 3 -type d -name \"*projetos*\" -o -type d -name \"*caveman*\" 2>/dev/null | head -20)",
+      "Bash(claude plugin *)",
+      "Bash(npx skills *)",
+      "Bash(npm -v)",
+      "Bash(git init *)",
+      "Bash(cd \"c:/Users/dgoul/OneDrive/Documentos/Gerenciamento Felino\" && mkdir -p apps/backend/src/modules apps/backend/src/prisma apps/frontend/src packages/shared/dtos packages/shared/enums && echo ok)",
+      "Bash(npm install *)",
+      "Bash(npx turbo *)",
+      "Bash(docker compose *)",
+      "Bash(git add *)",
+      "Bash(git config *)",
+      "Bash(git commit *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\dgoul\\OneDrive\\Documentos\\Gerenciamento Felino\\apps\\backend\\src"
+    ]
+  }
+}
