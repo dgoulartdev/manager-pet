@@ -1,0 +1,1570 @@
+openapi: "3.1.0"
+
+info:
+  title: Gerenciamento Felinos API
+  version: "1.0.0"
+  description: |
+    API do sistema de prontuário veterinário para profissionais autônomos.
+
+    ## Autenticação
+    Todos os endpoints (exceto `/v1/auth/*`) exigem um JWT Bearer token
+    obtido via `POST /v1/auth/login`.
+
+    ## Isolamento de dados
+    Todos os recursos são isolados por `user_id` derivado do JWT.
+    Um veterinário nunca acessa dados de outro.
+
+    ## Paginação
+    Endpoints de coleção usam paginação offset-based com `page` e `per_page`.
+    Valores padrão: `page=1`, `per_page=20`. Máximo: `per_page=100`.
+
+    ## Erros
+    Todos os erros seguem RFC 7807 (`application/problem+json`).
+
+servers:
+  - url: https://api.gerenciamentofelinos.com.br/v1
+    description: Produção
+  - url: http://localhost:3000/v1
+    description: Desenvolvimento local
+
+tags:
+  - name: Auth
+    description: Autenticação e gerenciamento de sessão
+  - name: Users
+    description: Perfil do veterinário autenticado
+  - name: Tutors
+    description: Tutores (donos dos animais)
+  - name: Patients
+    description: Pacientes felinos
+  - name: Locations
+    description: Locais de atendimento pré-cadastrados
+  - name: Appointments
+    description: Atendimentos veterinários
+
+# ---------------------------------------------------------------------------
+# PATHS
+# ---------------------------------------------------------------------------
+
+paths:
+
+  # ── AUTH ──────────────────────────────────────────────────────────────────
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Cadastrar novo veterinário
+      operationId: registerUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+            example:
+              name: "Dra. Ana Lima"
+              email: "ana@email.com"
+              password: "Senha@2024"
+      responses:
+        "201":
+          description: Conta criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Autenticar e obter tokens
+      operationId: loginUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            example:
+              email: "ana@email.com"
+              password: "Senha@2024"
+      responses:
+        "200":
+          description: Autenticado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Renovar access token via refresh token
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+      responses:
+        "200":
+          description: Token renovado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Solicitar e-mail de recuperação de senha
+      operationId: forgotPassword
+      security: []
+      description: |
+        Sempre retorna 200 para não expor se o e-mail existe na base.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+      responses:
+        "200":
+          description: Se o e-mail existir, o link de recuperação será enviado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Se o e-mail estiver cadastrado, você receberá as instruções em breve."
+
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Redefinir senha com token de recuperação
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+      responses:
+        "200":
+          description: Senha redefinida com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Senha redefinida com sucesso."
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Invalidar refresh token atual
+      operationId: logoutUser
+      responses:
+        "204":
+          description: Logout realizado com sucesso
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ── USERS ─────────────────────────────────────────────────────────────────
+
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Obter perfil do veterinário autenticado
+      operationId: getMe
+      responses:
+        "200":
+          description: Perfil retornado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    patch:
+      tags: [Users]
+      summary: Atualizar perfil do veterinário autenticado
+      operationId: updateMe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: Perfil atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /users/me/password:
+    patch:
+      tags: [Users]
+      summary: Alterar senha do veterinário autenticado
+      operationId: changePassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+      responses:
+        "204":
+          description: Senha alterada com sucesso
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  # ── TUTORS ────────────────────────────────────────────────────────────────
+
+  /tutors:
+    get:
+      tags: [Tutors]
+      summary: Listar tutores
+      operationId: listTutors
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: q
+          in: query
+          description: Busca por nome, e-mail ou telefone
+          schema:
+            type: string
+            example: "Maria"
+      responses:
+        "200":
+          description: Lista paginada de tutores
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TutorListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Tutors]
+      summary: Cadastrar tutor
+      operationId: createTutor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTutorRequest"
+            example:
+              name: "Maria Souza"
+              phone: "11999998888"
+              email: "maria@email.com"
+      responses:
+        "201":
+          description: Tutor criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /tutors/{tutor_id}:
+    parameters:
+      - $ref: "#/components/parameters/TutorId"
+
+    get:
+      tags: [Tutors]
+      summary: Obter tutor por ID
+      operationId: getTutor
+      responses:
+        "200":
+          description: Tutor retornado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Tutors]
+      summary: Atualizar tutor
+      operationId: updateTutor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTutorRequest"
+      responses:
+        "200":
+          description: Tutor atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      tags: [Tutors]
+      summary: Remover tutor
+      operationId: deleteTutor
+      description: |
+        Só é permitido se o tutor não tiver pacientes associados.
+        Caso contrário, retorna 409.
+      responses:
+        "204":
+          description: Tutor removido
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  # ── PATIENTS ──────────────────────────────────────────────────────────────
+
+  /patients:
+    get:
+      tags: [Patients]
+      summary: Listar pacientes
+      operationId: listPatients
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: q
+          in: query
+          description: Busca por nome do paciente, nome do tutor ou telefone do tutor
+          schema:
+            type: string
+            example: "Mimi"
+        - name: tutor_id
+          in: query
+          description: Filtrar por tutor
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Lista paginada de pacientes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Patients]
+      summary: Cadastrar paciente
+      operationId: createPatient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePatientRequest"
+            example:
+              tutor_id: "550e8400-e29b-41d4-a716-446655440000"
+              name: "Mimi"
+              species: "Felis catus"
+              sex: "FEMALE"
+              breed: "Persa"
+              color: "Branca"
+              birth_date: "2020-03-15"
+      responses:
+        "201":
+          description: Paciente criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /patients/{patient_id}:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+
+    get:
+      tags: [Patients]
+      summary: Obter paciente por ID
+      operationId: getPatient
+      responses:
+        "200":
+          description: Paciente retornado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Patients]
+      summary: Atualizar dados do paciente
+      operationId: updatePatient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePatientRequest"
+      responses:
+        "200":
+          description: Paciente atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      tags: [Patients]
+      summary: Remover paciente
+      operationId: deletePatient
+      description: |
+        Remove o paciente e todos os seus atendimentos (cascade).
+      responses:
+        "204":
+          description: Paciente removido
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /patients/{patient_id}/photo:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+
+    put:
+      tags: [Patients]
+      summary: Enviar ou substituir foto do paciente
+      operationId: uploadPatientPhoto
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [photo]
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                  description: Imagem JPG ou PNG, máximo 5MB
+      responses:
+        "200":
+          description: Foto atualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  photo_url:
+                    type: string
+                    format: uri
+                    example: "https://cdn.gerenciamentofelinos.com.br/patients/uuid/photo.jpg"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      tags: [Patients]
+      summary: Remover foto do paciente
+      operationId: deletePatientPhoto
+      responses:
+        "204":
+          description: Foto removida
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ── LOCATIONS ─────────────────────────────────────────────────────────────
+
+  /locations:
+    get:
+      tags: [Locations]
+      summary: Listar locais de atendimento cadastrados
+      operationId: listLocations
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Lista paginada de locais
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocationListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Locations]
+      summary: Cadastrar local de atendimento
+      operationId: createLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLocationRequest"
+            example:
+              name: "Clínica Vida Animal"
+              address: "Rua das Flores, 123 – Goiânia, GO"
+              phone: "6233334444"
+      responses:
+        "201":
+          description: Local criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Location"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /locations/{location_id}:
+    parameters:
+      - $ref: "#/components/parameters/LocationId"
+
+    get:
+      tags: [Locations]
+      summary: Obter local por ID
+      operationId: getLocation
+      responses:
+        "200":
+          description: Local retornado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Location"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Locations]
+      summary: Atualizar local de atendimento
+      operationId: updateLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLocationRequest"
+      responses:
+        "200":
+          description: Local atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Location"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      tags: [Locations]
+      summary: Remover local de atendimento
+      operationId: deleteLocation
+      description: |
+        Só é permitido se o local não estiver referenciado por nenhum
+        atendimento. Caso contrário, retorna 409.
+      responses:
+        "204":
+          description: Local removido
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  # ── APPOINTMENTS ──────────────────────────────────────────────────────────
+
+  /appointments:
+    get:
+      tags: [Appointments]
+      summary: Listar atendimentos
+      operationId: listAppointments
+      description: |
+        Endpoint principal para histórico e busca de atendimentos.
+        Use `patient_id` para a timeline de um paciente específico.
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: patient_id
+          in: query
+          description: Filtrar por paciente (retorna a timeline do paciente)
+          schema:
+            type: string
+            format: uuid
+        - name: location_id
+          in: query
+          description: Filtrar por local de atendimento
+          schema:
+            type: string
+            format: uuid
+        - name: date_from
+          in: query
+          description: Data inicial do filtro (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+            example: "2024-01-01"
+        - name: date_to
+          in: query
+          description: Data final do filtro (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+            example: "2024-12-31"
+      responses:
+        "200":
+          description: Lista paginada de atendimentos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Appointments]
+      summary: Registrar atendimento
+      operationId: createAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppointmentRequest"
+            example:
+              patient_id: "550e8400-e29b-41d4-a716-446655440000"
+              date: "2024-06-15"
+              location_type: "REGISTERED"
+              location_id: "660e8400-e29b-41d4-a716-446655440001"
+              weight_kg: 4.2
+              chief_complaint: "Vômito há 2 dias"
+              history: "Animal começou a vomitar após mudança de ração."
+              diagnosis: "Gastrite aguda"
+              treatment: "Omeprazol 1mg/kg por 7 dias"
+              prescription: "Omeprazol comprimido 10mg – 1x ao dia – 7 dias"
+              notes: "Retorno em 7 dias se não melhorar"
+      responses:
+        "201":
+          description: Atendimento criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /appointments/{appointment_id}:
+    parameters:
+      - $ref: "#/components/parameters/AppointmentId"
+
+    get:
+      tags: [Appointments]
+      summary: Obter atendimento por ID
+      operationId: getAppointment
+      responses:
+        "200":
+          description: Atendimento retornado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Appointments]
+      summary: Atualizar atendimento
+      operationId: updateAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAppointmentRequest"
+      responses:
+        "200":
+          description: Atendimento atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      tags: [Appointments]
+      summary: Remover atendimento
+      operationId: deleteAppointment
+      responses:
+        "204":
+          description: Atendimento removido
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+# ---------------------------------------------------------------------------
+# COMPONENTS
+# ---------------------------------------------------------------------------
+
+components:
+
+  # ── SECURITY ──────────────────────────────────────────────────────────────
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  security:
+    - BearerAuth: []
+
+  # ── PARAMETERS ────────────────────────────────────────────────────────────
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Número da página
+
+    PerPageParam:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Itens por página
+
+    TutorId:
+      name: tutor_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    PatientId:
+      name: patient_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    LocationId:
+      name: location_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    AppointmentId:
+      name: appointment_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  # ── SCHEMAS ───────────────────────────────────────────────────────────────
+
+  schemas:
+
+    # -- Auth ----------------------------------------------------------------
+
+    RegisterRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+          example: "Dra. Ana Lima"
+        email:
+          type: string
+          format: email
+          example: "ana@email.com"
+        password:
+          type: string
+          minLength: 8
+          description: Mínimo 8 caracteres, pelo menos 1 letra e 1 número
+          example: "Senha@2024"
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    RefreshRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+
+    ForgotPasswordRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+
+    ResetPasswordRequest:
+      type: object
+      required: [token, new_password]
+      properties:
+        token:
+          type: string
+          description: Token recebido por e-mail
+        new_password:
+          type: string
+          minLength: 8
+
+    AuthResponse:
+      type: object
+      required: [access_token, refresh_token, user]
+      properties:
+        access_token:
+          type: string
+          description: JWT de curta duração (15min)
+        refresh_token:
+          type: string
+          description: Token de longa duração (7 dias)
+        user:
+          $ref: "#/components/schemas/User"
+
+    # -- User ----------------------------------------------------------------
+
+    User:
+      type: object
+      required: [id, name, email, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          example: "Dra. Ana Lima"
+        email:
+          type: string
+          format: email
+          example: "ana@email.com"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        email:
+          type: string
+          format: email
+
+    ChangePasswordRequest:
+      type: object
+      required: [current_password, new_password]
+      properties:
+        current_password:
+          type: string
+        new_password:
+          type: string
+          minLength: 8
+
+    # -- Tutor ---------------------------------------------------------------
+
+    Tutor:
+      type: object
+      required: [id, name, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          example: "Maria Souza"
+        phone:
+          type: string
+          nullable: true
+          example: "11999998888"
+        email:
+          type: string
+          format: email
+          nullable: true
+          example: "maria@email.com"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateTutorRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        phone:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+
+    UpdateTutorRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        phone:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+
+    TutorListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tutor"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    # -- Patient -------------------------------------------------------------
+
+    Sex:
+      type: string
+      enum: [MALE, FEMALE, UNKNOWN]
+      description: |
+        MALE = Macho, FEMALE = Fêmea, UNKNOWN = Não informado
+
+    Patient:
+      type: object
+      required: [id, tutor_id, name, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tutor_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Mimi"
+        species:
+          type: string
+          nullable: true
+          example: "Felis catus"
+        sex:
+          $ref: "#/components/schemas/Sex"
+        breed:
+          type: string
+          nullable: true
+          example: "Persa"
+        color:
+          type: string
+          nullable: true
+          example: "Branca"
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2020-03-15"
+        photo_url:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    PatientDetail:
+      allOf:
+        - $ref: "#/components/schemas/Patient"
+        - type: object
+          properties:
+            tutor:
+              $ref: "#/components/schemas/Tutor"
+
+    CreatePatientRequest:
+      type: object
+      required: [tutor_id, name]
+      properties:
+        tutor_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        species:
+          type: string
+          nullable: true
+          maxLength: 60
+        sex:
+          $ref: "#/components/schemas/Sex"
+        breed:
+          type: string
+          nullable: true
+          maxLength: 60
+        color:
+          type: string
+          nullable: true
+          maxLength: 60
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+
+    UpdatePatientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        species:
+          type: string
+          nullable: true
+          maxLength: 60
+        sex:
+          $ref: "#/components/schemas/Sex"
+        breed:
+          type: string
+          nullable: true
+          maxLength: 60
+        color:
+          type: string
+          nullable: true
+          maxLength: 60
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+
+    PatientListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Patient"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    # -- Location ------------------------------------------------------------
+
+    Location:
+      type: object
+      required: [id, name, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          example: "Clínica Vida Animal"
+        address:
+          type: string
+          nullable: true
+          example: "Rua das Flores, 123 – Goiânia, GO"
+        phone:
+          type: string
+          nullable: true
+          example: "6233334444"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateLocationRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        address:
+          type: string
+          nullable: true
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+
+    UpdateLocationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        address:
+          type: string
+          nullable: true
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+
+    LocationListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Location"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    # -- Appointment ---------------------------------------------------------
+
+    LocationType:
+      type: string
+      enum: [REGISTERED, AD_HOC, HOME_VISIT]
+      description: |
+        REGISTERED = local pré-cadastrado (exige location_id),
+        AD_HOC = local avulso informado na hora (exige ad_hoc_location_name),
+        HOME_VISIT = atendimento domiciliar (home_address é opcional)
+
+    Appointment:
+      type: object
+      required: [id, patient_id, date, location_type, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        patient_id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+          example: "2024-06-15"
+        location_type:
+          $ref: "#/components/schemas/LocationType"
+        location_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Preenchido quando location_type = REGISTERED
+        ad_hoc_location_name:
+          type: string
+          nullable: true
+          description: Preenchido quando location_type = AD_HOC
+        home_address:
+          type: string
+          nullable: true
+          description: Preenchido quando location_type = HOME_VISIT (opcional)
+        weight_kg:
+          type: number
+          format: float
+          nullable: true
+          example: 4.2
+        chief_complaint:
+          type: string
+          nullable: true
+          example: "Vômito há 2 dias"
+        history:
+          type: string
+          nullable: true
+        diagnosis:
+          type: string
+          nullable: true
+        treatment:
+          type: string
+          nullable: true
+        prescription:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    AppointmentDetail:
+      allOf:
+        - $ref: "#/components/schemas/Appointment"
+        - type: object
+          properties:
+            patient:
+              $ref: "#/components/schemas/Patient"
+            location:
+              $ref: "#/components/schemas/Location"
+              nullable: true
+
+    CreateAppointmentRequest:
+      type: object
+      required: [patient_id, date, location_type]
+      properties:
+        patient_id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        location_type:
+          $ref: "#/components/schemas/LocationType"
+        location_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Obrigatório se location_type = REGISTERED
+        ad_hoc_location_name:
+          type: string
+          nullable: true
+          description: Obrigatório se location_type = AD_HOC
+        home_address:
+          type: string
+          nullable: true
+          description: Opcional se location_type = HOME_VISIT
+        weight_kg:
+          type: number
+          format: float
+          nullable: true
+          minimum: 0.1
+          maximum: 30
+        chief_complaint:
+          type: string
+          nullable: true
+          maxLength: 500
+        history:
+          type: string
+          nullable: true
+        diagnosis:
+          type: string
+          nullable: true
+        treatment:
+          type: string
+          nullable: true
+        prescription:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    UpdateAppointmentRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        location_type:
+          $ref: "#/components/schemas/LocationType"
+        location_id:
+          type: string
+          format: uuid
+          nullable: true
+        ad_hoc_location_name:
+          type: string
+          nullable: true
+        home_address:
+          type: string
+          nullable: true
+        weight_kg:
+          type: number
+          format: float
+          nullable: true
+          minimum: 0.1
+          maximum: 30
+        chief_complaint:
+          type: string
+          nullable: true
+          maxLength: 500
+        history:
+          type: string
+          nullable: true
+        diagnosis:
+          type: string
+          nullable: true
+        treatment:
+          type: string
+          nullable: true
+        prescription:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    AppointmentListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Appointment"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    # -- Shared --------------------------------------------------------------
+
+    Pagination:
+      type: object
+      required: [page, per_page, total, total_pages]
+      properties:
+        page:
+          type: integer
+          example: 1
+        per_page:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 45
+        total_pages:
+          type: integer
+          example: 3
+
+    Problem:
+      description: RFC 7807 Problem Details
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "https://gerenciamentofelinos.com.br/errors/validation-error"
+        title:
+          type: string
+          example: "Validation Error"
+        status:
+          type: integer
+          example: 422
+        detail:
+          type: string
+          example: "O campo 'email' deve ser um endereço de e-mail válido."
+        instance:
+          type: string
+          format: uri
+          example: "/v1/users"
+        errors:
+          type: array
+          description: Detalhes por campo (para erros de validação)
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "email"
+              message:
+                type: string
+                example: "Deve ser um e-mail válido"
+
+  # ── RESPONSES ─────────────────────────────────────────────────────────────
+
+  responses:
+    Unauthorized:
+      description: Token ausente, inválido ou expirado
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://gerenciamentofelinos.com.br/errors/unauthorized"
+            title: "Unauthorized"
+            status: 401
+            detail: "Token de acesso inválido ou expirado."
+
+    Forbidden:
+      description: Autenticado, mas sem permissão para este recurso
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://gerenciamentofelinos.com.br/errors/forbidden"
+            title: "Forbidden"
+            status: 403
+            detail: "Você não tem permissão para acessar este recurso."
+
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://gerenciamentofelinos.com.br/errors/not-found"
+            title: "Not Found"
+            status: 404
+            detail: "O recurso solicitado não foi encontrado."
+
+    Conflict:
+      description: Conflito com o estado atual do recurso
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://gerenciamentofelinos.com.br/errors/conflict"
+            title: "Conflict"
+            status: 409
+            detail: "Já existe um cadastro com este e-mail."
+
+    UnprocessableEntity:
+      description: Erro de validação dos dados enviados
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://gerenciamentofelinos.com.br/errors/validation-error"
+            title: "Validation Error"
+            status: 422
+            detail: "Um ou mais campos estão inválidos."
+            errors:
+              - field: "email"
+                message: "Deve ser um e-mail válido"
+              - field: "password"
+                message: "Deve ter pelo menos 8 caracteres"
+
+security:
+  - BearerAuth: []
