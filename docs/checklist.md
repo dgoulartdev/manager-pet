@@ -9,10 +9,10 @@
 - [ ] Subir PostgreSQL local (Docker)
 
 ## 1. Banco de dados
-- [ ] Instalar Prisma no `apps/backend`
-- [ ] Criar `schema.prisma` (a partir da arquitetura v1.3.0)
-- [ ] Rodar primeira migration
-- [ ] Popular seed básico (usuário de teste, opcional)
+- [x] Instalar Prisma no `apps/backend`
+- [x] Criar `schema.prisma` (a partir da arquitetura v1.3.0)
+- [x] Rodar primeira migration
+- [x] Popular seed básico (usuário de teste, opcional)
 
 ## 2. Módulo Auth
 - [ ] `POST /auth/register`

@@ -1,0 +1,178 @@
+// schema.prisma
+// Gerenciamento Felinos — v1.3.0
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// ENUMS
+// ---------------------------------------------------------------------------
+
+enum Sex {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum LocationType {
+  REGISTERED // Local pré-cadastrado (FK para Location)
+  AD_HOC // Local avulso informado na hora
+  HOME_VISIT // Atendimento domiciliar
+}
+
+// ---------------------------------------------------------------------------
+// MODELS
+// ---------------------------------------------------------------------------
+
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  password   String // bcrypt hash
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relações (isolamento multitenant via user_id)
+  tutors         Tutor[]
+  patients       Patient[]
+  locations      Location[]
+  appointments   Appointment[]
+  documents      Document[]
+  refresh_tokens RefreshToken[]
+
+  @@map("users")
+}
+
+model Tutor {
+  id         String   @id @default(uuid())
+  user_id    String
+  name       String
+  phone      String?
+  email      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user     User      @relation(fields: [user_id], references: [id])
+  patients Patient[]
+
+  @@index([user_id])
+  @@map("tutors")
+}
+
+model Patient {
+  id         String    @id @default(uuid())
+  user_id    String
+  tutor_id   String
+  name       String
+  species    String?
+  sex        Sex       @default(UNKNOWN)
+  breed      String?
+  color      String?
+  birth_date DateTime?
+  photo_url  String?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  user         User          @relation(fields: [user_id], references: [id])
+  tutor        Tutor         @relation(fields: [tutor_id], references: [id])
+  appointments Appointment[]
+
+  @@index([user_id])
+  @@index([tutor_id])
+  @@map("patients")
+}
+
+model Location {
+  id         String   @id @default(uuid())
+  user_id    String
+  name       String
+  address    String?
+  phone      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user         User          @relation(fields: [user_id], references: [id])
+  appointments Appointment[]
+
+  @@index([user_id])
+  @@map("locations")
+}
+
+model Appointment {
+  id                   String       @id @default(uuid())
+  user_id              String
+  patient_id           String
+  location_type        LocationType
+  location_id          String? // preenchido se location_type = REGISTERED
+  ad_hoc_location_name String? // preenchido se location_type = AD_HOC
+  home_address         String? // opcional se location_type = HOME_VISIT
+  date                 DateTime
+  weight_kg            Decimal?     @db.Decimal(5, 2)
+  chief_complaint      String?
+  history              String?      @db.Text
+  diagnosis            String?      @db.Text
+  treatment            String?      @db.Text
+  prescription         String?      @db.Text
+  notes                String?      @db.Text
+  created_at           DateTime     @default(now())
+  updated_at           DateTime     @updatedAt
+
+  user      User       @relation(fields: [user_id], references: [id])
+  patient   Patient    @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  location  Location?  @relation(fields: [location_id], references: [id])
+  documents Document[]
+
+  @@index([user_id])
+  @@index([patient_id])
+  @@index([location_id])
+  @@index([date])
+  @@map("appointments")
+}
+
+// ---------------------------------------------------------------------------
+// SEGURANÇA — Refresh tokens persistidos para invalidação real no logout.
+// token_hash armazena o hash do token (nunca o valor bruto).
+// ---------------------------------------------------------------------------
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  user_id    String
+  token_hash String   @unique // SHA-256 do refresh token, nunca o token bruto
+  expires_at DateTime
+  revoked    Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("refresh_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// RESERVADO — Módulo de documentos/exames (pós-MVP)
+// Tabela criada agora para evitar migration com dados em produção no futuro.
+// Nenhum endpoint exposto no MVP.
+// ---------------------------------------------------------------------------
+
+model Document {
+  id             String   @id @default(uuid())
+  user_id        String
+  appointment_id String
+  name           String
+  type           String? // "exame_sangue", "raio_x", "laudo", etc.
+  url            String // URL do arquivo no storage externo (S3/R2)
+  created_at     DateTime @default(now())
+
+  user        User        @relation(fields: [user_id], references: [id])
+  appointment Appointment @relation(fields: [appointment_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([appointment_id])
+  @@map("documents")
+}
