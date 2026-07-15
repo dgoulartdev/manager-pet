@@ -12,3 +12,5 @@ coverage/
 .vscode/*
 !.vscode/extensions.json
 apps/backend/generated/
+.agents
+.claude

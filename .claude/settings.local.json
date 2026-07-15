@@ -22,7 +22,25 @@
       "Bash(docker compose *)",
       "Bash(git add *)",
       "Bash(git config *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(npm approve-builds *)",
+      "Bash(npm pkg *)",
+      "Bash(npm approve-scripts *)",
+      "Bash(npx prisma *)",
+      "Bash(npm view *)",
+      "Bash(npm uninstall *)",
+      "Bash(npx dotenv *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(cat turbo.json)",
+      "Bash(cat package.json)",
+      "Bash(find packages *)",
+      "Bash(cat .env.example)",
+      "Bash(cat tsconfig*.json)",
+      "Bash(grep -iE \"^class-\\(validator|transformer\\)$|^passport|throttler\")",
+      "Bash(npx tsc *)",
+      "Bash(node -e \"const fs=require\\('fs'\\); const s=fs.readFileSync\\('src/common/filters/problem-details.filter.ts','utf8'\\); const line=s.split\\('\\\\n'\\).find\\(l=>l.includes\\('replace'\\)&&l.includes\\('normalize'\\)===false&&l.includes\\('NFD'\\)===false\\); console.log\\(JSON.stringify\\(s.split\\('\\\\n'\\)[24]\\)\\);\")",
+      "Bash(node -e ' *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\dgoul\\OneDrive\\Documentos\\Gerenciamento Felino\\apps\\backend\\src"
