@@ -15,15 +15,15 @@
 - [x] Popular seed básico (usuário de teste, opcional)
 
 ## 2. Módulo Auth
-- [ ] `POST /auth/register`
-- [ ] `POST /auth/login`
-- [ ] `POST /auth/refresh`
-- [ ] `POST /auth/logout`
-- [ ] `POST /auth/forgot-password`
-- [ ] `POST /auth/reset-password`
-- [ ] Guard JWT global + estratégia refresh token com hash
-- [ ] Rate limiting nos endpoints de auth
-- [ ] Testar fluxo completo (Postman/Insomnia)
+- [x] `POST /auth/register`
+- [x] `POST /auth/login`
+- [x] `POST /auth/refresh`
+- [x] `POST /auth/logout`
+- [x] `POST /auth/forgot-password`
+- [x] `POST /auth/reset-password`
+- [x] Guard JWT global + estratégia refresh token com hash
+- [x] Rate limiting nos endpoints de auth
+- [x] Testar fluxo completo (curl — ver `docs/architecture.md`/README)
 
 ## 3. Módulo Users
 - [ ] `GET /users/me`

@@ -101,8 +101,33 @@ O `.env` fica na raiz do monorepo e é carregado pelos scripts do backend via `d
 - [x] `schema.prisma` completo com os modelos da arquitetura v1.3.0 (`User`, `Tutor`, `Patient`, `Location`, `Appointment`, `RefreshToken`, `Document` reservado)
 - [x] Primeira migration (`init`) aplicada no banco
 - [x] Seed básico com usuário, tutor e paciente de teste
+- [x] **Módulo Auth completo** — register, login, refresh, logout, forgot/reset-password, guard JWT global, rate limiting (ver detalhes abaixo)
 
-### Decisões arquiteturais desta etapa
+### Módulo Auth
+
+Endpoints (`/v1/auth/*`, todos conforme `docs/openapi.yaml`):
+
+| Rota | Auth necessária | Rate limit |
+|---|---|---|
+| `POST /auth/register` | Não | 5/min |
+| `POST /auth/login` | Não | 10/min |
+| `POST /auth/refresh` | Não | 20/min |
+| `POST /auth/forgot-password` | Não | 5/min |
+| `POST /auth/reset-password` | Não | 5/min |
+| `POST /auth/logout` | Sim (Bearer access token) | — |
+
+Decisões desta etapa:
+
+- **`PasswordResetToken` — tabela nova, não prevista na arquitetura v1.3.0.** O schema aprovado não tinha onde persistir o token de recuperação de senha. Foi criada seguindo o mesmo padrão do `RefreshToken` (ADR-006): só o hash SHA-256 do token fica no banco, nunca o valor bruto, e o token é marcado `used` após o reset. Decisão confirmada com o usuário antes da migration.
+- **Access e refresh tokens são JWTs assinados com segredos separados** (`JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET`, já previstos no `.env.example`). O refresh token, além de assinado, tem seu hash persistido em `refresh_tokens` — o `/auth/refresh` verifica a assinatura **e** a existência/validade no banco antes de rotacionar (token antigo é revogado, um novo é emitido).
+- **`/auth/logout` revoga todos os refresh tokens ativos do usuário.** A rota não recebe corpo na spec (`docs/openapi.yaml`), então não há como indicar "qual" sessão encerrar — encerrar todas é o comportamento mais seguro para o MVP (single-user).
+- **`/auth/reset-password` também revoga todos os refresh tokens do usuário** ao trocar a senha, por segurança (uma sessão previamente aberta não sobrevive à troca de senha).
+- **`/auth/forgot-password` não envia e-mail de verdade** — não há provedor de e-mail configurado ainda no MVP. Sempre responde 200 (para não revelar se o e-mail existe, conforme a spec) e, se o e-mail existir, loga o link/token no console do backend para uso manual em desenvolvimento.
+- **`JwtAuthGuard` é global** (`APP_GUARD`), registrado dentro do próprio `AuthModule`. Rotas públicas usam `@Public()`; `@CurrentUser()` expõe o usuário autenticado (id extraído do JWT) nos controllers.
+- **Rate limiting (`@nestjs/throttler`) é aplicado só no `AuthController`**, não globalmente — os demais módulos ainda não têm requisitos de rate limit definidos.
+- **`ValidationPipe` global + filtro RFC 7807 (`application/problem+json`)** foram adicionados como pré-requisito para o Auth responder no formato definido em `docs/openapi.yaml` (erros com `type`/`title`/`status`/`detail`/`errors[]`). Cobre todo o app, não só Auth — é infraestrutura transversal mínima necessária, o hardening completo do item 8 do checklist (ownership, etc.) continua pendente.
+
+### Decisões arquiteturais anteriores
 
 - **Prisma fixado em 6.19.3, não 7.x**: a v7 remove o suporte a `datasource.url` diretamente no `schema.prisma` (exige adapters de driver), quebrando a sintaxe já aprovada em `docs/architecture.md` v1.3.0. Fixar em 6.x evita reescrever a arquitetura aprovada por causa de uma dependência.
 - **Schema em `apps/backend/src/prisma/schema.prisma`**: segue a estrutura de pastas definida em `docs/architecture.md`, mantendo tudo relativo ao Prisma dentro do módulo de backend.
@@ -113,13 +138,12 @@ O `.env` fica na raiz do monorepo e é carregado pelos scripts do backend via `d
 
 Com base no restante de `docs/checklist.md`:
 
-1. **Módulo Auth** — registro, login, refresh, logout, recuperação de senha, guard JWT global, rate limiting.
-2. **Módulo Users** — perfil do usuário autenticado.
-3. **Módulo Tutors** — CRUD completo.
-4. **Módulo Locations** — CRUD completo.
-5. **Módulo Patients** — CRUD, foto, estratégia de storage.
-6. **Módulo Appointments** — CRUD, regras de `location_type`.
-7. **Validação e erros transversais** — `ValidationPipe` global, exception filter RFC 7807, checagem de ownership.
-8. **Testes** — unitários (auth, appointments) e e2e dos fluxos principais.
-9. **Frontend (PWA)** — setup React, telas de login, pacientes, atendimentos, tutores/locais, perfil.
-10. **Pré-lançamento** — placeholders legais, hosting, deploy de staging, teste piloto.
+1. **Módulo Users** — perfil do usuário autenticado.
+2. **Módulo Tutors** — CRUD completo.
+3. **Módulo Locations** — CRUD completo.
+4. **Módulo Patients** — CRUD, foto, estratégia de storage.
+5. **Módulo Appointments** — CRUD, regras de `location_type`.
+6. **Validação e erros transversais** — checagem de ownership em todas as queries (o `ValidationPipe` global e o exception filter RFC 7807 já foram implementados junto com o Auth).
+7. **Testes** — unitários (auth, appointments) e e2e dos fluxos principais.
+8. **Frontend (PWA)** — setup React, telas de login, pacientes, atendimentos, tutores/locais, perfil.
+9. **Pré-lançamento** — placeholders legais, hosting, deploy de staging, teste piloto.
