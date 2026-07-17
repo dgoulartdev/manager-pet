@@ -8,7 +8,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { AuthenticatedUser } from './guards/jwt-auth.guard';
+import { AuthenticatedUser } from '../../common/types/authenticated-user';
 
 @UseGuards(ThrottlerGuard)
 @Controller('auth')

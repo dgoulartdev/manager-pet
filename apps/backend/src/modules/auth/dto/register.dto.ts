@@ -1,5 +1,6 @@
 import { IsEmail, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import type { RegisterRequest } from '@felino/shared';
+import { NormalizeEmail } from '../../../common/decorators/normalize-email.decorator';
 
 export class RegisterDto implements RegisterRequest {
   @IsString()
@@ -7,6 +8,7 @@ export class RegisterDto implements RegisterRequest {
   @MaxLength(120)
   name!: string;
 
+  @NormalizeEmail()
   @IsEmail()
   email!: string;
 

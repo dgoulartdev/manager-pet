@@ -4,7 +4,9 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 
 const TITLES_BY_STATUS: Record<number, string> = {
@@ -27,24 +29,30 @@ function slug(title: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
-@Catch(HttpException)
+interface ResolvedError {
+  status: number;
+  detail: string;
+  errors?: unknown;
+}
+
+@Catch()
 export class ProblemDetailsFilter implements ExceptionFilter {
-  catch(exception: HttpException, host: ArgumentsHost) {
+  private readonly logger = new Logger(ProblemDetailsFilter.name);
+
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const status = exception.getStatus();
-    const body = exception.getResponse();
 
-    const title = TITLES_BY_STATUS[status] ?? exception.name;
-    let detail = exception.message;
-    let errors: unknown;
+    const { status, detail, errors } = this.resolve(exception);
+    const title = TITLES_BY_STATUS[status] ?? 'Error';
 
-    if (typeof body === 'object' && body !== null) {
-      const record = body as Record<string, unknown>;
-      if (typeof record.detail === 'string') detail = record.detail;
-      else if (typeof record.message === 'string') detail = record.message;
-      if (Array.isArray(record.errors)) errors = record.errors;
+    // Erros 5xx: registra a causa real no servidor sem expor ao cliente.
+    if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      this.logger.error(
+        `${request.method} ${request.originalUrl}`,
+        exception instanceof Error ? exception.stack : String(exception),
+      );
     }
 
     response
@@ -58,5 +66,43 @@ export class ProblemDetailsFilter implements ExceptionFilter {
         instance: request.originalUrl,
         ...(errors ? { errors } : {}),
       });
+  }
+
+  private resolve(exception: unknown): ResolvedError {
+    if (exception instanceof HttpException) {
+      const status = exception.getStatus();
+      const body = exception.getResponse();
+      let detail = exception.message;
+      let errors: unknown;
+
+      if (typeof body === 'object' && body !== null) {
+        const record = body as Record<string, unknown>;
+        if (typeof record.detail === 'string') detail = record.detail;
+        else if (typeof record.message === 'string') detail = record.message;
+        if (Array.isArray(record.errors)) errors = record.errors;
+      }
+
+      return { status, detail, errors };
+    }
+
+    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      if (exception.code === 'P2002') {
+        return {
+          status: HttpStatus.CONFLICT,
+          detail: 'Já existe um registro com esse valor único.',
+        };
+      }
+      if (exception.code === 'P2025') {
+        return {
+          status: HttpStatus.NOT_FOUND,
+          detail: 'O recurso solicitado não foi encontrado.',
+        };
+      }
+    }
+
+    return {
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      detail: 'Erro interno do servidor.',
+    };
   }
 }

@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcryptjs';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import type { StringValue } from 'ms';
 import type { AuthResponse, UserDto } from '@felino/shared';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -26,15 +26,23 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
-    const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (existing) {
-      throw new ConflictException('Já existe um cadastro com este e-mail.');
-    }
-
     const passwordHash = await hash(dto.password, 10);
-    const user = await this.prisma.user.create({
-      data: { name: dto.name, email: dto.email, password: passwordHash },
-    });
+
+    let user: User;
+    try {
+      user = await this.prisma.user.create({
+        data: { name: dto.name, email: dto.email, password: passwordHash },
+      });
+    } catch (error) {
+      // P2002 = violação de unique (email). Trata a corrida sem pré-check TOCTOU.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException('Já existe um cadastro com este e-mail.');
+      }
+      throw error;
+    }
 
     return this.issueTokens(user);
   }
@@ -97,8 +105,10 @@ export class AuthService {
       },
     });
 
-    // MVP: sem provedor de e-mail configurado ainda. Log local para uso manual em dev.
-    console.log(`[auth] Link de recuperação de senha para ${email}: token=${rawToken}`);
+    // MVP: sem provedor de e-mail ainda. Log só fora de produção para não vazar token.
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[auth] Link de recuperação de senha para ${email}: token=${rawToken}`);
+    }
   }
 
   async resetPassword(dto: ResetPasswordDto): Promise<void> {

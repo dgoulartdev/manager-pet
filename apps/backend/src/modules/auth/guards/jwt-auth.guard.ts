@@ -9,10 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../../../common/decorators/public.decorator';
-
-export interface AuthenticatedUser {
-  id: string;
-}
+import { AuthenticatedUser } from '../../../common/types/authenticated-user';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
