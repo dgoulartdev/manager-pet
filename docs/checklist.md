@@ -1,12 +1,12 @@
 # Checklist — Gerenciamento Felinos (MVP)
 
 ## 0. Setup do monorepo
-- [ ] Criar repo Git
-- [ ] Inicializar Turborepo (`apps/backend`, `apps/frontend`, `packages/shared`)
-- [ ] Configurar TypeScript compartilhado (tsconfig base)
-- [ ] Configurar lint/prettier no monorepo
-- [ ] Configurar `.env` e `.env.example`
-- [ ] Subir PostgreSQL local (Docker)
+- [x] Criar repo Git
+- [x] Inicializar Turborepo (`apps/backend`, `apps/frontend`, `packages/shared`)
+- [x] Configurar TypeScript compartilhado (tsconfig base)
+- [x] Configurar lint/prettier no monorepo
+- [x] Configurar `.env` e `.env.example`
+- [x] Subir PostgreSQL local (Docker)
 
 ## 1. Banco de dados
 - [x] Instalar Prisma no `apps/backend`
@@ -63,8 +63,8 @@
 - [ ] Validar regras de `location_type` (REGISTERED/AD_HOC/HOME_VISIT)
 
 ## 8. Validação e erros transversais
-- [ ] `ValidationPipe` global
-- [ ] Exception filter no formato RFC 7807
+- [x] `ValidationPipe` global
+- [x] Exception filter no formato RFC 7807 (catch-all + mapeamento Prisma)
 - [ ] Checagem de ownership (`user_id`) em todas as queries
 
 ## 9. Testes

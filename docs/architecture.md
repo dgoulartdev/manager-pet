@@ -130,7 +130,7 @@ gerenciamento-felinos/
 
 ```prisma
 // schema.prisma
-// Gerenciamento Felinos — v1.2.0
+// Gerenciamento Felinos — v1.3.0
 
 generator client {
   provider = "prisma-client-js"
@@ -176,6 +176,7 @@ model User {
   appointments    Appointment[]
   documents       Document[]
   refresh_tokens  RefreshToken[]
+  password_reset_tokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -286,6 +287,25 @@ model RefreshToken {
 }
 
 // ---------------------------------------------------------------------------
+// SEGURANÇA — Tokens de recuperação de senha, mesmo padrão do RefreshToken
+// (ADR-006): token_hash armazena o hash do token, nunca o valor bruto.
+// ---------------------------------------------------------------------------
+
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+  user_id    String
+  token_hash String   @unique  // SHA-256 do token de reset, nunca o token bruto
+  expires_at DateTime
+  used       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("password_reset_tokens")
+}
+
+// ---------------------------------------------------------------------------
 // RESERVADO — Módulo de documentos/exames (pós-MVP)
 // Tabela criada agora para evitar migration com dados em produção no futuro.
 // Nenhum endpoint exposto no MVP.
@@ -318,7 +338,7 @@ model Document {
 - **Paginação:** offset-based com `page`, `per_page`, `total`, `total_pages`
 - **Rotas planas com query params:** ex. `/appointments?patient_id=X` em vez de `/patients/:id/appointments`
 - **Convenção de nomes:** `snake_case` nos JSON, alinhado com Prisma
-- **Spec completa:** `docs/specs/openapi.yaml` (OpenAPI 3.1, 27 endpoints, 6 módulos)
+- **Spec completa:** `docs/openapi.yaml` (OpenAPI 3.1, 27 endpoints, 6 módulos)
 
 ---
 
