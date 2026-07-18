@@ -26,9 +26,9 @@
 - [x] Testar fluxo completo (curl — ver `docs/architecture.md`/README)
 
 ## 3. Módulo Users
-- [ ] `GET /users/me`
-- [ ] `PATCH /users/me`
-- [ ] `PATCH /users/me/password`
+- [x] `GET /users/me`
+- [x] `PATCH /users/me`
+- [x] `PATCH /users/me/password`
 
 ## 4. Módulo Tutors
 - [ ] `GET /tutors` (paginado + busca)
