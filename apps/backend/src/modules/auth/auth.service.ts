@@ -9,8 +9,9 @@ import { compare, hash } from 'bcryptjs';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { Prisma, User } from '@prisma/client';
 import type { StringValue } from 'ms';
-import type { AuthResponse, UserDto } from '@felino/shared';
+import type { AuthResponse } from '@felino/shared';
 import { PrismaService } from '../../prisma/prisma.service';
+import { toUserDto } from '../../common/mappers/user.mapper';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -165,21 +166,11 @@ export class AuthService {
     return {
       access_token: accessToken,
       refresh_token: refreshToken,
-      user: this.toUserDto(user),
+      user: toUserDto(user),
     };
   }
 
   private hashToken(token: string): string {
     return createHash('sha256').update(token).digest('hex');
-  }
-
-  private toUserDto(user: User): UserDto {
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      created_at: user.created_at.toISOString(),
-      updated_at: user.updated_at.toISOString(),
-    };
   }
 }
