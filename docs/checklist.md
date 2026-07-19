@@ -38,11 +38,11 @@
 - [x] `DELETE /tutors/:id` (bloquear se tiver pacientes)
 
 ## 5. Módulo Locations
-- [ ] `GET /locations`
-- [ ] `POST /locations`
-- [ ] `GET /locations/:id`
-- [ ] `PATCH /locations/:id`
-- [ ] `DELETE /locations/:id` (bloquear se referenciado)
+- [x] `GET /locations`
+- [x] `POST /locations`
+- [x] `GET /locations/:id`
+- [x] `PATCH /locations/:id`
+- [x] `DELETE /locations/:id` (bloquear se referenciado)
 
 ## 6. Módulo Patients
 - [ ] `GET /patients` (paginado, busca, filtro por tutor)
