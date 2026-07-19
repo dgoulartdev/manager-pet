@@ -31,11 +31,11 @@
 - [x] `PATCH /users/me/password`
 
 ## 4. Módulo Tutors
-- [ ] `GET /tutors` (paginado + busca)
-- [ ] `POST /tutors`
-- [ ] `GET /tutors/:id`
-- [ ] `PATCH /tutors/:id`
-- [ ] `DELETE /tutors/:id` (bloquear se tiver pacientes)
+- [x] `GET /tutors` (paginado + busca)
+- [x] `POST /tutors`
+- [x] `GET /tutors/:id`
+- [x] `PATCH /tutors/:id`
+- [x] `DELETE /tutors/:id` (bloquear se tiver pacientes)
 
 ## 5. Módulo Locations
 - [ ] `GET /locations`
