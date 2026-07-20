@@ -5,6 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { TutorsModule } from './modules/tutors/tutors.module';
 import { LocationsModule } from './modules/locations/locations.module';
+import { PatientsModule } from './modules/patients/patients.module';
 import { validateEnv } from './config/env.validation';
 
 @Module({
@@ -18,6 +19,7 @@ import { validateEnv } from './config/env.validation';
     UsersModule,
     TutorsModule,
     LocationsModule,
+    PatientsModule,
   ],
 })
 export class AppModule {}
