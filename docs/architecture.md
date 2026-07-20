@@ -489,6 +489,31 @@ Persistir o hash SHA-256 de cada refresh token na tabela `refresh_tokens`. O val
 
 ---
 
+### ADR-007: Storage de foto de paciente atrás de uma interface, disco local no MVP
+
+**Status:** Aceito
+
+**Contexto:**
+O endpoint `PUT /patients/{id}/photo` recebe upload multipart e deve devolver uma `photo_url`. A arquitetura deixou o storage em aberto (URL externa ou base64 temporário; storage real pós-MVP). A intenção declarada é migrar para object storage (Cloudflare R2 / S3) no futuro, mas montar isso agora exige conta, credenciais e dependência de SDK antes do necessário.
+
+**Decisão:**
+Definir a interface `PatientPhotoStorage` (`save`/`remove`) como fronteira do módulo Patients. No MVP, a implementação é `LocalDiskPatientPhotoStorage`: multer usa MemoryStorage e o buffer é gravado em `apps/backend/uploads/patients/<patientId>.<ext>`, servido estaticamente em `/uploads/`. A `photo_url` é montada a partir de `PUBLIC_URL` (ou `http://localhost:$PORT`). Um provider R2/S3 no pós-MVP é uma nova classe que implementa a mesma interface + troca do binding no `PatientsModule` — o service não muda.
+
+**Consequências positivas:**
+- Feature completa e fiel ao contrato OpenAPI já no MVP (upload real → URL)
+- Migração para R2/S3 é localizada (um provider + uma linha no módulo)
+- Multer em memória entrega o buffer direto ao provider (R2 futuro sem tocar disco)
+
+**Consequências negativas:**
+- Disco é efêmero em PaaS sem volume persistente: a foto some no redeploy. Aceitável para o piloto de teste; host com volume ou R2 resolve.
+- Arquivos servidos pelo próprio backend (sem CDN) — irrelevante na escala do MVP
+
+**Alternativas rejeitadas:**
+- Base64 no banco: sobrevive a redeploy, mas infla banco/payload e seria descartado por inteiro ao migrar para R2 (a interface de disco é o degrau natural para object storage)
+- R2/S3 agora: correto para produção, mas antecipa infraestrutura que a trajetória define como pós-MVP
+
+---
+
 ## 10. Visão de Produto e Princípios de Desenvolvimento
 
 ### 10.1 Problema que o sistema resolve
@@ -537,6 +562,6 @@ Estes princípios governam decisões cotidianas e devem ser consultados antes de
 |---|---|---|---|
 | Scope creep no MVP | Alta | Alto | Lista "fora do MVP" documentada e revisada antes de cada nova feature |
 | Fronteiras de módulo violadas | Média | Médio | Code review pessoal antes de merge; módulos só se comunicam via interfaces públicas |
-| Storage para fotos sem definição | Baixa | Baixo | MVP pode usar URL externa ou base64 temporariamente; storage real é pós-MVP |
+| Storage para fotos sem definição | Baixa | Baixo | Resolvido: interface `PatientPhotoStorage` com disco local no MVP; swap para R2/S3 no pós-MVP (ADR-007) |
 | Migration traumática pós-MVP | Baixa | Alto | Tabelas reservadas (Document, RefreshToken) e `user_id` em todas as entidades desde o início |
 | Logout ineficaz / token roubado | Baixa | Alto | Refresh tokens persistidos com hash; revogação imediata no logout (ADR-006) |

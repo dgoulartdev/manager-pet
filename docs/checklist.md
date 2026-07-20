@@ -45,14 +45,14 @@
 - [x] `DELETE /locations/:id` (bloquear se referenciado)
 
 ## 6. Módulo Patients
-- [ ] `GET /patients` (paginado, busca, filtro por tutor)
-- [ ] `POST /patients`
-- [ ] `GET /patients/:id`
-- [ ] `PATCH /patients/:id`
-- [ ] `DELETE /patients/:id` (cascade em atendimentos)
-- [ ] `PUT /patients/:id/photo`
-- [ ] `DELETE /patients/:id/photo`
-- [ ] Definir estratégia de storage de foto (mesmo que temporária)
+- [x] `GET /patients` (paginado, busca, filtro por tutor)
+- [x] `POST /patients`
+- [x] `GET /patients/:id`
+- [x] `PATCH /patients/:id`
+- [x] `DELETE /patients/:id` (cascade em atendimentos)
+- [x] `PUT /patients/:id/photo`
+- [x] `DELETE /patients/:id/photo`
+- [x] Definir estratégia de storage de foto (mesmo que temporária) — ADR-007
 
 ## 7. Módulo Appointments
 - [ ] `GET /appointments` (paginado, filtros: patient_id, location_id, date_from/to)
