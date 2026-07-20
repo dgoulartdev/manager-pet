@@ -15,6 +15,7 @@ const TITLES_BY_STATUS: Record<number, string> = {
   [HttpStatus.FORBIDDEN]: 'Forbidden',
   [HttpStatus.NOT_FOUND]: 'Not Found',
   [HttpStatus.CONFLICT]: 'Conflict',
+  [HttpStatus.PAYLOAD_TOO_LARGE]: 'Payload Too Large',
   [HttpStatus.UNPROCESSABLE_ENTITY]: 'Validation Error',
   [HttpStatus.TOO_MANY_REQUESTS]: 'Too Many Requests',
   [HttpStatus.INTERNAL_SERVER_ERROR]: 'Internal Server Error',
@@ -98,6 +99,22 @@ export class ProblemDetailsFilter implements ExceptionFilter {
           detail: 'O recurso solicitado não foi encontrado.',
         };
       }
+    }
+
+    // Erros do multer (upload) não são HttpException. Mapeados aqui por nome
+    // para não virarem 500 genérico. @types/multer não é instalado no projeto.
+    if (exception instanceof Error && exception.name === 'MulterError') {
+      const code = (exception as { code?: string }).code;
+      if (code === 'LIMIT_FILE_SIZE') {
+        return {
+          status: HttpStatus.PAYLOAD_TOO_LARGE,
+          detail: 'Imagem excede o tamanho máximo de 5MB.',
+        };
+      }
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        detail: 'Falha no upload do arquivo.',
+      };
     }
 
     return {
