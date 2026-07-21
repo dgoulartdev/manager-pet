@@ -1,0 +1,14 @@
+{
+  "rootDir": ".",
+  "testRegex": ".*\\.e2e-spec\\.ts$",
+  "transform": {
+    "^.+\\.ts$": [
+      "ts-jest",
+      { "diagnostics": { "ignoreCodes": [151002] } }
+    ]
+  },
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "testEnvironment": "node",
+  "globalSetup": "<rootDir>/setup-e2e.ts",
+  "globalTeardown": "<rootDir>/teardown-e2e.ts"
+}

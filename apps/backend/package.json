@@ -8,6 +8,8 @@
     "start": "node dist/main.js",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:e2e": "dotenv -e ../../.env -- jest --config test/jest-e2e.json --runInBand",
     "db:generate": "dotenv -e ../../.env -- prisma generate",
     "db:migrate": "dotenv -e ../../.env -- prisma migrate dev",
     "db:migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
@@ -35,14 +37,37 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.5",
+    "@nestjs/testing": "^10.4.22",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.7.5",
+    "@types/supertest": "^6.0.3",
     "dotenv-cli": "^11.0.0",
     "jest": "^29.7.0",
     "prisma": "^6.19.3",
+    "supertest": "^7.2.2",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
+  },
+  "jest": {
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.ts$": [
+        "ts-jest",
+        { "diagnostics": { "ignoreCodes": [151002] } }
+      ]
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "testEnvironment": "node"
   }
 }
