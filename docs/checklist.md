@@ -55,21 +55,21 @@
 - [x] Definir estratégia de storage de foto (mesmo que temporária) — ADR-007
 
 ## 7. Módulo Appointments
-- [ ] `GET /appointments` (paginado, filtros: patient_id, location_id, date_from/to)
-- [ ] `POST /appointments`
-- [ ] `GET /appointments/:id`
-- [ ] `PATCH /appointments/:id`
-- [ ] `DELETE /appointments/:id`
-- [ ] Validar regras de `location_type` (REGISTERED/AD_HOC/HOME_VISIT)
+- [x] `GET /appointments` (paginado, filtros: patient_id, location_id, date_from/to)
+- [x] `POST /appointments`
+- [x] `GET /appointments/:id`
+- [x] `PATCH /appointments/:id`
+- [x] `DELETE /appointments/:id`
+- [x] Validar regras de `location_type` (REGISTERED/AD_HOC/HOME_VISIT)
 
 ## 8. Validação e erros transversais
 - [x] `ValidationPipe` global
 - [x] Exception filter no formato RFC 7807 (catch-all + mapeamento Prisma)
-- [ ] Checagem de ownership (`user_id`) em todas as queries
+- [x] Checagem de ownership (`user_id`) em todas as queries
 
 ## 9. Testes
-- [ ] Testes unitários dos services críticos (auth, appointments)
-- [ ] Testes e2e dos fluxos principais (register→login→CRUD→logout)
+- [x] Testes unitários dos services críticos (auth, appointments)
+- [x] Testes e2e dos fluxos principais (register→login→CRUD→logout)
 
 ## 10. Frontend (PWA)
 - [ ] Setup do projeto React + PWA
