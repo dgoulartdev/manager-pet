@@ -1392,7 +1392,7 @@ components:
           format: float
           nullable: true
           minimum: 0.1
-          maximum: 30
+          maximum: 100
         chief_complaint:
           type: string
           nullable: true
@@ -1436,7 +1436,7 @@ components:
           format: float
           nullable: true
           minimum: 0.1
-          maximum: 30
+          maximum: 100
         chief_complaint:
           type: string
           nullable: true

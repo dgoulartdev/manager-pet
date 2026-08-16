@@ -9,7 +9,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { LocationType, type UpdateAppointmentRequest } from '@felino/shared';
+import { LocationType, type UpdateAppointmentRequest } from '@meupaciente/shared';
 
 export class UpdateAppointmentDto implements UpdateAppointmentRequest {
   @IsOptional()
@@ -37,7 +37,7 @@ export class UpdateAppointmentDto implements UpdateAppointmentRequest {
   @IsOptional()
   @IsNumber()
   @Min(0.1)
-  @Max(30)
+  @Max(100)
   weight_kg?: number | null;
 
   @IsOptional()

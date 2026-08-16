@@ -9,7 +9,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { LocationType, type CreateAppointmentRequest } from '@felino/shared';
+import { LocationType, type CreateAppointmentRequest } from '@meupaciente/shared';
 
 export class CreateAppointmentDto implements CreateAppointmentRequest {
   @IsUUID()
@@ -38,7 +38,7 @@ export class CreateAppointmentDto implements CreateAppointmentRequest {
   @IsOptional()
   @IsNumber()
   @Min(0.1)
-  @Max(30)
+  @Max(100)
   weight_kg?: number | null;
 
   @IsOptional()
