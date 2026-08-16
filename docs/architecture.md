@@ -1,18 +1,18 @@
-# Arquitetura — Gerenciamento Felinos
+# Arquitetura — MeuPaciente
 
-**Versão:** 1.3.0
-**Data:** 2026-07-05
+**Versão:** 1.4.0
+**Data:** 2026-08-15
 **Status:** Aprovado — pronto para implementação
 
 ---
 
 ## 1. Visão Geral do Produto
 
-Sistema de prontuário veterinário focado em profissionais autônomos especialistas em felinos. O veterinário registra e consulta o histórico completo dos seus pacientes, independente do local onde o atendimento foi realizado.
+MeuPaciente é uma plataforma de prontuário veterinário para profissionais autônomos, com suporte inicial a pacientes cães e gatos. O veterinário registra e consulta o histórico completo dos seus pacientes, independente do local onde o atendimento foi realizado.
 
-**Problema resolvido:** Veterinários autônomos gerenciam informações de pacientes de forma fragmentada (WhatsApp, planilhas, PDFs, sistemas de clínicas parceiras). O sistema centraliza tudo em um prontuário próprio e portátil.
+**Problema resolvido:** Veterinários autônomos gerenciam informações de pacientes de forma fragmentada (WhatsApp, planilhas, PDFs, sistemas de clínicas parceiras). O MeuPaciente centraliza tudo em um prontuário próprio e portátil.
 
-**Público-alvo inicial:** Veterinário autônomo especialista em felinos que atende em clínicas parceiras, consultórios e domicílios.
+**Público-alvo inicial:** Veterinário autônomo que atende cães e gatos em clínicas parceiras, consultórios e domicílios.
 
 ---
 
@@ -21,7 +21,7 @@ Sistema de prontuário veterinário focado em profissionais autônomos especiali
 ### Incluído
 
 - Autenticação (cadastro, login, recuperação de senha)
-- Cadastro de pacientes (felinos) com foto
+- Cadastro de pacientes (cães e gatos) com foto
 - Cadastro de tutores (donos dos animais)
 - Cadastro de locais de atendimento
 - Registro de atendimentos veterinários completos
@@ -89,7 +89,7 @@ Financeiro, estoque, agenda, gestão de clínica, funcionários, portal do tutor
 ### Estrutura de pastas
 
 ```
-gerenciamento-felinos/
+meupaciente/
 ├── apps/
 │   ├── backend/
 │   │   └── src/
@@ -329,6 +329,12 @@ model Document {
 }
 ```
 
+### 6.1 Representação do paciente e da espécie
+
+A hierarquia do domínio é: **MeuPaciente → Paciente → Espécie → Cão ou Gato**.
+
+O `Patient` já é uma entidade genérica — não existe uma tabela ou tipo "Felino" no schema. A espécie é apenas uma característica do paciente: o campo `species` é texto livre (`String?`), não um enum fechado. Os valores inicialmente esperados são `"Cão"` e `"Gato"`, mas o campo não impõe essa lista — nenhuma migration é necessária para o sistema aceitar outras espécies no futuro. Essa é uma decisão de modelagem que já existia antes do rebranding (ver ADR-008); a generalização do domínio aproveita essa escolha em vez de exigir uma reestruturação.
+
 ---
 
 ## 7. Padrões de API
@@ -514,13 +520,38 @@ Definir a interface `PatientPhotoStorage` (`save`/`remove`) como fronteira do m�
 
 ---
 
+### ADR-008: Rebranding para MeuPaciente e generalização de espécie
+
+**Status:** Aceito
+
+**Contexto:**
+O sistema foi concebido e documentado como "Gerenciamento Felinos", com público-alvo restrito a veterinários especialistas em felinos. A visão de produto evoluiu: o sistema passa a atender veterinários autônomos que tratam cães e gatos desde o início, mantendo a mesma base técnica.
+
+**Decisão:**
+O projeto passa a se chamar **MeuPaciente**. O conceito central do domínio continua sendo o Paciente (`Patient`), que já representa qualquer animal atendido pelo sistema sem estrutura exclusiva de felino. A espécie do paciente é tratada como uma característica (campo `species`, texto livre) e não uma limitação estrutural: os valores inicialmente suportados são "Cão" e "Gato", mas o campo aceita qualquer valor sem exigir alteração de schema (ver seção 6.1). Nenhuma entidade, relacionamento ou regra de negócio foi alterada — a generalização aproveita uma decisão de modelagem que já existia.
+
+**Consequências positivas:**
+- O rebranding não exige migration de banco: `species` já era `String?` livre.
+- Expansão para outras espécies no futuro continua sem exigir reconstrução do domínio.
+- Documentação (arquitetura, OpenAPI) passa a refletir com precisão o escopo real do produto.
+
+**Consequências negativas:**
+- Identificadores técnicos já existentes (nome do pacote npm, container Docker, volume, domínio usado em URLs de erro) ainda carregam o nome antigo até uma etapa futura de atualização de código e infraestrutura — inconsistência temporária entre documentação e artefatos técnicos.
+- Textos específicos de "felino" em código (comentários, seeds, testes, exemplos) precisam de revisão própria antes do rebranding estar completo de ponta a ponta.
+
+**Alternativas rejeitadas:**
+- Criar uma entidade `Species` separada ou um enum fechado (`DOG`/`CAT`): rejeitado por introduzir uma regra de negócio nova (validação estrutural de espécie) que o MVP nunca exigiu — o campo texto livre já resolve o problema sem essa complexidade.
+- Manter o nome "Gerenciamento Felinos" e apenas ampliar o público-alvo na descrição: rejeitado porque o nome por si só comunica um escopo exclusivo a gatos, contradizendo o novo posicionamento.
+
+---
+
 ## 10. Visão de Produto e Princípios de Desenvolvimento
 
 ### 10.1 Problema que o sistema resolve
 
 Veterinários autônomos gerenciam informações de pacientes de forma fragmentada — WhatsApp, planilhas, PDFs, anotações pessoais e sistemas das clínicas onde atendem. Isso gera dificuldade para consultar histórico clínico rapidamente, acompanhar a evolução do paciente e manter um prontuário próprio independente do local de atendimento.
 
-O Gerenciamento Felinos centraliza o prontuário no profissional, não na clínica. O veterinário carrega sua base de pacientes para onde for.
+O MeuPaciente centraliza o prontuário no profissional, não na clínica. O veterinário carrega sua base de pacientes para onde for.
 
 ### 10.2 Posicionamento de produto
 
@@ -534,13 +565,13 @@ As decisões arquiteturais do MVP foram tomadas antecipando a seguinte evoluçã
 
 | Fase | Expansão planejada |
 |---|---|
-| MVP | Veterinário autônomo felino, usuário único |
+| MVP | Veterinário autônomo, pacientes cães e gatos, usuário único |
 | Pós-MVP imediato | Upload de documentos e exames (tabela `Document` já reservada) |
-| Futuro | Outras espécies além de felinos |
+| Futuro | Outras espécies além de cães e gatos |
 | Futuro | Multiusuários — equipes veterinárias pequenas |
 | Futuro | Recursos avançados (agenda, financeiro básico, portal do tutor) |
 
-Decisões que já refletem essa trajetória: `user_id` em todas as entidades (multitenancy), tabela `Document` reservada, fronteiras de módulo limpas no NestJS (extração futura viável).
+Decisões que já refletem essa trajetória: `user_id` em todas as entidades (multitenancy), tabela `Document` reservada, fronteiras de módulo limpas no NestJS (extração futura viável), campo `species` como texto livre em vez de estrutura fechada por espécie.
 
 ### 10.4 Princípios de desenvolvimento
 

@@ -1,4 +1,4 @@
-# Checklist — Gerenciamento Felinos (MVP)
+# Checklist — MeuPaciente (MVP)
 
 ## 0. Setup do monorepo
 - [x] Criar repo Git

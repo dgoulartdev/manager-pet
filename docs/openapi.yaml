@@ -1,10 +1,11 @@
 openapi: "3.1.0"
 
 info:
-  title: Gerenciamento Felinos API
+  title: MeuPaciente API
   version: "1.0.0"
   description: |
-    API do sistema de prontuário veterinário para profissionais autônomos.
+    API do sistema de prontuário veterinário para profissionais autônomos,
+    com suporte inicial a pacientes cães e gatos.
 
     ## Autenticação
     Todos os endpoints (exceto `/v1/auth/*`) exigem um JWT Bearer token
@@ -22,7 +23,7 @@ info:
     Todos os erros seguem RFC 7807 (`application/problem+json`).
 
 servers:
-  - url: https://api.gerenciamentofelinos.com.br/v1
+  - url: https://api.meupaciente.com.br/v1
     description: Produção
   - url: http://localhost:3000/v1
     description: Desenvolvimento local
@@ -35,7 +36,7 @@ tags:
   - name: Tutors
     description: Tutores (donos dos animais)
   - name: Patients
-    description: Pacientes felinos
+    description: Pacientes (cães e gatos, inicialmente)
   - name: Locations
     description: Locais de atendimento pré-cadastrados
   - name: Appointments
@@ -408,14 +409,27 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreatePatientRequest"
-            example:
-              tutor_id: "550e8400-e29b-41d4-a716-446655440000"
-              name: "Mimi"
-              species: "Felis catus"
-              sex: "FEMALE"
-              breed: "Persa"
-              color: "Branca"
-              birth_date: "2020-03-15"
+            examples:
+              gato:
+                summary: Paciente felino
+                value:
+                  tutor_id: "550e8400-e29b-41d4-a716-446655440000"
+                  name: "Mimi"
+                  species: "Gato"
+                  sex: "FEMALE"
+                  breed: "Persa"
+                  color: "Branca"
+                  birth_date: "2020-03-15"
+              cao:
+                summary: Paciente canino
+                value:
+                  tutor_id: "550e8400-e29b-41d4-a716-446655440000"
+                  name: "Rex"
+                  species: "Cão"
+                  sex: "MALE"
+                  breed: "Labrador"
+                  color: "Caramelo"
+                  birth_date: "2021-08-02"
       responses:
         "201":
           description: Paciente criado
@@ -519,7 +533,7 @@ paths:
                   photo_url:
                     type: string
                     format: uri
-                    example: "https://cdn.gerenciamentofelinos.com.br/patients/uuid/photo.jpg"
+                    example: "https://cdn.meupaciente.com.br/patients/uuid/photo.jpg"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -1077,7 +1091,10 @@ components:
         species:
           type: string
           nullable: true
-          example: "Felis catus"
+          description: |
+            Espécie do paciente. Campo texto livre — os valores iniciais
+            suportados são "Cão" e "Gato", mas a API aceita qualquer valor.
+          example: "Gato"
         sex:
           $ref: "#/components/schemas/Sex"
         breed:
@@ -1130,6 +1147,10 @@ components:
           type: string
           nullable: true
           maxLength: 60
+          description: |
+            Espécie do paciente. Campo texto livre — os valores iniciais
+            suportados são "Cão" e "Gato", mas a API aceita qualquer valor.
+          example: "Gato"
         sex:
           $ref: "#/components/schemas/Sex"
         breed:
@@ -1156,6 +1177,9 @@ components:
           type: string
           nullable: true
           maxLength: 60
+          description: |
+            Espécie do paciente. Campo texto livre — os valores iniciais
+            suportados são "Cão" e "Gato", mas a API aceita qualquer valor.
         sex:
           $ref: "#/components/schemas/Sex"
         breed:
@@ -1471,7 +1495,7 @@ components:
         type:
           type: string
           format: uri
-          example: "https://gerenciamentofelinos.com.br/errors/validation-error"
+          example: "https://meupaciente.com.br/errors/validation-error"
         title:
           type: string
           example: "Validation Error"
@@ -1508,7 +1532,7 @@ components:
           schema:
             $ref: "#/components/schemas/Problem"
           example:
-            type: "https://gerenciamentofelinos.com.br/errors/unauthorized"
+            type: "https://meupaciente.com.br/errors/unauthorized"
             title: "Unauthorized"
             status: 401
             detail: "Token de acesso inválido ou expirado."
@@ -1520,7 +1544,7 @@ components:
           schema:
             $ref: "#/components/schemas/Problem"
           example:
-            type: "https://gerenciamentofelinos.com.br/errors/forbidden"
+            type: "https://meupaciente.com.br/errors/forbidden"
             title: "Forbidden"
             status: 403
             detail: "Você não tem permissão para acessar este recurso."
@@ -1532,7 +1556,7 @@ components:
           schema:
             $ref: "#/components/schemas/Problem"
           example:
-            type: "https://gerenciamentofelinos.com.br/errors/not-found"
+            type: "https://meupaciente.com.br/errors/not-found"
             title: "Not Found"
             status: 404
             detail: "O recurso solicitado não foi encontrado."
@@ -1544,7 +1568,7 @@ components:
           schema:
             $ref: "#/components/schemas/Problem"
           example:
-            type: "https://gerenciamentofelinos.com.br/errors/conflict"
+            type: "https://meupaciente.com.br/errors/conflict"
             title: "Conflict"
             status: 409
             detail: "Já existe um cadastro com este e-mail."
@@ -1556,7 +1580,7 @@ components:
           schema:
             $ref: "#/components/schemas/Problem"
           example:
-            type: "https://gerenciamentofelinos.com.br/errors/validation-error"
+            type: "https://meupaciente.com.br/errors/validation-error"
             title: "Validation Error"
             status: 422
             detail: "Um ou mais campos estão inválidos."

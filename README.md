@@ -1,12 +1,12 @@
-# Gerenciamento Felinos
+# MeuPaciente
 
-Prontuário veterinário digital para profissionais autônomos especialistas em felinos. Centraliza cadastro de pacientes, tutores, locais de atendimento e o histórico clínico completo (timeline de atendimentos), independente de onde a consulta aconteceu.
+Prontuário veterinário digital para profissionais autônomos, com suporte inicial a pacientes cães e gatos. Centraliza cadastro de pacientes, tutores, locais de atendimento e o histórico clínico completo (timeline de atendimentos), independente de onde a consulta aconteceu.
 
 ## Objetivo
 
 Substituir o controle fragmentado de pacientes (WhatsApp, planilhas, PDFs, sistemas de clínicas parceiras) por um prontuário único, portátil, que o veterinário carrega para qualquer local de atendimento (clínica parceira, consultório próprio ou domicílio).
 
-Público-alvo: veterinário autônomo especialista em felinos. Financeiro, estoque, agenda e gestão de equipe estão fora do escopo do MVP (ver `docs/architecture.md`).
+Público-alvo: veterinário autônomo que atende cães e gatos. Financeiro, estoque, agenda e gestão de equipe estão fora do escopo do MVP (ver `docs/architecture.md`).
 
 ## Tecnologias
 
@@ -22,7 +22,7 @@ Público-alvo: veterinário autônomo especialista em felinos. Financeiro, estoq
 ## Estrutura de pastas
 
 ```
-gerenciamento-felinos/
+meupaciente/
 ├── apps/
 │   ├── backend/
 │   │   ├── package.json
