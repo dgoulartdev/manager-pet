@@ -8,8 +8,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Gerenciamento Felinos',
-        short_name: 'Felinos',
+        name: 'MeuPaciente',
+        short_name: 'MeuPaciente',
         theme_color: '#0f172a',
         display: 'standalone',
         start_url: '/',
