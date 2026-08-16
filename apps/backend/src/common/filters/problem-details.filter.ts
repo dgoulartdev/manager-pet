@@ -62,7 +62,7 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       .status(status)
       .type('application/problem+json')
       .json({
-        type: `https://gerenciamentofelinos.com.br/errors/${slug(title)}`,
+        type: `https://meupaciente.com.br/errors/${slug(title)}`,
         title,
         status,
         detail,

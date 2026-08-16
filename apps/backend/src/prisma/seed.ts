@@ -7,11 +7,11 @@ async function main() {
   const passwordHash = await hash('teste123', 10);
 
   const user = await prisma.user.upsert({
-    where: { email: 'teste@gerenciamentofelinos.com' },
+    where: { email: 'teste@meupaciente.com' },
     update: {},
     create: {
       name: 'Usuário de Teste',
-      email: 'teste@gerenciamentofelinos.com',
+      email: 'teste@meupaciente.com',
       password: passwordHash,
     },
   });
@@ -36,7 +36,7 @@ async function main() {
       user_id: user.id,
       tutor_id: tutor.id,
       name: 'Miau de Teste',
-      species: 'Felino',
+      species: 'Gato',
       breed: 'SRD',
     },
   });
