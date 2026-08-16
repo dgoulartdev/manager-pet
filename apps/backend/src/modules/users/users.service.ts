@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { compare, hash } from 'bcryptjs';
 import { Prisma } from '@prisma/client';
-import type { UserDto } from '@felino/shared';
+import type { UserDto } from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { toUserDto } from '../../common/mappers/user.mapper';
 import { UpdateUserDto } from './dto/update-user.dto';

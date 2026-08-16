@@ -1,5 +1,5 @@
 import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import type { UpdateUserRequest } from '@felino/shared';
+import type { UpdateUserRequest } from '@meupaciente/shared';
 import { NormalizeEmail } from '../../../common/decorators/normalize-email.decorator';
 
 export class UpdateUserDto implements UpdateUserRequest {

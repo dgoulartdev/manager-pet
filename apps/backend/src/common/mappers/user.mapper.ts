@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import type { UserDto } from '@felino/shared';
+import type { UserDto } from '@meupaciente/shared';
 
 export function toUserDto(user: User): UserDto {
   return {

@@ -6,7 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Sex, type UpdatePatientRequest } from '@felino/shared';
+import { Sex, type UpdatePatientRequest } from '@meupaciente/shared';
 
 export class UpdatePatientDto implements UpdatePatientRequest {
   @IsOptional()

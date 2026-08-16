@@ -1,5 +1,5 @@
 import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import type { CreateTutorRequest } from '@felino/shared';
+import type { CreateTutorRequest } from '@meupaciente/shared';
 
 export class CreateTutorDto implements CreateTutorRequest {
   @IsString()

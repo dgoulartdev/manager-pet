@@ -10,7 +10,7 @@ import type {
   PatientDetailDto,
   PatientDto,
   PhotoUploadResponse,
-} from '@felino/shared';
+} from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { paginate } from '../../common/pagination';
 import {

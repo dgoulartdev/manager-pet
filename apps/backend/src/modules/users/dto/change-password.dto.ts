@@ -1,5 +1,5 @@
 import { IsString, Matches, MinLength } from 'class-validator';
-import type { ChangePasswordRequest } from '@felino/shared';
+import type { ChangePasswordRequest } from '@meupaciente/shared';
 
 export class ChangePasswordDto implements ChangePasswordRequest {
   @IsString()

@@ -1,5 +1,5 @@
 import { Location } from '@prisma/client';
-import type { LocationDto } from '@felino/shared';
+import type { LocationDto } from '@meupaciente/shared';
 
 export function toLocationDto(location: Location): LocationDto {
   return {

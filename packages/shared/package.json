@@ -1,5 +1,5 @@
 {
-  "name": "@felino/shared",
+  "name": "@meupaciente/shared",
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",

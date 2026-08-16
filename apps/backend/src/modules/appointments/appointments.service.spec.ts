@@ -1,6 +1,6 @@
 import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Appointment } from '@prisma/client';
-import { LocationType } from '@felino/shared';
+import { LocationType } from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';

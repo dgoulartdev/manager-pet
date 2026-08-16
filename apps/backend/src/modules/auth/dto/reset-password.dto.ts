@@ -1,5 +1,5 @@
 import { IsString, Matches, MinLength } from 'class-validator';
-import type { ResetPasswordRequest } from '@felino/shared';
+import type { ResetPasswordRequest } from '@meupaciente/shared';
 
 export class ResetPasswordDto implements ResetPasswordRequest {
   @IsString()

@@ -1,6 +1,6 @@
 import { Patient, Tutor } from '@prisma/client';
-import type { PatientDetailDto, PatientDto } from '@felino/shared';
-import { Sex } from '@felino/shared';
+import type { PatientDetailDto, PatientDto } from '@meupaciente/shared';
+import { Sex } from '@meupaciente/shared';
 import { toTutorDto } from './tutor.mapper';
 
 export function toPatientDto(patient: Patient): PatientDto {

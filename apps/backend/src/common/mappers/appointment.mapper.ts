@@ -1,6 +1,6 @@
 import { Appointment, Location, Patient } from '@prisma/client';
-import type { AppointmentDetailDto, AppointmentDto } from '@felino/shared';
-import { LocationType } from '@felino/shared';
+import type { AppointmentDetailDto, AppointmentDto } from '@meupaciente/shared';
+import { LocationType } from '@meupaciente/shared';
 import { toPatientDto } from './patient.mapper';
 import { toLocationDto } from './location.mapper';
 

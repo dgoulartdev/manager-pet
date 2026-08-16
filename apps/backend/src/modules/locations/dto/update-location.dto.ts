@@ -1,5 +1,5 @@
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import type { UpdateLocationRequest } from '@felino/shared';
+import type { UpdateLocationRequest } from '@meupaciente/shared';
 
 export class UpdateLocationDto implements UpdateLocationRequest {
   @IsOptional()

@@ -4,12 +4,12 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Appointment, Location, Patient, Prisma } from '@prisma/client';
-import { LocationType } from '@felino/shared';
+import { LocationType } from '@meupaciente/shared';
 import type {
   AppointmentDetailDto,
   AppointmentDto,
   PaginatedResponse,
-} from '@felino/shared';
+} from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { paginate } from '../../common/pagination';
 import {

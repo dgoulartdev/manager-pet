@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Location, Prisma } from '@prisma/client';
-import type { LocationDto, PaginatedResponse } from '@felino/shared';
+import type { LocationDto, PaginatedResponse } from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { paginate } from '../../common/pagination';
 import { toLocationDto } from '../../common/mappers/location.mapper';

@@ -1,5 +1,5 @@
 import { Tutor } from '@prisma/client';
-import type { TutorDto } from '@felino/shared';
+import type { TutorDto } from '@meupaciente/shared';
 
 export function toTutorDto(tutor: Tutor): TutorDto {
   return {

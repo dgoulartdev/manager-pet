@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
-import { LocationType } from '@felino/shared';
+import { LocationType } from '@meupaciente/shared';
 import { AppModule } from '../src/app.module';
 import { ProblemDetailsFilter } from '../src/common/filters/problem-details.filter';
 import { validationExceptionFactory } from '../src/common/validation-exception-factory';

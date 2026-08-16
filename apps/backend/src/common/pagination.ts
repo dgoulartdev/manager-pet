@@ -1,4 +1,4 @@
-import type { PaginatedResponse } from '@felino/shared';
+import type { PaginatedResponse } from '@meupaciente/shared';
 
 export function paginate<T>(
   data: T[],

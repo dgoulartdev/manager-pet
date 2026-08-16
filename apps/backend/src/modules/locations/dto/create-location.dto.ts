@@ -1,5 +1,5 @@
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import type { CreateLocationRequest } from '@felino/shared';
+import type { CreateLocationRequest } from '@meupaciente/shared';
 
 export class CreateLocationDto implements CreateLocationRequest {
   @IsString()

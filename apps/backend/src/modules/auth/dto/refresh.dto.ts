@@ -1,5 +1,5 @@
 import { IsString } from 'class-validator';
-import type { RefreshRequest } from '@felino/shared';
+import type { RefreshRequest } from '@meupaciente/shared';
 
 export class RefreshDto implements RefreshRequest {
   @IsString()

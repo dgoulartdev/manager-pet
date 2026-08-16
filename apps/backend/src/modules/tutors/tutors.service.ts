@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma, Tutor } from '@prisma/client';
-import type { PaginatedResponse, TutorDto } from '@felino/shared';
+import type { PaginatedResponse, TutorDto } from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { paginate } from '../../common/pagination';
 import { toTutorDto } from '../../common/mappers/tutor.mapper';

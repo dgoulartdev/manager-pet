@@ -7,7 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Sex, type CreatePatientRequest } from '@felino/shared';
+import { Sex, type CreatePatientRequest } from '@meupaciente/shared';
 
 export class CreatePatientDto implements CreatePatientRequest {
   @IsUUID()

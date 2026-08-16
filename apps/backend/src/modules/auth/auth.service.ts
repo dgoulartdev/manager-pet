@@ -9,7 +9,7 @@ import { compare, hash } from 'bcryptjs';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { Prisma, User } from '@prisma/client';
 import type { StringValue } from 'ms';
-import type { AuthResponse } from '@felino/shared';
+import type { AuthResponse } from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { toUserDto } from '../../common/mappers/user.mapper';
 import { RegisterDto } from './dto/register.dto';

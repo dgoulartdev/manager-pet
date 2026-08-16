@@ -1,5 +1,5 @@
 import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import type { UpdateTutorRequest } from '@felino/shared';
+import type { UpdateTutorRequest } from '@meupaciente/shared';
 
 export class UpdateTutorDto implements UpdateTutorRequest {
   @IsOptional()

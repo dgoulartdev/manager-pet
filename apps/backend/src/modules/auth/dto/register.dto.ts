@@ -1,5 +1,5 @@
 import { IsEmail, IsString, Matches, MaxLength, MinLength } from 'class-validator';
-import type { RegisterRequest } from '@felino/shared';
+import type { RegisterRequest } from '@meupaciente/shared';
 import { NormalizeEmail } from '../../../common/decorators/normalize-email.decorator';
 
 export class RegisterDto implements RegisterRequest {
