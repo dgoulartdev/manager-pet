@@ -47,6 +47,9 @@ export class PatientsService {
         breed: dto.breed ?? null,
         color: dto.color ?? null,
         birth_date: dto.birth_date ? new Date(dto.birth_date) : null,
+        // O enum Sex do shared e o do Prisma têm os mesmos valores, mas o
+        // TypeScript os trata como tipos diferentes — o duplo cast só converte
+        // o tipo, sem mudar o valor.
         ...(dto.sex !== undefined
           ? { sex: dto.sex as unknown as PrismaSex }
           : {}),

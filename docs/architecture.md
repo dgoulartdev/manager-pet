@@ -554,6 +554,13 @@ Estes princípios governam decisões cotidianas e devem ser consultados antes de
 
 **Fronteiras de módulo são contratos.** Módulos NestJS só se comunicam via interfaces públicas. Violações de fronteira criam acoplamento que dificulta a extração futura para serviços independentes.
 
+**Código escrito para ser lido.** O código deve ser compreensível por qualquer pessoa que esteja estudando o projeto, sem exigir contexto prévio. Na prática:
+
+- Nomes de variáveis, funções e constantes descrevem o que a coisa é ou faz, sem abreviações desnecessárias.
+- Estruturas simples têm preferência sobre padrões elaborados quando o resultado é o mesmo.
+- Comentários existem apenas para explicar o que o código sozinho não consegue mostrar (regras de negócio, restrições técnicas, decisões não óbvias) — nunca para narrar o óbvio. Comentários e mensagens de erro são escritos em português, de forma simples e natural.
+- Ao revisar ou refatorar por legibilidade, o comportamento do sistema é intocável. A ordem de prioridade é: **funcionamento atual > preservação da lógica > legibilidade > estética do código**. Se uma mudança puder alterar o comportamento, ela não é feita.
+
 ---
 
 ## 11. Riscos e Mitigações

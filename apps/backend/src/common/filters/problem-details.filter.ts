@@ -25,7 +25,9 @@ function slug(title: string): string {
   return title
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    // Remove acentos: o normalize('NFD') separa a letra do acento, e este
+    // intervalo Unicode (U+0300 a U+036F) apaga só os acentos soltos.
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 }
