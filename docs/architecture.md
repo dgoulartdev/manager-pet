@@ -130,7 +130,7 @@ meupaciente/
 
 ```prisma
 // schema.prisma
-// Gerenciamento Felinos — v1.3.0
+// MeuPaciente — v1.4.0
 
 generator client {
   provider = "prisma-client-js"
@@ -536,8 +536,10 @@ O projeto passa a se chamar **MeuPaciente**. O conceito central do domínio cont
 - Documentação (arquitetura, OpenAPI) passa a refletir com precisão o escopo real do produto.
 
 **Consequências negativas:**
-- Identificadores técnicos já existentes (nome do pacote npm, container Docker, volume, domínio usado em URLs de erro) ainda carregam o nome antigo até uma etapa futura de atualização de código e infraestrutura — inconsistência temporária entre documentação e artefatos técnicos.
-- Textos específicos de "felino" em código (comentários, seeds, testes, exemplos) precisam de revisão própria antes do rebranding estar completo de ponta a ponta.
+- Renomear o pacote interno `@felino/shared` para `@meupaciente/shared` exigiu editar os 3 `package.json` do monorepo e o import em cada um dos ~30 arquivos que o consomem, além de reinstalar o workspace — mecânico, mas com blast radius grande para uma mudança só de identidade.
+- Renomear `POSTGRES_USER`/`POSTGRES_DB`/volume no `docker-compose.yml` só surte efeito com o volume Postgres recriado vazio — ambientes de desenvolvimento com dados locais já persistidos precisam derrubar o volume antigo manualmente (`docker compose down -v`) para adotar o novo usuário/banco.
+
+**Atualização:** os itens acima já foram executados — pacote renomeado (`@meupaciente/shared`), `docker-compose.yml`/`.env`/`.env.example` atualizados, `package.json` raiz renomeado, comentário de cabeçalho do `schema.prisma` atualizado, domínio de erro RFC 7807 trocado para `meupaciente.com.br`, e o limite de `weight_kg` nos DTOs/OpenAPI ampliado de 30kg para 100kg (cobre raças caninas grandes). Domínio próprio (`meupaciente.com.br`) ainda não foi registrado — mantido como identificador de URI (não precisa resolver de verdade para ser um `type` RFC 7807 válido).
 
 **Alternativas rejeitadas:**
 - Criar uma entidade `Species` separada ou um enum fechado (`DOG`/`CAT`): rejeitado por introduzir uma regra de negócio nova (validação estrutural de espécie) que o MVP nunca exigiu — o campo texto livre já resolve o problema sem essa complexidade.
