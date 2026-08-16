@@ -75,7 +75,7 @@ Na raiz do projeto:
 docker compose up -d
 ```
 
-Isso sobe um container PostgreSQL 16 (`gerenciamento-felinos-db`) na porta `5432`, com dados persistidos no volume `felino_pgdata`. Para parar: `docker compose down` (o volume não é removido).
+Isso sobe um container PostgreSQL 16 (`meupaciente-db`) na porta `5432`, com dados persistidos no volume `meupaciente_pgdata`. Para parar: `docker compose down` (o volume não é removido).
 
 ## Variáveis de ambiente
 

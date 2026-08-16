@@ -1,16 +1,16 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: gerenciamento-felinos-db
+    container_name: meupaciente-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: felino
-      POSTGRES_PASSWORD: felino
-      POSTGRES_DB: gerenciamento_felinos
+      POSTGRES_USER: meupaciente
+      POSTGRES_PASSWORD: meupaciente
+      POSTGRES_DB: meupaciente
     ports:
       - "5432:5432"
     volumes:
-      - felino_pgdata:/var/lib/postgresql/data
+      - meupaciente_pgdata:/var/lib/postgresql/data
 
 volumes:
-  felino_pgdata:
+  meupaciente_pgdata:
