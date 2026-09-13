@@ -62,6 +62,14 @@
 - [x] `DELETE /appointments/:id`
 - [x] Validar regras de `location_type` (REGISTERED/AD_HOC/HOME_VISIT)
 
+## 7.1 Módulo Vaccines
+- [x] `GET /vaccines` (paginado, filtro por patient_id)
+- [x] `POST /vaccines`
+- [x] `GET /vaccines/:id`
+- [x] `PATCH /vaccines/:id`
+- [x] `DELETE /vaccines/:id`
+- [x] Validar que `appointment_id`, quando informado, pertence ao mesmo paciente da vacina
+
 ## 8. Validação e erros transversais
 - [x] `ValidationPipe` global
 - [x] Exception filter no formato RFC 7807 (catch-all + mapeamento Prisma)

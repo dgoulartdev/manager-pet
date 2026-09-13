@@ -41,6 +41,8 @@ tags:
     description: Locais de atendimento pré-cadastrados
   - name: Appointments
     description: Atendimentos veterinários
+  - name: Vaccines
+    description: Vacinas aplicadas aos pacientes
 
 # ---------------------------------------------------------------------------
 # PATHS
@@ -801,6 +803,124 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  # ── VACCINES ──────────────────────────────────────────────────────────────
+
+  /vaccines:
+    get:
+      tags: [Vaccines]
+      summary: Listar vacinas
+      operationId: listVaccines
+      description: |
+        Endpoint principal para o histórico vacinal. Use `patient_id` para
+        listar as vacinas de um paciente específico.
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: patient_id
+          in: query
+          description: Filtrar por paciente
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Lista paginada de vacinas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VaccineListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Vaccines]
+      summary: Registrar vacina aplicada
+      operationId: createVaccine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVaccineRequest"
+            example:
+              patient_id: "550e8400-e29b-41d4-a716-446655440000"
+              appointment_id: "770e8400-e29b-41d4-a716-446655440002"
+              name: "V10"
+              manufacturer: "Zoetis"
+              batch: "L12345"
+              application_date: "2024-06-15"
+              next_dose_date: "2025-06-15"
+              notes: "Sem reações adversas"
+      responses:
+        "201":
+          description: Vacina registrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vaccine"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /vaccines/{vaccine_id}:
+    parameters:
+      - $ref: "#/components/parameters/VaccineId"
+
+    get:
+      tags: [Vaccines]
+      summary: Obter vacina por ID
+      operationId: getVaccine
+      responses:
+        "200":
+          description: Vacina retornada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VaccineDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Vaccines]
+      summary: Atualizar vacina
+      operationId: updateVaccine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVaccineRequest"
+      responses:
+        "200":
+          description: Vacina atualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vaccine"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      tags: [Vaccines]
+      summary: Remover vacina
+      operationId: deleteVaccine
+      responses:
+        "204":
+          description: Vacina removida
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 # ---------------------------------------------------------------------------
 # COMPONENTS
 # ---------------------------------------------------------------------------
@@ -866,6 +986,14 @@ components:
 
     AppointmentId:
       name: appointment_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    VaccineId:
+      name: vaccine_id
       in: path
       required: true
       schema:
@@ -1465,6 +1593,142 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Appointment"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    # -- Vaccine ---------------------------------------------------------------
+
+    Vaccine:
+      type: object
+      required: [id, patient_id, name, application_date, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        patient_id:
+          type: string
+          format: uuid
+        appointment_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Atendimento em que a vacina foi aplicada, se houver
+        name:
+          type: string
+          example: "V10"
+        manufacturer:
+          type: string
+          nullable: true
+          example: "Zoetis"
+        batch:
+          type: string
+          nullable: true
+          example: "L12345"
+        application_date:
+          type: string
+          format: date
+          example: "2024-06-15"
+        next_dose_date:
+          type: string
+          format: date
+          nullable: true
+          description: Previsão da próxima dose/reforço
+          example: "2025-06-15"
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    VaccineDetail:
+      allOf:
+        - $ref: "#/components/schemas/Vaccine"
+        - type: object
+          properties:
+            patient:
+              $ref: "#/components/schemas/Patient"
+
+    CreateVaccineRequest:
+      type: object
+      required: [patient_id, name, application_date]
+      properties:
+        patient_id:
+          type: string
+          format: uuid
+        appointment_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Deve pertencer ao mesmo paciente informado
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        manufacturer:
+          type: string
+          nullable: true
+          maxLength: 120
+        batch:
+          type: string
+          nullable: true
+          maxLength: 60
+        application_date:
+          type: string
+          format: date
+        next_dose_date:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    UpdateVaccineRequest:
+      type: object
+      properties:
+        appointment_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Deve pertencer ao mesmo paciente da vacina
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        manufacturer:
+          type: string
+          nullable: true
+          maxLength: 120
+        batch:
+          type: string
+          nullable: true
+          maxLength: 60
+        application_date:
+          type: string
+          format: date
+        next_dose_date:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    VaccineListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Vaccine"
         pagination:
           $ref: "#/components/schemas/Pagination"
 

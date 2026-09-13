@@ -44,6 +44,7 @@ model User {
   locations      Location[]
   appointments   Appointment[]
   documents      Document[]
+  vaccines       Vaccine[]
   refresh_tokens RefreshToken[]
   password_reset_tokens PasswordResetToken[]
 
@@ -83,6 +84,7 @@ model Patient {
   user         User          @relation(fields: [user_id], references: [id])
   tutor        Tutor         @relation(fields: [tutor_id], references: [id])
   appointments Appointment[]
+  vaccines     Vaccine[]
 
   @@index([user_id])
   @@index([tutor_id])
@@ -128,6 +130,7 @@ model Appointment {
   patient   Patient    @relation(fields: [patient_id], references: [id], onDelete: Cascade)
   location  Location?  @relation(fields: [location_id], references: [id])
   documents Document[]
+  vaccines  Vaccine[]
 
   @@index([user_id])
   @@index([patient_id])
@@ -195,4 +198,35 @@ model Document {
   @@index([user_id])
   @@index([appointment_id])
   @@map("documents")
+}
+
+// ---------------------------------------------------------------------------
+// Vacinas aplicadas ao paciente. appointment_id é opcional: cobre tanto a
+// vacina aplicada durante um atendimento quanto o registro retroativo
+// (histórico vindo de outra clínica, sem atendimento correspondente no sistema).
+// ---------------------------------------------------------------------------
+
+model Vaccine {
+  id                String    @id @default(uuid())
+  user_id           String
+  patient_id        String
+  appointment_id    String?
+  name              String
+  manufacturer      String?
+  batch             String?
+  application_date  DateTime
+  next_dose_date    DateTime?
+  notes             String?   @db.Text
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  user        User         @relation(fields: [user_id], references: [id])
+  patient     Patient      @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointment_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([patient_id])
+  @@index([appointment_id])
+  @@index([application_date])
+  @@map("vaccines")
 }

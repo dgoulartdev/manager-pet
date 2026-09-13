@@ -1,7 +1,7 @@
 # Arquitetura — MeuPaciente
 
-**Versão:** 1.4.0
-**Data:** 2026-08-15
+**Versão:** 1.5.0
+**Data:** 2026-08-16
 **Status:** Aprovado — pronto para implementação
 
 ---
@@ -25,6 +25,7 @@ MeuPaciente é uma plataforma de prontuário veterinário para profissionais aut
 - Cadastro de tutores (donos dos animais)
 - Cadastro de locais de atendimento
 - Registro de atendimentos veterinários completos
+- Registro de vacinas aplicadas por paciente (opcionalmente vinculadas a um atendimento)
 - Timeline de atendimentos por paciente
 - Busca por nome do paciente, tutor e telefone
 
@@ -73,6 +74,8 @@ Financeiro, estoque, agenda, gestão de clínica, funcionários, portal do tutor
 │  │  │ LocationsModule│   │                                    │
 │  │  ├────────────────┤   │                                    │
 │  │  │ AppointmentsM. │   │                                    │
+│  │  ├────────────────┤   │                                    │
+│  │  │ VaccinesModule │   │                                    │
 │  │  └────────────────┘   │                                    │
 │  │          │             │                                    │
 │  │    ┌─────▼──────┐      │                                   │
@@ -99,7 +102,8 @@ meupaciente/
 │   │       │   ├── tutors/
 │   │       │   ├── patients/
 │   │       │   ├── locations/
-│   │       │   └── appointments/
+│   │       │   ├── appointments/
+│   │       │   └── vaccines/
 │   │       ├── prisma/
 │   │       │   └── schema.prisma
 │   │       └── main.ts
@@ -123,6 +127,7 @@ meupaciente/
 | `PatientsModule` | CRUD de pacientes, upload de foto |
 | `LocationsModule` | CRUD de locais de atendimento pré-cadastrados |
 | `AppointmentsModule` | Registro e histórico de atendimentos, timeline por paciente |
+| `VaccinesModule` | CRUD de vacinas aplicadas ao paciente, com vínculo opcional a um atendimento |
 
 ---
 
@@ -130,7 +135,7 @@ meupaciente/
 
 ```prisma
 // schema.prisma
-// MeuPaciente — v1.4.0
+// MeuPaciente — v1.5.0
 
 generator client {
   provider = "prisma-client-js"
@@ -175,6 +180,7 @@ model User {
   locations       Location[]
   appointments    Appointment[]
   documents       Document[]
+  vaccines        Vaccine[]
   refresh_tokens  RefreshToken[]
   password_reset_tokens PasswordResetToken[]
 
@@ -214,6 +220,7 @@ model Patient {
   user         User          @relation(fields: [user_id], references: [id])
   tutor        Tutor         @relation(fields: [tutor_id], references: [id])
   appointments Appointment[]
+  vaccines     Vaccine[]
 
   @@index([user_id])
   @@index([tutor_id])
@@ -259,6 +266,7 @@ model Appointment {
   patient   Patient   @relation(fields: [patient_id], references: [id], onDelete: Cascade)
   location  Location? @relation(fields: [location_id], references: [id])
   documents Document[]
+  vaccines  Vaccine[]
 
   @@index([user_id])
   @@index([patient_id])
@@ -327,6 +335,37 @@ model Document {
   @@index([appointment_id])
   @@map("documents")
 }
+
+// ---------------------------------------------------------------------------
+// Vacinas aplicadas ao paciente. appointment_id é opcional: cobre tanto a
+// vacina aplicada durante um atendimento quanto o registro retroativo
+// (histórico vindo de outra clínica, sem atendimento correspondente no sistema).
+// ---------------------------------------------------------------------------
+
+model Vaccine {
+  id                String    @id @default(uuid())
+  user_id           String
+  patient_id        String
+  appointment_id    String?
+  name              String
+  manufacturer      String?
+  batch             String?
+  application_date  DateTime
+  next_dose_date    DateTime?
+  notes             String?   @db.Text
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  user        User         @relation(fields: [user_id], references: [id])
+  patient     Patient      @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointment_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([patient_id])
+  @@index([appointment_id])
+  @@index([application_date])
+  @@map("vaccines")
+}
 ```
 
 ### 6.1 Representação do paciente e da espécie
@@ -344,7 +383,7 @@ O `Patient` já é uma entidade genérica — não existe uma tabela ou tipo "Fe
 - **Paginação:** offset-based com `page`, `per_page`, `total`, `total_pages`
 - **Rotas planas com query params:** ex. `/appointments?patient_id=X` em vez de `/patients/:id/appointments`
 - **Convenção de nomes:** `snake_case` nos JSON, alinhado com Prisma
-- **Spec completa:** `docs/openapi.yaml` (OpenAPI 3.1, 27 endpoints, 6 módulos)
+- **Spec completa:** `docs/openapi.yaml` (OpenAPI 3.1, 36 endpoints, 7 módulos)
 
 ---
 
@@ -544,6 +583,30 @@ O projeto passa a se chamar **MeuPaciente**. O conceito central do domínio cont
 **Alternativas rejeitadas:**
 - Criar uma entidade `Species` separada ou um enum fechado (`DOG`/`CAT`): rejeitado por introduzir uma regra de negócio nova (validação estrutural de espécie) que o MVP nunca exigiu — o campo texto livre já resolve o problema sem essa complexidade.
 - Manter o nome "Gerenciamento Felinos" e apenas ampliar o público-alvo na descrição: rejeitado porque o nome por si só comunica um escopo exclusivo a gatos, contradizendo o novo posicionamento.
+
+---
+
+### ADR-009: Vacinas como model próprio, com vínculo opcional a um atendimento
+
+**Status:** Aceito
+
+**Contexto:**
+O prontuário precisava registrar vacinas aplicadas aos pacientes (cães e gatos), incluindo nome/tipo, fabricante, lote, data de aplicação e previsão da próxima dose. A vacina pode ser aplicada durante um atendimento registrado no sistema, mas também pode ser um registro retroativo (histórico trazido de outra clínica), sem atendimento correspondente.
+
+**Decisão:**
+Criar o model `Vaccine` como entidade própria — não como campos dentro de `Appointment` — com `patient_id` obrigatório e `appointment_id` opcional (`onDelete: SetNull`: remover o atendimento não apaga o histórico vacinal). Segue o mesmo padrão de rotas planas de `Appointment` (ADR-004): `/vaccines?patient_id=X`. O service valida que `appointment_id`, quando informado, pertence ao mesmo paciente da vacina.
+
+**Consequências positivas:**
+- Histórico vacinal existe independente de haver um atendimento registrado (cobre importação de histórico e aplicações fora do fluxo de atendimento).
+- Consulta de vacinas por paciente é direta (`GET /vaccines?patient_id=X`), sem depender de percorrer atendimentos.
+- Exclusão de um atendimento nunca apaga vacina aplicada nele (`SetNull` preserva o registro).
+
+**Consequências negativas:**
+- Uma vacina aplicada durante um atendimento vive em duas tabelas (`Appointment` e `Vaccine`) em vez de ser um campo só — aceitável, pois nem toda vacina tem atendimento associado.
+
+**Alternativas rejeitadas:**
+- Campos de vacina embutidos em `Appointment` (ex.: `vaccine_name`, `vaccine_batch`): rejeitado por não suportar múltiplas vacinas no mesmo atendimento nem vacinas sem atendimento.
+- `appointment_id` obrigatório: rejeitado por impedir o registro de histórico vacinal retroativo/externo.
 
 ---
 

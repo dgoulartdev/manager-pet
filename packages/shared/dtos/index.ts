@@ -5,3 +5,4 @@ export * from './tutors';
 export * from './locations';
 export * from './patients';
 export * from './appointments';
+export * from './vaccines';
