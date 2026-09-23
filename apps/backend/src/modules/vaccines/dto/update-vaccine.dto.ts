@@ -1,5 +1,4 @@
 import {
-  IsDateString,
   IsOptional,
   IsString,
   IsUUID,
@@ -8,6 +7,7 @@ import {
 } from 'class-validator';
 import type { UpdateVaccineRequest } from '@meupaciente/shared';
 import { IsOptionalNotNull } from '../../../common/decorators/is-optional-not-null.decorator';
+import { IsDateOnly } from '../../../common/decorators/is-date-only.decorator';
 
 export class UpdateVaccineDto implements UpdateVaccineRequest {
   @IsOptional()
@@ -31,11 +31,11 @@ export class UpdateVaccineDto implements UpdateVaccineRequest {
   batch?: string | null;
 
   @IsOptionalNotNull()
-  @IsDateString()
+  @IsDateOnly()
   application_date?: string;
 
   @IsOptional()
-  @IsDateString()
+  @IsDateOnly()
   next_dose_date?: string | null;
 
   @IsOptional()

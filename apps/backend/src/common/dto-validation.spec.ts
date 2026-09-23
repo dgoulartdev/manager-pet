@@ -6,6 +6,7 @@ import { UpdateLocationDto } from '../modules/locations/dto/update-location.dto'
 import { CreatePatientDto } from '../modules/patients/dto/create-patient.dto';
 import { UpdatePatientDto } from '../modules/patients/dto/update-patient.dto';
 import { UpdateAppointmentDto } from '../modules/appointments/dto/update-appointment.dto';
+import { ListAppointmentsQueryDto } from '../modules/appointments/dto/list-appointments-query.dto';
 import { CreateVaccineDto } from '../modules/vaccines/dto/create-vaccine.dto';
 import { UpdateVaccineDto } from '../modules/vaccines/dto/update-vaccine.dto';
 
@@ -59,6 +60,37 @@ describe('Validação de DTOs', () => {
         sex: null,
       });
       expect(fields).toEqual(['sex']);
+    });
+  });
+
+  describe('datas sem hora (YYYY-MM-DD)', () => {
+    it('aceita data no formato YYYY-MM-DD', async () => {
+      expect(
+        await invalidFields(UpdateAppointmentDto, { date: '2024-06-15' }),
+      ).toEqual([]);
+    });
+
+    it.each([
+      ['data com hora', '2024-06-15T10:00:00Z'],
+      ['data impossível', '2024-02-30'],
+      ['formato brasileiro', '15/06/2024'],
+    ])('rejeita %s', async (_caso, value) => {
+      expect(await invalidFields(UpdateAppointmentDto, { date: value })).toEqual(
+        ['date'],
+      );
+    });
+
+    it.each([
+      [UpdatePatientDto, 'birth_date'],
+      [UpdateVaccineDto, 'application_date'],
+      [UpdateVaccineDto, 'next_dose_date'],
+      [ListAppointmentsQueryDto, 'date_from'],
+      [ListAppointmentsQueryDto, 'date_to'],
+    ] as const)('%p.%s rejeita data com hora', async (dtoClass, field) => {
+      const fields = await invalidFields(dtoClass, {
+        [field]: '2024-06-15T10:00:00Z',
+      });
+      expect(fields).toEqual([field]);
     });
   });
 

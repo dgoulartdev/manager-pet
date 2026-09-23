@@ -1,5 +1,6 @@
-import { IsDateString, IsOptional, IsUUID } from 'class-validator';
+import { IsOptional, IsUUID } from 'class-validator';
 import { PaginationQueryDto } from '../../../common/dto/pagination-query.dto';
+import { IsDateOnly } from '../../../common/decorators/is-date-only.decorator';
 
 export class ListAppointmentsQueryDto extends PaginationQueryDto {
   @IsOptional()
@@ -11,10 +12,10 @@ export class ListAppointmentsQueryDto extends PaginationQueryDto {
   location_id?: string;
 
   @IsOptional()
-  @IsDateString()
+  @IsDateOnly()
   date_from?: string;
 
   @IsOptional()
-  @IsDateString()
+  @IsDateOnly()
   date_to?: string;
 }

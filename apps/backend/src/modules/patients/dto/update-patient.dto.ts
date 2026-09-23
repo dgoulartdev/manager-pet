@@ -1,5 +1,4 @@
 import {
-  IsDateString,
   IsEnum,
   IsOptional,
   IsString,
@@ -8,6 +7,7 @@ import {
 } from 'class-validator';
 import { Sex, type UpdatePatientRequest } from '@meupaciente/shared';
 import { IsOptionalNotNull } from '../../../common/decorators/is-optional-not-null.decorator';
+import { IsDateOnly } from '../../../common/decorators/is-date-only.decorator';
 
 export class UpdatePatientDto implements UpdatePatientRequest {
   @IsOptionalNotNull()
@@ -36,6 +36,6 @@ export class UpdatePatientDto implements UpdatePatientRequest {
   color?: string | null;
 
   @IsOptional()
-  @IsDateString()
+  @IsDateOnly()
   birth_date?: string | null;
 }

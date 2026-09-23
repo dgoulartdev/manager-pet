@@ -1,5 +1,4 @@
 import {
-  IsDateString,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -11,10 +10,11 @@ import {
 } from 'class-validator';
 import { LocationType, type UpdateAppointmentRequest } from '@meupaciente/shared';
 import { IsOptionalNotNull } from '../../../common/decorators/is-optional-not-null.decorator';
+import { IsDateOnly } from '../../../common/decorators/is-date-only.decorator';
 
 export class UpdateAppointmentDto implements UpdateAppointmentRequest {
   @IsOptionalNotNull()
-  @IsDateString()
+  @IsDateOnly()
   date?: string;
 
   @IsOptionalNotNull()

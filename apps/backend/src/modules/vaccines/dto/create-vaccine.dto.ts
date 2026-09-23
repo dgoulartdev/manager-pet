@@ -1,5 +1,4 @@
 import {
-  IsDateString,
   IsOptional,
   IsString,
   IsUUID,
@@ -7,6 +6,7 @@ import {
   MinLength,
 } from 'class-validator';
 import type { CreateVaccineRequest } from '@meupaciente/shared';
+import { IsDateOnly } from '../../../common/decorators/is-date-only.decorator';
 
 export class CreateVaccineDto implements CreateVaccineRequest {
   @IsUUID()
@@ -31,11 +31,11 @@ export class CreateVaccineDto implements CreateVaccineRequest {
   @MaxLength(60)
   batch?: string | null;
 
-  @IsDateString()
+  @IsDateOnly()
   application_date!: string;
 
   @IsOptional()
-  @IsDateString()
+  @IsDateOnly()
   next_dose_date?: string | null;
 
   @IsOptional()
