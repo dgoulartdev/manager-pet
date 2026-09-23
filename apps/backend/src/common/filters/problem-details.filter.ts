@@ -95,6 +95,15 @@ export class ProblemDetailsFilter implements ExceptionFilter {
           detail: 'Já existe um registro com esse valor único.',
         };
       }
+      // P2003 = violação de chave estrangeira. Os services já bloqueiam esses
+      // casos antes (ex.: tutor com pacientes), então só ocorre em corrida
+      // entre duas requisições — é um conflito, não um erro do servidor.
+      if (exception.code === 'P2003') {
+        return {
+          status: HttpStatus.CONFLICT,
+          detail: 'A operação conflita com um registro vinculado.',
+        };
+      }
       if (exception.code === 'P2025') {
         return {
           status: HttpStatus.NOT_FOUND,
