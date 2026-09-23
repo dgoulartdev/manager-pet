@@ -6,13 +6,14 @@ import {
   MaxLength,
 } from 'class-validator';
 import type { UpdateVaccineRequest } from '@meupaciente/shared';
+import { IsOptionalNotNull } from '../../../common/decorators/is-optional-not-null.decorator';
 
 export class UpdateVaccineDto implements UpdateVaccineRequest {
   @IsOptional()
   @IsUUID()
   appointment_id?: string | null;
 
-  @IsOptional()
+  @IsOptionalNotNull()
   @IsString()
   @MaxLength(120)
   name?: string;
@@ -27,7 +28,7 @@ export class UpdateVaccineDto implements UpdateVaccineRequest {
   @MaxLength(60)
   batch?: string | null;
 
-  @IsOptional()
+  @IsOptionalNotNull()
   @IsDateString()
   application_date?: string;
 

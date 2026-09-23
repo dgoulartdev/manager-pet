@@ -1,15 +1,16 @@
-import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 import type { UpdateUserRequest } from '@meupaciente/shared';
 import { NormalizeEmail } from '../../../common/decorators/normalize-email.decorator';
+import { IsOptionalNotNull } from '../../../common/decorators/is-optional-not-null.decorator';
 
 export class UpdateUserDto implements UpdateUserRequest {
-  @IsOptional()
+  @IsOptionalNotNull()
   @IsString()
   @MinLength(2)
   @MaxLength(120)
   name?: string;
 
-  @IsOptional()
+  @IsOptionalNotNull()
   @NormalizeEmail()
   @IsEmail()
   email?: string;

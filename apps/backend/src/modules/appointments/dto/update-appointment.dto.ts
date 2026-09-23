@@ -10,13 +10,14 @@ import {
   Min,
 } from 'class-validator';
 import { LocationType, type UpdateAppointmentRequest } from '@meupaciente/shared';
+import { IsOptionalNotNull } from '../../../common/decorators/is-optional-not-null.decorator';
 
 export class UpdateAppointmentDto implements UpdateAppointmentRequest {
-  @IsOptional()
+  @IsOptionalNotNull()
   @IsDateString()
   date?: string;
 
-  @IsOptional()
+  @IsOptionalNotNull()
   @IsEnum(LocationType)
   location_type?: LocationType;
 
