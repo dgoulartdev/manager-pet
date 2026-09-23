@@ -6,6 +6,7 @@ import { UpdateLocationDto } from '../modules/locations/dto/update-location.dto'
 import { CreatePatientDto } from '../modules/patients/dto/create-patient.dto';
 import { UpdatePatientDto } from '../modules/patients/dto/update-patient.dto';
 import { UpdateAppointmentDto } from '../modules/appointments/dto/update-appointment.dto';
+import { CreateVaccineDto } from '../modules/vaccines/dto/create-vaccine.dto';
 import { UpdateVaccineDto } from '../modules/vaccines/dto/update-vaccine.dto';
 
 // Valida um objeto como o ValidationPipe global faria e devolve os campos com erro.
@@ -58,6 +59,25 @@ describe('Validação de DTOs', () => {
         sex: null,
       });
       expect(fields).toEqual(['sex']);
+    });
+  });
+
+  describe('nome da vacina', () => {
+    const PATIENT_ID = '660e8400-e29b-41d4-a716-446655440001';
+
+    it('rejeita nome vazio no cadastro', async () => {
+      const fields = await invalidFields(CreateVaccineDto, {
+        patient_id: PATIENT_ID,
+        name: '',
+        application_date: '2024-06-15',
+      });
+      expect(fields).toEqual(['name']);
+    });
+
+    it('rejeita nome vazio na atualização', async () => {
+      expect(await invalidFields(UpdateVaccineDto, { name: '' })).toEqual([
+        'name',
+      ]);
     });
   });
 });

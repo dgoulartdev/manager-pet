@@ -4,6 +4,7 @@ import {
   IsString,
   IsUUID,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 import type { CreateVaccineRequest } from '@meupaciente/shared';
 
@@ -16,6 +17,7 @@ export class CreateVaccineDto implements CreateVaccineRequest {
   appointment_id?: string | null;
 
   @IsString()
+  @MinLength(1)
   @MaxLength(120)
   name!: string;
 

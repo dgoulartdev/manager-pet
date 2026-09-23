@@ -4,6 +4,7 @@ import {
   IsString,
   IsUUID,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 import type { UpdateVaccineRequest } from '@meupaciente/shared';
 import { IsOptionalNotNull } from '../../../common/decorators/is-optional-not-null.decorator';
@@ -15,6 +16,7 @@ export class UpdateVaccineDto implements UpdateVaccineRequest {
 
   @IsOptionalNotNull()
   @IsString()
+  @MinLength(1)
   @MaxLength(120)
   name?: string;
 
