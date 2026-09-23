@@ -11,8 +11,8 @@ info:
     Todos os endpoints exigem um JWT Bearer token obtido via
     `POST /v1/auth/login`, exceto `register`, `login`, `refresh`,
     `forgot-password` e `reset-password` em `/v1/auth/*`.
-    Esses cinco endpoints públicos têm rate limit por IP e respondem 429
-    quando o limite é excedido.
+    Todos os endpoints de `/v1/auth/*` (inclusive `logout`) têm rate limit
+    por IP e respondem 429 quando o limite é excedido.
 
     ## Isolamento de dados
     Todos os recursos são isolados por `user_id` derivado do JWT.
@@ -215,6 +215,8 @@ paths:
           description: Logout realizado com sucesso
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   # ── USERS ─────────────────────────────────────────────────────────────────
 
