@@ -1,6 +1,6 @@
 # MeuPaciente
 
-Prontuário veterinário digital para profissionais autônomos, com suporte inicial a pacientes cães e gatos. Centraliza cadastro de pacientes, tutores, locais de atendimento e o histórico clínico completo (timeline de atendimentos), independente de onde a consulta aconteceu.
+Prontuário veterinário digital para profissionais autônomos, com suporte inicial a pacientes cães e gatos. Centraliza cadastro de pacientes, tutores, locais de atendimento, vacinas e o histórico clínico completo (timeline de atendimentos), independente de onde a consulta aconteceu.
 
 ## Objetivo
 
@@ -12,37 +12,41 @@ Público-alvo: veterinário autônomo que atende cães e gatos. Financeiro, esto
 
 | Camada | Tecnologia |
 |---|---|
-| Backend | NestJS + TypeScript |
+| Backend | NestJS 10 + TypeScript |
 | Banco de dados | PostgreSQL 16 |
 | ORM | Prisma 6 |
-| Frontend | React + TypeScript (PWA) — ainda não iniciado |
+| Frontend | React 18 + TypeScript + Vite (PWA) — em desenvolvimento |
 | Monorepo | Turborepo + npm workspaces |
+| Testes | Jest + Supertest |
 | Hash de senha | bcryptjs |
+
+## Documentação
+
+| Documento | Conteúdo |
+|---|---|
+| [`docs/architecture.md`](docs/architecture.md) | Escopo, schema, padrões de API e ADRs |
+| [`docs/openapi.yaml`](docs/openapi.yaml) | Contrato completo da API (OpenAPI 3.1, 36 endpoints) |
+| [`docs/checklist.md`](docs/checklist.md) | Progresso do MVP item a item |
 
 ## Estrutura de pastas
 
 ```
 meupaciente/
 ├── apps/
-│   ├── backend/
-│   │   ├── package.json
-│   │   ├── prisma/migrations gerenciadas em src/prisma/migrations
-│   │   └── src/
-│   │       ├── app.module.ts
-│   │       ├── main.ts
-│   │       └── prisma/
-│   │           ├── schema.prisma
-│   │           ├── seed.ts
-│   │           └── migrations/
-│   └── frontend/          # placeholder, setup ainda não iniciado
+│   ├── backend/                 # API NestJS
+│   │   ├── src/
+│   │   │   ├── common/          # decorators, filtro RFC 7807, mappers, paginação
+│   │   │   ├── config/          # validação de env no boot
+│   │   │   ├── modules/         # auth, users, tutors, patients, locations, appointments, vaccines
+│   │   │   ├── prisma/          # schema.prisma, migrations, seed
+│   │   │   └── main.ts
+│   │   └── test/                # testes e2e
+│   └── frontend/                # PWA React (esqueleto: Vite + vite-plugin-pwa)
 ├── packages/
-│   └── shared/            # DTOs e enums compartilhados (ainda não populado)
+│   └── shared/                  # DTOs e enums compartilhados (@meupaciente/shared)
 ├── docs/
-│   ├── architecture.md
-│   ├── checklist.md
-│   └── openapi.yaml
 ├── docker-compose.yml
-└── .env / .env.example
+└── .env.example
 ```
 
 ## Como executar o projeto localmente
@@ -53,19 +57,24 @@ Pré-requisitos: Node.js 20+, npm, Docker.
 # 1. Instalar dependências do monorepo
 npm install
 
-# 2. Subir o banco de dados (ver seção abaixo)
+# 2. Criar o .env a partir do exemplo
+cp .env.example .env
+
+# 3. Subir o banco de dados
 docker compose up -d
 
-# 3. Rodar migrations
+# 4. Rodar migrations (gera também o Prisma Client)
 cd apps/backend
 npm run db:migrate
 
-# 4. (Opcional) popular dados de teste
+# 5. (Opcional) popular dados de teste — usuário teste@meupaciente.com / teste123
 npm run db:seed
 
-# 5. Iniciar o backend em modo dev
+# 6. Iniciar o backend em modo dev (http://localhost:3000/v1)
 npm run dev
 ```
+
+Na raiz, `npm run dev` sobe backend e frontend juntos via Turborepo (o `packages/shared` é compilado antes).
 
 ## Como iniciar o banco de dados com Docker
 
@@ -77,35 +86,59 @@ docker compose up -d
 
 Isso sobe um container PostgreSQL 16 (`meupaciente-db`) na porta `5432`, com dados persistidos no volume `meupaciente_pgdata`. Para parar: `docker compose down` (o volume não é removido).
 
+## Testes
+
+Dentro de `apps/backend`:
+
+```bash
+# Unitários (não precisam de banco)
+npm test
+
+# e2e (precisam do Postgres no ar; rodam no schema isolado `test_e2e`)
+npm run test:e2e
+```
+
 ## Variáveis de ambiente
 
 Arquivo `.env` na raiz do projeto (copiar de `.env.example`):
 
-| Variável | Descrição |
+| Variável | Obrigatória | Descrição |
+|---|---|---|
+| `DATABASE_URL` | Sim | String de conexão PostgreSQL usada pelo Prisma |
+| `JWT_ACCESS_SECRET` | Sim | Segredo do access token JWT |
+| `JWT_REFRESH_SECRET` | Sim | Segredo do refresh token JWT |
+| `JWT_ACCESS_EXPIRES_IN` | Não | Validade do access token (padrão `15m`) |
+| `JWT_REFRESH_EXPIRES_IN` | Não | Validade do refresh token (padrão `7d`) |
+| `PORT` | Não | Porta do backend (padrão `3000`) |
+| `CORS_ORIGIN` | Não | Origens permitidas no CORS, separadas por vírgula (ausente = libera todas) |
+| `PUBLIC_URL` | Não | Base pública para montar a URL das fotos de pacientes (padrão `http://localhost:$PORT`) |
+| `NODE_ENV` | Não | Em `production`, o token de recuperação de senha deixa de ser logado |
+| `VITE_API_URL` | Não | URL base da API consumida pelo frontend |
+
+As variáveis obrigatórias são validadas no boot: o backend não sobe se faltar alguma. O `.env` fica na raiz do monorepo e é carregado pelos scripts do backend via `dotenv-cli`.
+
+## Estado atual
+
+**Backend completo para o MVP; frontend ainda não iniciado.** Detalhe item a item em [`docs/checklist.md`](docs/checklist.md).
+
+| Módulo | Endpoints (`/v1`) |
 |---|---|
-| `DATABASE_URL` | String de conexão PostgreSQL usada pelo Prisma |
-| `JWT_ACCESS_SECRET` | Segredo do access token JWT |
-| `JWT_REFRESH_SECRET` | Segredo do refresh token JWT |
-| `JWT_ACCESS_EXPIRES_IN` | Validade do access token (ex: `15m`) |
-| `JWT_REFRESH_EXPIRES_IN` | Validade do refresh token (ex: `7d`) |
-| `PORT` | Porta do backend NestJS |
-| `VITE_API_URL` | URL base da API consumida pelo frontend |
+| Auth | `POST /auth/register`, `/login`, `/refresh`, `/logout`, `/forgot-password`, `/reset-password` |
+| Users | `GET/PATCH /users/me`, `PATCH /users/me/password` |
+| Tutors | CRUD `/tutors` — busca por nome, e-mail ou telefone; remoção bloqueada se houver pacientes |
+| Locations | CRUD `/locations` — remoção bloqueada se houver atendimentos |
+| Patients | CRUD `/patients` — busca por paciente, tutor ou telefone; `PUT/DELETE /patients/:id/photo` |
+| Appointments | CRUD `/appointments` — filtros `patient_id`, `location_id`, `date_from`, `date_to` |
+| Vaccines | CRUD `/vaccines` — filtro `patient_id`; vínculo opcional a um atendimento do mesmo paciente |
 
-O `.env` fica na raiz do monorepo e é carregado pelos scripts do backend via `dotenv-cli` (os comandos `db:*` do `apps/backend` já apontam para `../../.env`).
+### Convenções da API
 
-## O que já foi implementado
+- Erros no formato RFC 7807 (`application/problem+json`); validação responde 422 com `errors[]` por campo.
+- Toda query é filtrada pelo `user_id` do token; recurso de outro usuário responde 404.
+- Datas trafegam como `YYYY-MM-DD`; data com hora é rejeitada.
+- PATCH é parcial: campo ausente não muda, `null` limpa campos anuláveis e é rejeitado em campos obrigatórios.
 
-- [x] Monorepo Turborepo (`apps/backend`, `apps/frontend`, `packages/shared`)
-- [x] PostgreSQL local via Docker Compose
-- [x] Prisma instalado no `apps/backend` (v6.19.3 — schema em `src/prisma/schema.prisma`)
-- [x] `schema.prisma` completo com os modelos da arquitetura v1.3.0 (`User`, `Tutor`, `Patient`, `Location`, `Appointment`, `RefreshToken`, `Document` reservado)
-- [x] Primeira migration (`init`) aplicada no banco
-- [x] Seed básico com usuário, tutor e paciente de teste
-- [x] **Módulo Auth completo** — register, login, refresh, logout, forgot/reset-password, guard JWT global, rate limiting (ver detalhes abaixo)
-
-### Módulo Auth
-
-Endpoints (`/v1/auth/*`, todos conforme `docs/openapi.yaml`):
+### Decisões do módulo Auth
 
 | Rota | Auth necessária | Rate limit |
 |---|---|---|
@@ -114,36 +147,26 @@ Endpoints (`/v1/auth/*`, todos conforme `docs/openapi.yaml`):
 | `POST /auth/refresh` | Não | 20/min |
 | `POST /auth/forgot-password` | Não | 5/min |
 | `POST /auth/reset-password` | Não | 5/min |
-| `POST /auth/logout` | Sim (Bearer access token) | — |
+| `POST /auth/logout` | Sim (Bearer access token) | 20/min |
 
-Decisões desta etapa:
+- **Access e refresh tokens são JWTs assinados com segredos separados.** O refresh token também tem o hash SHA-256 persistido em `refresh_tokens` (ADR-006): o `/auth/refresh` verifica assinatura **e** banco antes de rotacionar (o token usado é revogado e um novo par é emitido).
+- **Logout revoga todos os refresh tokens ativos do usuário.** A rota não recebe corpo, então não há como indicar uma sessão específica. Troca e redefinição de senha fazem o mesmo.
+- **`PasswordResetToken`** segue o padrão do `RefreshToken`: só o hash fica no banco, e o token é marcado `used` após o reset (validade de 1h).
+- **`/auth/forgot-password` ainda não envia e-mail** — não há provedor configurado. Sempre responde 200 (não revela se o e-mail existe) e, fora de produção, loga o token no console para uso manual. **Em produção a recuperação de senha não funciona até um provedor de e-mail ser integrado.**
+- **`JwtAuthGuard` é global** (`APP_GUARD`). Rotas públicas usam `@Public()`; `@CurrentUser()` expõe o usuário autenticado.
+- **Rate limiting (`@nestjs/throttler`) é aplicado só no `AuthController`.**
 
-- **`PasswordResetToken` — tabela nova, não prevista na arquitetura v1.3.0.** O schema aprovado não tinha onde persistir o token de recuperação de senha. Foi criada seguindo o mesmo padrão do `RefreshToken` (ADR-006): só o hash SHA-256 do token fica no banco, nunca o valor bruto, e o token é marcado `used` após o reset. Decisão confirmada com o usuário antes da migration.
-- **Access e refresh tokens são JWTs assinados com segredos separados** (`JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET`, já previstos no `.env.example`). O refresh token, além de assinado, tem seu hash persistido em `refresh_tokens` — o `/auth/refresh` verifica a assinatura **e** a existência/validade no banco antes de rotacionar (token antigo é revogado, um novo é emitido).
-- **`/auth/logout` revoga todos os refresh tokens ativos do usuário.** A rota não recebe corpo na spec (`docs/openapi.yaml`), então não há como indicar "qual" sessão encerrar — encerrar todas é o comportamento mais seguro para o MVP (single-user).
-- **`/auth/reset-password` também revoga todos os refresh tokens do usuário** ao trocar a senha, por segurança (uma sessão previamente aberta não sobrevive à troca de senha).
-- **`/auth/forgot-password` não envia e-mail de verdade** — não há provedor de e-mail configurado ainda no MVP. Sempre responde 200 (para não revelar se o e-mail existe, conforme a spec) e, se o e-mail existir, loga o link/token no console do backend para uso manual em desenvolvimento.
-- **`JwtAuthGuard` é global** (`APP_GUARD`), registrado dentro do próprio `AuthModule`. Rotas públicas usam `@Public()`; `@CurrentUser()` expõe o usuário autenticado (id extraído do JWT) nos controllers.
-- **Rate limiting (`@nestjs/throttler`) é aplicado só no `AuthController`**, não globalmente — os demais módulos ainda não têm requisitos de rate limit definidos.
-- **`ValidationPipe` global + filtro RFC 7807 (`application/problem+json`)** foram adicionados como pré-requisito para o Auth responder no formato definido em `docs/openapi.yaml` (erros com `type`/`title`/`status`/`detail`/`errors[]`). Cobre todo o app, não só Auth — é infraestrutura transversal mínima necessária, o hardening completo do item 8 do checklist (ownership, etc.) continua pendente.
+### Outras decisões de implementação
 
-### Decisões arquiteturais anteriores
-
-- **Prisma fixado em 6.19.3, não 7.x**: a v7 remove o suporte a `datasource.url` diretamente no `schema.prisma` (exige adapters de driver), quebrando a sintaxe já aprovada em `docs/architecture.md` v1.3.0. Fixar em 6.x evita reescrever a arquitetura aprovada por causa de uma dependência.
-- **Schema em `apps/backend/src/prisma/schema.prisma`**: segue a estrutura de pastas definida em `docs/architecture.md`, mantendo tudo relativo ao Prisma dentro do módulo de backend.
-- **`bcryptjs` em vez de `bcrypt`**: `bcrypt` exige compilação nativa (node-gyp), com risco de falha em ambientes Windows sem toolchain de build. `bcryptjs` é implementação pura em JS, mesma API, zero dependência nativa — sem downside relevante nesta escala.
-- **`.env` único na raiz do monorepo**: compartilhado entre backend e frontend (já era a convenção existente); os scripts `db:*` do backend usam `dotenv-cli` para carregá-lo, evitando duplicar variáveis por app.
+- **Foto de paciente em disco local** (`apps/backend/uploads/`, servido em `/uploads/`), atrás da interface `PatientPhotoStorage` (ADR-007). Em PaaS sem volume persistente a foto some no redeploy; migrar para R2/S3 é trocar um provider.
+- **Vacinas são um model próprio** com `appointment_id` opcional (ADR-009): remover um atendimento não apaga a vacina.
+- **Prisma fixado em 6.x, não 7.x**: a v7 remove `datasource.url` no `schema.prisma` (exige adapters de driver), o que quebraria a sintaxe aprovada na arquitetura.
+- **Schema em `apps/backend/src/prisma/schema.prisma`**, mantendo tudo do Prisma dentro do backend.
+- **`bcryptjs` em vez de `bcrypt`**: implementação pura em JS, sem compilação nativa (evita falhas com node-gyp).
+- **`.env` único na raiz do monorepo**, compartilhado entre backend e frontend.
 
 ## Próximos passos
 
-Com base no restante de `docs/checklist.md`:
-
-1. **Módulo Users** — perfil do usuário autenticado.
-2. **Módulo Tutors** — CRUD completo.
-3. **Módulo Locations** — CRUD completo.
-4. **Módulo Patients** — CRUD, foto, estratégia de storage.
-5. **Módulo Appointments** — CRUD, regras de `location_type`.
-6. **Validação e erros transversais** — checagem de ownership em todas as queries (o `ValidationPipe` global e o exception filter RFC 7807 já foram implementados junto com o Auth).
-7. **Testes** — unitários (auth, appointments) e e2e dos fluxos principais.
-8. **Frontend (PWA)** — setup React, telas de login, pacientes, atendimentos, tutores/locais, perfil.
-9. **Pré-lançamento** — placeholders legais, hosting, deploy de staging, teste piloto.
+1. **Frontend (PWA)** — cliente HTTP com refresh automático, telas de autenticação, pacientes, atendimentos, vacinas, tutores/locais e perfil.
+2. **Pendências do backend** — provedor de e-mail para recuperação de senha, limpeza de tokens expirados e testes que faltam.
+3. **Pré-lançamento** — hosting (com storage persistente para fotos), documentos legais, deploy de staging e teste com usuária piloto.
