@@ -167,6 +167,24 @@ describe('Fluxo principal (e2e)', () => {
     expect(res.body.diagnosis).toBe('Saudável');
   });
 
+  it('rejeita date = null no PATCH sem alterar o atendimento (422)', async () => {
+    const res = await request(app.getHttpServer())
+      .patch(`/v1/appointments/${appointmentId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ date: null })
+      .expect(422);
+
+    expect(res.body.errors).toEqual(
+      expect.arrayContaining([expect.objectContaining({ field: 'date' })]),
+    );
+
+    const detail = await request(app.getHttpServer())
+      .get(`/v1/appointments/${appointmentId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(detail.body.date).not.toBe('1970-01-01');
+  });
+
   it('busca o paciente com o tutor aninhado no detalhe', async () => {
     const res = await request(app.getHttpServer())
       .get(`/v1/patients/${patientId}`)
