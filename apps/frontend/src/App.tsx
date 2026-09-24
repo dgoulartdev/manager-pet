@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import { AppShell } from './components/AppShell/AppShell';
+import { AppointmentFormPage } from './pages/AppointmentForm/AppointmentFormPage';
 import { ToastProvider } from './components/Toast/Toast';
 import { LoginPage } from './pages/Login/LoginPage';
 import { NewPatientPage } from './pages/NewPatient/NewPatientPage';
@@ -56,12 +57,11 @@ export function App() {
               <Route path="/pacientes/:patientId" element={<PatientRecordPage />} />
               <Route
                 path="/pacientes/:patientId/atendimentos/novo"
-                element={
-                  <SectionPlaceholder
-                    title="Novo atendimento"
-                    description="Registro do atendimento: local, peso, queixa, diagnóstico, tratamento e prescrição."
-                  />
-                }
+                element={<AppointmentFormPage />}
+              />
+              <Route
+                path="/pacientes/:patientId/atendimentos/:appointmentId/editar"
+                element={<AppointmentFormPage />}
               />
               <Route
                 path="/tutores"
