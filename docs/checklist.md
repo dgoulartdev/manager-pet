@@ -97,10 +97,12 @@
 - [ ] Telas: esqueci minha senha / redefinir senha
 - [x] Estrutura do app (barra lateral, trilho no tablet, abas no mobile)
 - [x] Tela: lista de pacientes + busca (API passou a incluir o resumo do tutor)
-- [ ] Tela: cadastro/edição de paciente (com upload de foto)
-- [ ] Tela: timeline de atendimentos do paciente
+- [x] Tela: cadastro de paciente (espécie Cão/Gato/Outra, foto, criação de tutor sem sair do formulário)
+- [ ] Edição de paciente (a partir do prontuário)
+- [x] Tela: prontuário do paciente (dados, timeline de atendimentos, pesagens, foto, exclusão)
 - [ ] Tela: novo atendimento
-- [ ] Tela: vacinas do paciente (lista + cadastro, vínculo opcional a atendimento)
+- [x] Tela: vacinas do paciente (carteira com situação + registro)
+- [ ] Vacinas: editar/excluir e vínculo a um atendimento
 - [ ] Tela: tutores e locais (CRUD simples)
 - [ ] Tela: perfil do usuário (dados + troca de senha)
 
