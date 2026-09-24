@@ -25,9 +25,34 @@ export function formatAge(birthDate: string | null, today = new Date()): string 
 export function formatPhone(phone: string | null): string | null {
   if (!phone) return null;
   const digits = phone.replace(/\D/g, '');
-  if (digits.length === 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-  if (digits.length === 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  if (digits.length === 11)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  if (digits.length === 10)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
   return phone;
+}
+
+/** Máscara enquanto digita: "11999998888" → "(11) 99999-8888". Guarda-se só os dígitos. */
+export function maskPhoneInput(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 2) return digits.length ? `(${digits}` : '';
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
+export function digitsOnly(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
+/**
+ * Termo de busca para a API. Telefones são guardados só com dígitos, então
+ * "(11) 99999-8888" vira "11999998888"; texto com letras vai como foi digitado.
+ */
+export function toSearchTerm(text: string): string {
+  const term = text.trim();
+  return /^[\d\s()+.-]+$/.test(term) ? digitsOnly(term) : term;
 }
 
 /** Duas letras para o avatar: "Dra. Ana Lima" → "AL", "Miso" → "MI". */

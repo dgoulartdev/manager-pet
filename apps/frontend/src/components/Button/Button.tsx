@@ -1,15 +1,25 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Link, type LinkProps } from 'react-router-dom';
 import styles from './Button.module.css';
 
 interface ButtonLookProps {
-  variant?: 'primary' | 'secondary' | 'ghost';
+  // destructive: só dentro de confirmação (DS), nunca solto numa lista.
+  variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
 }
 
-function buttonClasses({ variant = 'primary', size = 'md', fullWidth = false }: ButtonLookProps, extra?: string) {
-  return [styles.button, styles[variant], styles[size], fullWidth ? styles.fullWidth : '', extra ?? ''].join(' ');
+function buttonClasses(
+  { variant = 'primary', size = 'md', fullWidth = false }: ButtonLookProps,
+  extra?: string,
+) {
+  return [
+    styles.button,
+    styles[variant],
+    styles[size],
+    fullWidth ? styles.fullWidth : '',
+    extra ?? '',
+  ].join(' ');
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonLookProps {
@@ -19,22 +29,26 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonLoo
   icon?: ReactNode;
 }
 
-export function Button({
-  variant = 'primary',
-  size = 'md',
-  fullWidth = false,
-  loading = false,
-  loadingLabel,
-  icon,
-  className,
-  children,
-  onClick,
-  ...props
-}: ButtonProps) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    variant = 'primary',
+    size = 'md',
+    fullWidth = false,
+    loading = false,
+    loadingLabel,
+    icon,
+    className,
+    children,
+    onClick,
+    ...props
+  },
+  ref,
+) {
   const classes = buttonClasses({ variant, size, fullWidth }, className);
 
   return (
     <button
+      ref={ref}
       type="button"
       {...props}
       className={classes}
@@ -54,14 +68,22 @@ export function Button({
       {loading && loadingLabel ? loadingLabel : children}
     </button>
   );
-}
+});
 
 interface ButtonLinkProps extends LinkProps, ButtonLookProps {
   icon?: ReactNode;
 }
 
 /** Navegação com aparência de botão: é um link de verdade (abre em nova aba, etc.). */
-export function ButtonLink({ variant, size, fullWidth, icon, className, children, ...props }: ButtonLinkProps) {
+export function ButtonLink({
+  variant,
+  size,
+  fullWidth,
+  icon,
+  className,
+  children,
+  ...props
+}: ButtonLinkProps) {
   return (
     <Link {...props} className={buttonClasses({ variant, size, fullWidth }, className)}>
       {icon}

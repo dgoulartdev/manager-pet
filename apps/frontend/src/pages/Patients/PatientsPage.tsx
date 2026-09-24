@@ -10,6 +10,7 @@ import {
   formatPhone,
   greetingFor,
   pluralize,
+  toSearchTerm,
 } from '../../lib/format';
 import { useApiQuery } from '../../lib/useApiQuery';
 import { useDocumentTitle } from '../../lib/useDocumentTitle';
@@ -23,11 +24,6 @@ import styles from './PatientsPage.module.css';
 const PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
-// O telefone é guardado só com dígitos: "(11) 99999-8888" digitado como aparece na lista
-// vira "11999998888" para a busca encontrar. Texto com letras vai como foi digitado.
-function toSearchTerm(text: string): string {
-  return /^[\d\s()+.-]+$/.test(text) ? text.replace(/\D/g, '') : text;
-}
 
 export function PatientsPage() {
   useDocumentTitle('Pacientes');

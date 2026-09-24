@@ -17,6 +17,12 @@
   color: var(--color-text-label);
 }
 
+.optional {
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--color-text-muted);
+}
+
 .labelRow a {
   font: var(--type-label);
 }

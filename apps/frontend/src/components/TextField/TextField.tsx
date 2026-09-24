@@ -4,6 +4,8 @@ import styles from './TextField.module.css';
 
 export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
+  // DS: marca-se o opcional, não o obrigatório (a API tem muitos campos anuláveis).
+  optional?: boolean;
   error?: string;
   hint?: string;
   // Ação ao lado do rótulo, como o link "Esqueci minha senha".
@@ -21,7 +23,7 @@ export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
  * O erro fica ligado ao campo por aria-describedby e marca aria-invalid.
  */
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function TextField(
-  { label, error, hint, labelAction, trailing, below, describedBy, id, className, ...inputProps },
+  { label, optional, error, hint, labelAction, trailing, below, describedBy, id, className, ...inputProps },
   ref,
 ) {
   const generatedId = useId();
@@ -37,6 +39,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
       <div className={styles.labelRow}>
         <label htmlFor={inputId} className={styles.label}>
           {label}
+          {optional && <span className={styles.optional}> (opcional)</span>}
         </label>
         {labelAction}
       </div>
