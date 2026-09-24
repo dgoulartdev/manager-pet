@@ -2,8 +2,22 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#12615c" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1418" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <title>MeuPaciente</title>
+    <script>
+      // Tema segue o sistema operacional. Roda antes do CSS para não piscar o tema claro.
+      (function () {
+        var media = window.matchMedia('(prefers-color-scheme: dark)');
+        function apply() {
+          document.documentElement.dataset.theme = media.matches ? 'dark' : 'light';
+        }
+        apply();
+        media.addEventListener('change', apply);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
