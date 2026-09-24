@@ -5,6 +5,17 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   // O .env fica na raiz do monorepo, compartilhado com o backend.
   envDir: '../../',
+  // O @meupaciente/shared é compilado em CommonJS (é usado também pelo NestJS).
+  // Sem isto, importar valores dele (enums como Sex) quebra no navegador; só
+  // tipos funcionavam, porque somem na compilação.
+  optimizeDeps: {
+    include: ['@meupaciente/shared'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/packages\/shared/, /node_modules/],
+    },
+  },
   server: {
     // Porta fixa: o CORS do backend libera exatamente esta origem (CORS_ORIGIN).
     port: 5173,

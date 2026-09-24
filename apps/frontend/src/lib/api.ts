@@ -1,10 +1,5 @@
 import type { AuthResponse } from '@meupaciente/shared';
-import {
-  clearSession,
-  getAccessToken,
-  readRefreshToken,
-  saveSession,
-} from './session';
+import { clearSession, getAccessToken, readRefreshToken, saveSession } from './session';
 
 const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:3000/v1').replace(/\/$/, '');
 
@@ -35,6 +30,7 @@ export class NetworkError extends Error {
 
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  // Objeto vira JSON; FormData (upload de arquivo) vai como multipart.
   body?: unknown;
   // false nas rotas públicas de /auth: não envia token nem tenta renovar a sessão.
   auth?: boolean;
@@ -53,11 +49,13 @@ export async function apiRequest<T>(
   path: string,
   { method = 'GET', body, auth = true }: RequestOptions = {},
 ): Promise<T> {
+  const isFormData = body instanceof FormData;
   const send = () =>
     sendRequest(path, {
       method,
-      headers: buildHeaders(body !== undefined, auth),
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      // Multipart: o navegador define o Content-Type com o boundary sozinho.
+      headers: buildHeaders(body !== undefined && !isFormData, auth),
+      body: isFormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
     });
 
   let response = await send();
@@ -113,9 +111,9 @@ export function refreshSession(): Promise<AuthResponse> {
   return refreshInFlight;
 }
 
-function buildHeaders(hasBody: boolean, auth: boolean): HeadersInit {
+function buildHeaders(hasJsonBody: boolean, auth: boolean): HeadersInit {
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (hasBody) headers['Content-Type'] = 'application/json';
+  if (hasJsonBody) headers['Content-Type'] = 'application/json';
   const token = getAccessToken();
   if (auth && token) headers.Authorization = `Bearer ${token}`;
   return headers;
