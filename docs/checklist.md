@@ -90,12 +90,13 @@
 - [ ] Testes e2e de vacinas, foto do paciente, `/users/me` e forgot/reset de senha
 
 ## 10. Frontend (PWA)
-- [ ] Setup do projeto React + PWA (Vite + `vite-plugin-pwa` já configurados; falta rotas e ícones do manifest)
-- [ ] Tipos/DTOs importados de `packages/shared`
-- [ ] Cliente HTTP com refresh automático do access token e tratamento de erros RFC 7807
-- [ ] Telas: login/registro
+- [x] Setup do projeto React + PWA (rotas, tokens do DS, fontes offline, ícone do manifest)
+- [x] Tipos/DTOs importados de `packages/shared`
+- [x] Cliente HTTP com refresh automático do access token e tratamento de erros RFC 7807
+- [x] Telas: login/registro
 - [ ] Telas: esqueci minha senha / redefinir senha
-- [ ] Tela: lista de pacientes + busca
+- [x] Estrutura do app (barra lateral, trilho no tablet, abas no mobile)
+- [x] Tela: lista de pacientes + busca (API passou a incluir o resumo do tutor)
 - [ ] Tela: cadastro/edição de paciente (com upload de foto)
 - [ ] Tela: timeline de atendimentos do paciente
 - [ ] Tela: novo atendimento
