@@ -1,0 +1,47 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.tile {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.md .tile {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+}
+
+.lg .tile {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+}
+
+.name {
+  font: 700 17px/1 var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+.panel .tile {
+  background: var(--color-brand-mark-bg);
+  color: var(--color-brand-mark-fg);
+}
+
+.panel .name {
+  color: var(--color-brand-panel-fg);
+}
+
+.surface .tile {
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg);
+}
+
+.surface .name {
+  color: var(--color-text-primary);
+}

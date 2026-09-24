@@ -1,0 +1,105 @@
+.page {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100dvh;
+  background: var(--color-surface);
+}
+
+/* ── painel de marca (só ≥ 1024px) ─────────────────────────────────── */
+.brandPanel {
+  display: none;
+}
+
+.pitch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 440px;
+}
+
+.headline {
+  font: var(--type-display);
+  font-size: 36px;
+  letter-spacing: var(--tracking-display);
+  color: var(--color-brand-panel-fg);
+  text-wrap: balance;
+}
+
+.description {
+  font: var(--type-body-large);
+  color: var(--color-brand-panel-body);
+  text-wrap: pretty;
+}
+
+.highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.highlights li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font: var(--type-body);
+  font-weight: 500;
+  color: var(--color-brand-panel-emphasis);
+}
+
+.highlights svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-brand-panel-muted);
+}
+
+.panelFooter {
+  font: var(--type-small);
+  font-weight: 500;
+  color: var(--color-brand-panel-muted);
+}
+
+/* ── área do formulário ────────────────────────────────────────────── */
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-16) var(--space-10);
+}
+
+@media (min-width: 1024px) {
+  .page {
+    grid-template-columns: clamp(400px, 44vw, 560px) 1fr;
+  }
+
+  .brandPanel {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-12);
+    height: 100dvh;
+    padding: var(--space-12);
+    background: var(--color-brand-panel);
+  }
+}
+
+@media (min-width: 1280px) {
+  .headline {
+    font-size: 48px;
+  }
+
+  .main {
+    padding: var(--space-16) var(--space-24);
+  }
+}
+
+@media (max-width: 767px) {
+  .main {
+    align-items: stretch;
+    padding: 0;
+  }
+}
