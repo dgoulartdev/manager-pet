@@ -100,7 +100,8 @@
 - [x] Tela: cadastro de paciente (espécie Cão/Gato/Outra, foto, criação de tutor sem sair do formulário)
 - [ ] Edição de paciente (a partir do prontuário)
 - [x] Tela: prontuário do paciente (dados, timeline de atendimentos, pesagens, foto, exclusão)
-- [ ] Tela: novo atendimento
+- [x] Tela: novo atendimento (local cadastrado/avulso/domicílio, peso, avaliação e conduta)
+- [x] Editar e excluir atendimento (a partir do histórico)
 - [x] Tela: vacinas do paciente (carteira com situação + registro)
 - [ ] Vacinas: editar/excluir e vínculo a um atendimento
 - [ ] Tela: tutores e locais (CRUD simples)
