@@ -68,6 +68,15 @@
   background: var(--color-hover);
 }
 
+.destructive {
+  background: var(--color-destructive-bg);
+  color: #ffffff;
+}
+
+.destructive:hover {
+  background: var(--color-destructive-hover);
+}
+
 .ghost {
   background: transparent;
   color: var(--color-text-secondary);

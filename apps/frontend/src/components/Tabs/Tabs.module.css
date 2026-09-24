@@ -1,0 +1,68 @@
+/* DS: sublinhado de 2px no item ativo, altura 44, gap 24, rolagem horizontal no mobile. */
+.tablist {
+  display: flex;
+  gap: var(--space-6);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-divider);
+  scrollbar-width: none;
+}
+
+.tablist::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: var(--type-small);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--color-text-primary);
+}
+
+.tab[aria-selected='true'] {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--color-action-primary-bg);
+}
+
+.tab:focus-visible {
+  outline-offset: -2px;
+}
+
+.count {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-hover);
+  color: var(--color-text-secondary);
+  font: 600 12px/1.4 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.tab[aria-selected='true'] .count {
+  background: var(--color-selected-bg);
+  color: var(--color-selected-fg);
+}

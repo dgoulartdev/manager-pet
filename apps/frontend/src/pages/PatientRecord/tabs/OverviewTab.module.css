@@ -1,0 +1,182 @@
+.layout {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.card {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+  box-shadow: var(--shadow-xs);
+}
+
+.cardTitle {
+  margin-bottom: var(--space-4);
+  font: var(--type-h6);
+}
+
+/* ── identificação: lista de definições em 2 colunas ───────────────── */
+/* Valores curtos: duas colunas já no celular, para não empurrar o resto para baixo. */
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.field dt {
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-muted);
+}
+
+.field dd {
+  margin: var(--space-1) 0 0;
+  overflow-wrap: anywhere;
+  font: var(--type-body);
+  color: var(--color-text-primary);
+}
+
+.field .data {
+  font: var(--type-data);
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  display: block;
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.missing {
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+}
+
+/* ── tutor ─────────────────────────────────────────────────────────── */
+.tutor {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.tutorText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tutorName {
+  font: var(--type-h6);
+}
+
+.contact {
+  font: var(--type-data);
+  font-size: 14px;
+}
+
+.contactEmail {
+  overflow: hidden;
+  font: var(--type-small);
+  font-weight: 500;
+  text-overflow: ellipsis;
+}
+
+/* ── foto ──────────────────────────────────────────────────────────── */
+.photo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.photoActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.photoHint,
+.photoError {
+  margin-top: var(--space-3);
+  font: var(--type-small);
+}
+
+.photoHint {
+  color: var(--color-text-muted);
+}
+
+.photoError {
+  font-weight: 500;
+  color: var(--color-error-fg);
+}
+
+/* ── exclusão ──────────────────────────────────────────────────────── */
+.danger {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.dangerTitle {
+  font: var(--type-h6);
+}
+
+.dangerText {
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+/* O vermelho fica para o botão da confirmação; aqui só o texto sinaliza. */
+.dangerButton {
+  color: var(--color-error-fg);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+@media (max-width: 767px) {
+  .dialogActions {
+    flex-direction: column-reverse;
+  }
+
+  .dialogActions button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: var(--space-5);
+  }
+
+  .fields {
+    gap: var(--space-5) var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+
+  .danger {
+    grid-column: 1 / -1;
+  }
+}

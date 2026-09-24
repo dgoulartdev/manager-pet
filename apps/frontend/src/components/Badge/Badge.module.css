@@ -1,0 +1,42 @@
+/* DS: altura 22, padding 4/8, raio xs, type.caption 600. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-xs);
+  font: var(--type-caption);
+  font-weight: 600;
+  letter-spacing: var(--tracking-caption);
+  white-space: nowrap;
+}
+
+.neutral {
+  background: var(--color-hover);
+  color: var(--color-text-secondary);
+}
+
+.primary {
+  background: var(--color-selected-bg);
+  color: var(--color-selected-fg);
+}
+
+.success {
+  background: var(--color-success-surface);
+  color: var(--color-success-fg);
+}
+
+.warning {
+  background: var(--color-warning-surface);
+  color: var(--color-warning-fg);
+}
+
+.error {
+  background: var(--color-error-surface);
+  color: var(--color-error-fg);
+}
+
+.accent {
+  background: var(--color-avatar-patient-bg);
+  color: var(--color-avatar-patient-fg);
+}

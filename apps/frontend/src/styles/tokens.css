@@ -177,6 +177,8 @@
   --color-action-primary-hover: var(--primary-700);
   --color-action-primary-active: var(--primary-800);
   --color-action-secondary-fg: var(--secondary-700);
+  --color-destructive-bg: var(--error-600);
+  --color-destructive-hover: var(--error-700);
 
   --color-focus-ring: rgba(31, 152, 141, 0.35);
   --color-focus-border: var(--primary-500);
@@ -215,6 +217,12 @@
   --color-avatar-patient-fg: var(--accent-700);
   --color-avatar-person-bg: var(--primary-100);
   --color-avatar-person-fg: var(--primary-700);
+  /* Marcador da linha do tempo (DS: acento terracota, fora das ações). */
+  --color-timeline-marker: var(--accent-500);
+  /* Gráfico de evolução de peso (DS: acento). accent-500 validado nos dois temas. */
+  --color-chart-line: var(--accent-500);
+  --color-chart-area: rgba(228, 94, 57, 0.1);
+  --color-chart-grid: var(--secondary-100);
 
   /* Painel de marca (telas de entrada). */
   --color-brand-panel: var(--primary-700);
@@ -282,6 +290,9 @@
   --color-avatar-patient-fg: var(--accent-200);
   --color-avatar-person-bg: rgba(70, 181, 170, 0.14);
   --color-avatar-person-fg: var(--primary-300);
+  --color-timeline-marker: var(--accent-400);
+  --color-chart-area: rgba(228, 94, 57, 0.14);
+  --color-chart-grid: #212c34;
 
   --color-brand-panel: var(--primary-900);
   --color-brand-panel-fg: #e8eef2;

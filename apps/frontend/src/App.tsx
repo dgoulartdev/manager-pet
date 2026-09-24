@@ -5,6 +5,7 @@ import { AppShell } from './components/AppShell/AppShell';
 import { ToastProvider } from './components/Toast/Toast';
 import { LoginPage } from './pages/Login/LoginPage';
 import { NewPatientPage } from './pages/NewPatient/NewPatientPage';
+import { PatientRecordPage } from './pages/PatientRecord/PatientRecordPage';
 import { PatientsPage } from './pages/Patients/PatientsPage';
 import { ProfilePlaceholder, SectionPlaceholder } from './pages/Placeholder/SectionPlaceholder';
 import { RegisterPage } from './pages/Register/RegisterPage';
@@ -52,12 +53,13 @@ export function App() {
             >
               <Route path="/pacientes" element={<PatientsPage />} />
               <Route path="/pacientes/novo" element={<NewPatientPage />} />
+              <Route path="/pacientes/:patientId" element={<PatientRecordPage />} />
               <Route
-                path="/pacientes/:patientId"
+                path="/pacientes/:patientId/atendimentos/novo"
                 element={
                   <SectionPlaceholder
-                    title="Prontuário"
-                    description="Dados do paciente, histórico de atendimentos e vacinas."
+                    title="Novo atendimento"
+                    description="Registro do atendimento: local, peso, queixa, diagnóstico, tratamento e prescrição."
                   />
                 }
               />
