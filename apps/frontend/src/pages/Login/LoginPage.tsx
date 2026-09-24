@@ -56,7 +56,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as LoginLocationState | null;
-  const redirectTo = locationState?.from ?? '/';
+  const redirectTo = locationState?.from ?? '/pacientes';
 
   const [email, setEmail] = useState(locationState?.email ?? '');
   const [password, setPassword] = useState('');

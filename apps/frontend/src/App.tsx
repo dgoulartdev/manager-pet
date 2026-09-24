@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/AuthContext';
-import { HomePage } from './pages/Home/HomePage';
+import { AppShell } from './components/AppShell/AppShell';
 import { LoginPage } from './pages/Login/LoginPage';
+import { PatientsPage } from './pages/Patients/PatientsPage';
+import { ProfilePlaceholder, SectionPlaceholder } from './pages/Placeholder/SectionPlaceholder';
 import { RegisterPage } from './pages/Register/RegisterPage';
 import { UnderConstructionPage } from './pages/UnderConstruction/UnderConstructionPage';
 import styles from './App.module.css';
@@ -36,15 +38,46 @@ export function App() {
               </PublicOnly>
             }
           />
+
+          {/* Telas internas: todas dentro da estrutura com navegação. */}
           <Route
-            path="/"
             element={
               <RequireAuth>
-                <HomePage />
+                <AppShell />
               </RequireAuth>
             }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          >
+            <Route path="/pacientes" element={<PatientsPage />} />
+            <Route
+              path="/pacientes/novo"
+              element={
+                <SectionPlaceholder
+                  title="Novo paciente"
+                  description="Cadastro com nome, espécie, tutor e foto."
+                />
+              }
+            />
+            <Route
+              path="/pacientes/:patientId"
+              element={
+                <SectionPlaceholder
+                  title="Prontuário"
+                  description="Dados do paciente, histórico de atendimentos e vacinas."
+                />
+              }
+            />
+            <Route
+              path="/tutores"
+              element={<SectionPlaceholder title="Tutores" description="Cadastro e busca dos tutores dos seus pacientes." />}
+            />
+            <Route
+              path="/locais"
+              element={<SectionPlaceholder title="Locais" description="Clínicas e consultórios onde você atende." />}
+            />
+            <Route path="/perfil" element={<ProfilePlaceholder />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/pacientes" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
@@ -70,7 +103,7 @@ function PublicOnly({ children }: { children: ReactNode }) {
 
   if (state.status === 'loading') return <SessionLoading />;
   if (state.status === 'authenticated') {
-    const from = (location.state as { from?: string } | null)?.from ?? '/';
+    const from = (location.state as { from?: string } | null)?.from ?? '/pacientes';
     return <Navigate to={from} replace />;
   }
   return children;

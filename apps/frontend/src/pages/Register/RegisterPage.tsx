@@ -108,7 +108,7 @@ export function RegisterPage() {
         { name: values.name.trim(), email: values.email.trim(), password: values.password },
         prefersRememberedSession(),
       );
-      navigate('/', { replace: true });
+      navigate('/pacientes', { replace: true });
     } catch (error) {
       setSubmitting(false);
       if (error instanceof ApiError && error.status === 409) {
