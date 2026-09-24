@@ -2,7 +2,9 @@ import type { ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import { AppShell } from './components/AppShell/AppShell';
+import { ToastProvider } from './components/Toast/Toast';
 import { LoginPage } from './pages/Login/LoginPage';
+import { NewPatientPage } from './pages/NewPatient/NewPatientPage';
 import { PatientsPage } from './pages/Patients/PatientsPage';
 import { ProfilePlaceholder, SectionPlaceholder } from './pages/Placeholder/SectionPlaceholder';
 import { RegisterPage } from './pages/Register/RegisterPage';
@@ -12,74 +14,78 @@ import styles from './App.module.css';
 export function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/entrar"
-            element={
-              <PublicOnly>
-                <LoginPage />
-              </PublicOnly>
-            }
-          />
-          <Route
-            path="/criar-conta"
-            element={
-              <PublicOnly>
-                <RegisterPage />
-              </PublicOnly>
-            }
-          />
-          <Route
-            path="/esqueci-senha"
-            element={
-              <PublicOnly>
-                <UnderConstructionPage title="Recuperar acesso" />
-              </PublicOnly>
-            }
-          />
-
-          {/* Telas internas: todas dentro da estrutura com navegação. */}
-          <Route
-            element={
-              <RequireAuth>
-                <AppShell />
-              </RequireAuth>
-            }
-          >
-            <Route path="/pacientes" element={<PatientsPage />} />
+      <ToastProvider>
+        <BrowserRouter>
+          <Routes>
             <Route
-              path="/pacientes/novo"
+              path="/entrar"
               element={
-                <SectionPlaceholder
-                  title="Novo paciente"
-                  description="Cadastro com nome, espécie, tutor e foto."
-                />
+                <PublicOnly>
+                  <LoginPage />
+                </PublicOnly>
               }
             />
             <Route
-              path="/pacientes/:patientId"
+              path="/criar-conta"
               element={
-                <SectionPlaceholder
-                  title="Prontuário"
-                  description="Dados do paciente, histórico de atendimentos e vacinas."
-                />
+                <PublicOnly>
+                  <RegisterPage />
+                </PublicOnly>
               }
             />
             <Route
-              path="/tutores"
-              element={<SectionPlaceholder title="Tutores" description="Cadastro e busca dos tutores dos seus pacientes." />}
+              path="/esqueci-senha"
+              element={
+                <PublicOnly>
+                  <UnderConstructionPage title="Recuperar acesso" />
+                </PublicOnly>
+              }
             />
-            <Route
-              path="/locais"
-              element={<SectionPlaceholder title="Locais" description="Clínicas e consultórios onde você atende." />}
-            />
-            <Route path="/perfil" element={<ProfilePlaceholder />} />
-          </Route>
 
-          <Route path="*" element={<Navigate to="/pacientes" replace />} />
-        </Routes>
-      </BrowserRouter>
+            {/* Telas internas: todas dentro da estrutura com navegação. */}
+            <Route
+              element={
+                <RequireAuth>
+                  <AppShell />
+                </RequireAuth>
+              }
+            >
+              <Route path="/pacientes" element={<PatientsPage />} />
+              <Route path="/pacientes/novo" element={<NewPatientPage />} />
+              <Route
+                path="/pacientes/:patientId"
+                element={
+                  <SectionPlaceholder
+                    title="Prontuário"
+                    description="Dados do paciente, histórico de atendimentos e vacinas."
+                  />
+                }
+              />
+              <Route
+                path="/tutores"
+                element={
+                  <SectionPlaceholder
+                    title="Tutores"
+                    description="Cadastro e busca dos tutores dos seus pacientes."
+                  />
+                }
+              />
+              <Route
+                path="/locais"
+                element={
+                  <SectionPlaceholder
+                    title="Locais"
+                    description="Clínicas e consultórios onde você atende."
+                  />
+                }
+              />
+              <Route path="/perfil" element={<ProfilePlaceholder />} />
+            </Route>
+
+            <Route path="*" element={<Navigate to="/pacientes" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </ToastProvider>
     </AuthProvider>
   );
 }
