@@ -1369,6 +1369,30 @@ components:
           type: [string, "null"]
           format: date
 
+    TutorSummary:
+      type: object
+      description: Resumo do tutor usado na listagem de pacientes
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Maria Souza"
+        phone:
+          type: [string, "null"]
+          example: "11999998888"
+
+    PatientListItem:
+      allOf:
+        - $ref: "#/components/schemas/Patient"
+        - type: object
+          required: [tutor]
+          properties:
+            tutor:
+              $ref: "#/components/schemas/TutorSummary"
+
     PatientListResponse:
       type: object
       required: [data, pagination]
@@ -1376,7 +1400,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Patient"
+            $ref: "#/components/schemas/PatientListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 

@@ -9,6 +9,7 @@ import type {
   PaginatedResponse,
   PatientDetailDto,
   PatientDto,
+  PatientListItemDto,
   PhotoUploadResponse,
 } from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -16,6 +17,7 @@ import { paginate } from '../../common/pagination';
 import {
   toPatientDetailDto,
   toPatientDto,
+  toPatientListItemDto,
 } from '../../common/mappers/patient.mapper';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
@@ -61,7 +63,7 @@ export class PatientsService {
   async findAll(
     userId: string,
     query: ListPatientsQueryDto,
-  ): Promise<PaginatedResponse<PatientDto>> {
+  ): Promise<PaginatedResponse<PatientListItemDto>> {
     const { page, per_page, q, tutor_id } = query;
 
     const where: Prisma.PatientWhereInput = {
@@ -81,6 +83,8 @@ export class PatientsService {
     const [patients, total] = await this.prisma.$transaction([
       this.prisma.patient.findMany({
         where,
+        // Resumo do tutor: a lista mostra o dono sem uma requisição por linha.
+        include: { tutor: { select: { id: true, name: true, phone: true } } },
         orderBy: { created_at: 'desc' },
         skip: (page - 1) * per_page,
         take: per_page,
@@ -88,7 +92,7 @@ export class PatientsService {
       this.prisma.patient.count({ where }),
     ]);
 
-    return paginate(patients.map(toPatientDto), total, page, per_page);
+    return paginate(patients.map(toPatientListItemDto), total, page, per_page);
   }
 
   async findOne(userId: string, id: string): Promise<PatientDetailDto> {

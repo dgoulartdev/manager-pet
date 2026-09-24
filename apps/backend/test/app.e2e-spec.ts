@@ -118,6 +118,20 @@ describe('Fluxo principal (e2e)', () => {
     patientId = res.body.id;
   });
 
+  it('lista pacientes com o resumo do tutor', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/v1/patients?q=Miau')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].tutor).toEqual({
+      id: tutorId,
+      name: 'Maria Tutora',
+      phone: '11999999999',
+    });
+  });
+
   it('rejeita atendimento REGISTERED sem location_id (422)', async () => {
     await request(app.getHttpServer())
       .post('/v1/appointments')

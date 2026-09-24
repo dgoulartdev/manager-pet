@@ -1,5 +1,9 @@
 import { Patient, Tutor } from '@prisma/client';
-import type { PatientDetailDto, PatientDto } from '@meupaciente/shared';
+import type {
+  PatientDetailDto,
+  PatientDto,
+  PatientListItemDto,
+} from '@meupaciente/shared';
 import { Sex } from '@meupaciente/shared';
 import { toTutorDto } from './tutor.mapper';
 
@@ -19,6 +23,19 @@ export function toPatientDto(patient: Patient): PatientDto {
     photo_url: patient.photo_url,
     created_at: patient.created_at.toISOString(),
     updated_at: patient.updated_at.toISOString(),
+  };
+}
+
+export function toPatientListItemDto(
+  patient: Patient & { tutor: Pick<Tutor, 'id' | 'name' | 'phone'> },
+): PatientListItemDto {
+  return {
+    ...toPatientDto(patient),
+    tutor: {
+      id: patient.tutor.id,
+      name: patient.tutor.name,
+      phone: patient.tutor.phone,
+    },
   };
 }
 

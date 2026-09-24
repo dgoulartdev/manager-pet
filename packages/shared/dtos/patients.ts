@@ -21,6 +21,18 @@ export interface PatientDetailDto extends PatientDto {
   tutor: TutorDto;
 }
 
+// Resumo do tutor na listagem: o suficiente para identificar o dono na lista.
+export interface TutorSummaryDto {
+  id: string;
+  name: string;
+  phone: string | null;
+}
+
+// Item de GET /patients: paciente + resumo do tutor.
+export interface PatientListItemDto extends PatientDto {
+  tutor: TutorSummaryDto;
+}
+
 export interface CreatePatientRequest {
   tutor_id: string;
   name: string;
@@ -44,4 +56,4 @@ export interface PhotoUploadResponse {
   photo_url: string;
 }
 
-export type PatientListResponse = PaginatedResponse<PatientDto>;
+export type PatientListResponse = PaginatedResponse<PatientListItemDto>;
