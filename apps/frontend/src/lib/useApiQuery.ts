@@ -11,16 +11,18 @@ interface QueryState<T> {
  * Busca um GET da API e refaz quando o caminho muda. Mantém o último dado
  * enquanto carrega o próximo (troca de página ou busca sem piscar a tela) e
  * descarta respostas que chegam depois de o caminho já ter mudado.
+ * Caminho nulo = não buscar (consulta que só vale em alguns casos).
  */
-export function useApiQuery<T>(path: string) {
+export function useApiQuery<T>(path: string | null) {
   const [state, setState] = useState<QueryState<T>>({
     data: undefined,
     error: undefined,
-    loading: true,
+    loading: path !== null,
   });
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    if (path === null) return;
     let current = true;
     setState((previous) => ({ ...previous, error: undefined, loading: true }));
     apiRequest<T>(path)
