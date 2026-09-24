@@ -204,6 +204,18 @@
   --color-warning-surface: var(--warning-50);
   --color-warning-subtle: var(--warning-200);
 
+  /* Item selecionado (navegação, linha ativa): fundo tonal primário. */
+  --color-selected-bg: var(--primary-100);
+  --color-selected-fg: var(--primary-700);
+  /* Fundo levemente mais escuro que o card: cabeçalho de tabela, esqueleto. */
+  --color-subtle-surface: var(--secondary-50);
+
+  /* Avatares: paciente sem foto usa o acento terracota (DS, DDR-008); pessoa usa o primário. */
+  --color-avatar-patient-bg: var(--accent-50);
+  --color-avatar-patient-fg: var(--accent-700);
+  --color-avatar-person-bg: var(--primary-100);
+  --color-avatar-person-fg: var(--primary-700);
+
   /* Painel de marca (telas de entrada). */
   --color-brand-panel: var(--primary-700);
   --color-brand-panel-fg: #ffffff;
@@ -261,6 +273,15 @@
   --color-warning-border: var(--warning-400);
   --color-warning-surface: rgba(103, 49, 15, 0.24);
   --color-warning-subtle: var(--warning-700);
+
+  --color-selected-bg: rgba(70, 181, 170, 0.14);
+  --color-selected-fg: var(--primary-300);
+  --color-subtle-surface: #141c21;
+
+  --color-avatar-patient-bg: rgba(98, 39, 28, 0.45);
+  --color-avatar-patient-fg: var(--accent-200);
+  --color-avatar-person-bg: rgba(70, 181, 170, 0.14);
+  --color-avatar-person-fg: var(--primary-300);
 
   --color-brand-panel: var(--primary-900);
   --color-brand-panel-fg: #e8eef2;

@@ -1,0 +1,36 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-16) var(--space-6);
+  text-align: center;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius-full);
+  background: var(--color-avatar-patient-bg);
+  color: var(--color-avatar-patient-fg);
+}
+
+.title {
+  font: var(--type-h4);
+  letter-spacing: var(--tracking-h4);
+  color: var(--color-text-primary);
+}
+
+.description {
+  max-width: 44ch;
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.action {
+  margin-top: var(--space-6);
+}

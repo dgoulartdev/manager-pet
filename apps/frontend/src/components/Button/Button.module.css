@@ -14,6 +14,11 @@
     box-shadow var(--transition-fast);
 }
 
+/* Quando é um link (ButtonLink), não herda o sublinhado de hover dos links. */
+.button:hover {
+  text-decoration: none;
+}
+
 .button:focus-visible {
   outline: none;
   box-shadow: var(--shadow-focus);

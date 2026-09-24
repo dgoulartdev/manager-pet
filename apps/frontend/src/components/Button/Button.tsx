@@ -1,10 +1,18 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { Link, type LinkProps } from 'react-router-dom';
 import styles from './Button.module.css';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonLookProps {
   variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
+}
+
+function buttonClasses({ variant = 'primary', size = 'md', fullWidth = false }: ButtonLookProps, extra?: string) {
+  return [styles.button, styles[variant], styles[size], fullWidth ? styles.fullWidth : '', extra ?? ''].join(' ');
+}
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonLookProps {
   loading?: boolean;
   // Texto durante o carregamento (ex.: "Entrando…"). Sem ele, o texto se mantém.
   loadingLabel?: string;
@@ -23,13 +31,7 @@ export function Button({
   onClick,
   ...props
 }: ButtonProps) {
-  const classes = [
-    styles.button,
-    styles[variant],
-    styles[size],
-    fullWidth ? styles.fullWidth : '',
-    className ?? '',
-  ].join(' ');
+  const classes = buttonClasses({ variant, size, fullWidth }, className);
 
   return (
     <button
@@ -51,5 +53,19 @@ export function Button({
       {loading ? <span className={styles.spinner} aria-hidden="true" /> : icon}
       {loading && loadingLabel ? loadingLabel : children}
     </button>
+  );
+}
+
+interface ButtonLinkProps extends LinkProps, ButtonLookProps {
+  icon?: ReactNode;
+}
+
+/** Navegação com aparência de botão: é um link de verdade (abre em nova aba, etc.). */
+export function ButtonLink({ variant, size, fullWidth, icon, className, children, ...props }: ButtonLinkProps) {
+  return (
+    <Link {...props} className={buttonClasses({ variant, size, fullWidth }, className)}>
+      {icon}
+      {children}
+    </Link>
   );
 }
