@@ -1,16 +1,24 @@
-import { ArrowLeft, ClipboardList, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, ClipboardList, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { LocationType, type AppointmentDto } from '@meupaciente/shared';
-import { formatDayMonth, formatLongDate, formatMonthYear } from '../../../lib/dates';
+import { apiRequest } from '../../../lib/api';
+import { formatDate, formatDayMonth, formatLongDate, formatMonthYear } from '../../../lib/dates';
 import { formatWeight } from '../../../lib/weights';
-import { ButtonLink } from '../../../components/Button/Button';
+import { Alert } from '../../../components/Alert/Alert';
+import { Button, ButtonLink } from '../../../components/Button/Button';
+import { Dialog } from '../../../components/Dialog/Dialog';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
+import { useToast } from '../../../components/Toast/Toast';
 import styles from './HistoryTab.module.css';
 
 interface HistoryTabProps {
   appointments: AppointmentDto[]; // mais recente primeiro (ordem da API)
   locationNames: Map<string, string>;
+  patientId: string;
   newAppointmentPath: string;
+  // Depois de excluir um atendimento: recarrega a lista.
+  onChanged: () => void;
 }
 
 // Seções da evolução, na ordem do atendimento. Campo vazio não aparece.
@@ -49,7 +57,13 @@ function titleOf(appointment: AppointmentDto): string {
  * comparar atendimentos sem perder o lugar na lista. No mobile vira navegação
  * em dois passos — a URL guarda o atendimento aberto (?atendimento=).
  */
-export function HistoryTab({ appointments, locationNames, newAppointmentPath }: HistoryTabProps) {
+export function HistoryTab({
+  appointments,
+  locationNames,
+  patientId,
+  newAppointmentPath,
+  onChanged,
+}: HistoryTabProps) {
   const [searchParams] = useSearchParams();
   const openedId = searchParams.get('atendimento');
 
@@ -132,7 +146,12 @@ export function HistoryTab({ appointments, locationNames, newAppointmentPath }: 
           <ArrowLeft size={18} strokeWidth={1.75} aria-hidden="true" />
           Voltar para o histórico
         </Link>
-        <AppointmentDetail appointment={selected} locationNames={locationNames} />
+        <AppointmentDetail
+          appointment={selected}
+          locationNames={locationNames}
+          editPath={`/pacientes/${patientId}/atendimentos/${selected.id}/editar`}
+          onDeleted={onChanged}
+        />
       </article>
     </div>
   );
@@ -141,9 +160,13 @@ export function HistoryTab({ appointments, locationNames, newAppointmentPath }: 
 function AppointmentDetail({
   appointment,
   locationNames,
+  editPath,
+  onDeleted,
 }: {
   appointment: AppointmentDto;
   locationNames: Map<string, string>;
+  editPath: string;
+  onDeleted: () => void;
 }) {
   const location = describeLocation(appointment, locationNames);
   const sections = SECTIONS.filter(({ key }) => appointment[key]);
@@ -151,9 +174,22 @@ function AppointmentDetail({
   return (
     <>
       <header className={styles.detailHeader}>
-        <h3 id="atendimento-titulo" className={styles.detailTitle}>
-          Atendimento de {formatLongDate(appointment.date)}
-        </h3>
+        <div className={styles.detailTop}>
+          <h3 id="atendimento-titulo" className={styles.detailTitle}>
+            Atendimento de {formatLongDate(appointment.date)}
+          </h3>
+          <div className={styles.detailActions}>
+            <ButtonLink
+              to={editPath}
+              variant="secondary"
+              size="sm"
+              icon={<Pencil size={16} strokeWidth={1.75} aria-hidden="true" />}
+            >
+              Editar
+            </ButtonLink>
+            <DeleteAppointment appointment={appointment} onDeleted={onDeleted} />
+          </div>
+        </div>
         <dl className={styles.facts}>
           <div>
             <dt>Local</dt>
@@ -190,6 +226,80 @@ function AppointmentDetail({
           ))}
         </div>
       )}
+    </>
+  );
+}
+
+/**
+ * Exclusão de atendimento. As vacinas registradas nele continuam na carteira
+ * (a API desfaz só o vínculo — ADR-009); a confirmação avisa isso.
+ */
+function DeleteAppointment({
+  appointment,
+  onDeleted,
+}: {
+  appointment: AppointmentDto;
+  onDeleted: () => void;
+}) {
+  const showToast = useToast();
+  const [open, setOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  async function confirm() {
+    setDeleting(true);
+    setFailed(false);
+    try {
+      await apiRequest(`/appointments/${appointment.id}`, { method: 'DELETE' });
+      setOpen(false);
+      showToast({
+        tone: 'success',
+        title: `Atendimento de ${formatDate(appointment.date)} excluído`,
+      });
+      onDeleted();
+    } catch {
+      setFailed(true);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <>
+      <Button
+        variant="ghost"
+        size="sm"
+        aria-label="Excluir atendimento"
+        icon={<Trash2 size={16} strokeWidth={1.75} aria-hidden="true" />}
+        onClick={() => setOpen(true)}
+      >
+        Excluir
+      </Button>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        title={`Excluir o atendimento de ${formatDate(appointment.date)}?`}
+        description="O peso e as anotações deste atendimento serão apagados. Vacinas registradas nele continuam na carteira. Não é possível desfazer."
+      >
+        {failed && (
+          <Alert tone="error" title="Não foi possível excluir">
+            Verifique sua conexão e tente de novo.
+          </Alert>
+        )}
+        <div className={styles.dialogActions}>
+          <Button variant="secondary" onClick={() => setOpen(false)} data-autofocus>
+            Cancelar
+          </Button>
+          <Button
+            variant="destructive"
+            loading={deleting}
+            loadingLabel="Excluindo…"
+            onClick={confirm}
+          >
+            Excluir atendimento
+          </Button>
+        </div>
+      </Dialog>
     </>
   );
 }

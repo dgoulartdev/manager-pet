@@ -193,7 +193,9 @@ export function PatientRecordPage() {
               <HistoryTab
                 appointments={appointments}
                 locationNames={locationNames}
+                patientId={patient.id}
                 newAppointmentPath={newAppointmentPath}
+                onChanged={appointmentsQuery.retry}
               />
             )}
           </SectionState>
