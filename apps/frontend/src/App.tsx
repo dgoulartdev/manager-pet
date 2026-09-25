@@ -9,7 +9,7 @@ import { LoginPage } from './pages/Login/LoginPage';
 import { NewPatientPage } from './pages/NewPatient/NewPatientPage';
 import { PatientRecordPage } from './pages/PatientRecord/PatientRecordPage';
 import { PatientsPage } from './pages/Patients/PatientsPage';
-import { ProfilePlaceholder } from './pages/Placeholder/SectionPlaceholder';
+import { ProfilePage } from './pages/Profile/ProfilePage';
 import { RegisterPage } from './pages/Register/RegisterPage';
 import { TutorsPage } from './pages/Tutors/TutorsPage';
 import { UnderConstructionPage } from './pages/UnderConstruction/UnderConstructionPage';
@@ -67,7 +67,7 @@ export function App() {
               />
               <Route path="/tutores" element={<TutorsPage />} />
               <Route path="/locais" element={<LocationsPage />} />
-              <Route path="/perfil" element={<ProfilePlaceholder />} />
+              <Route path="/perfil" element={<ProfilePage />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/pacientes" replace />} />

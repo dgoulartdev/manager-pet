@@ -14,7 +14,12 @@ import type {
   UserDto,
 } from '@meupaciente/shared';
 import { apiRequest, onSessionExpired, refreshSession } from '../lib/api';
-import { clearSession, readRefreshToken, saveSession } from '../lib/session';
+import {
+  clearSession,
+  prefersRememberedSession,
+  readRefreshToken,
+  saveSession,
+} from '../lib/session';
 
 type AuthState =
   | { status: 'loading' }
@@ -27,6 +32,14 @@ interface AuthContextValue {
   // A API já devolve os tokens no cadastro: a conta criada entra direto.
   register: (data: RegisterRequest, remember: boolean) => Promise<void>;
   logout: () => Promise<void>;
+  // Perfil salvo: o usuário devolvido pela API passa a valer no app todo (menu, saudação).
+  updateUser: (user: UserDto) => void;
+  /**
+   * Troca a senha. A API revoga todas as sessões, inclusive esta, então o app
+   * entra de novo com a nova senha. "signed-out": a senha foi trocada, mas não
+   * deu para entrar de novo — a pessoa volta ao login.
+   */
+  changePassword: (currentPassword: string, newPassword: string) => Promise<'kept' | 'signed-out'>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -97,9 +110,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const updateUser = useCallback((user: UserDto) => {
+    setState({ status: 'authenticated', user });
+  }, []);
+
+  const email = state.status === 'authenticated' ? state.user.email : null;
+  const changePassword = useCallback(
+    async (currentPassword: string, newPassword: string) => {
+      if (!email) throw new Error('changePassword exige uma sessão aberta.');
+      // Lido antes da troca: a nova sessão fica guardada do mesmo jeito que a atual.
+      const remember = readRefreshToken()?.remember ?? prefersRememberedSession();
+      await apiRequest<void>('/users/me/password', {
+        method: 'PATCH',
+        body: { current_password: currentPassword, new_password: newPassword },
+      });
+      try {
+        await login({ email, password: newPassword }, remember);
+        return 'kept' as const;
+      } catch {
+        clearSession();
+        setState({ status: 'anonymous' });
+        return 'signed-out' as const;
+      }
+    },
+    [email, login],
+  );
+
   const value = useMemo(
-    () => ({ state, login, register, logout }),
-    [state, login, register, logout],
+    () => ({ state, login, register, logout, updateUser, changePassword }),
+    [state, login, register, logout, updateUser, changePassword],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
