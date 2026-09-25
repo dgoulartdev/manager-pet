@@ -21,12 +21,12 @@ import { Alert } from '../../components/Alert/Alert';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Button, ButtonLink } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
+import { LocationDialog } from '../../components/LocationDialog/LocationDialog';
 import { Segmented } from '../../components/Segmented/Segmented';
 import { Select } from '../../components/Select/Select';
 import { Textarea } from '../../components/Textarea/Textarea';
 import { TextField } from '../../components/TextField/TextField';
 import { useToast } from '../../components/Toast/Toast';
-import { NewLocationDialog } from './NewLocationDialog';
 import styles from './AppointmentFormPage.module.css';
 
 // Tecla do atalho de salvar: ⌘ no Mac, Ctrl no resto.
@@ -585,10 +585,10 @@ export function AppointmentFormPage() {
         </div>
       </form>
 
-      <NewLocationDialog
+      <LocationDialog
         open={creatingLocation}
         onClose={() => setCreatingLocation(false)}
-        onCreated={(location) => {
+        onSaved={(location) => {
           setCreatingLocation(false);
           setLocations((current) => [location, ...current]);
           setValues((current) => ({

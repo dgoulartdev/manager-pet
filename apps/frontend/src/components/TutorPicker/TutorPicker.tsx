@@ -6,7 +6,7 @@ import { formatPhone, toSearchTerm } from '../../lib/format';
 import { Avatar } from '../Avatar/Avatar';
 import { Button } from '../Button/Button';
 import { SearchField } from '../SearchField/SearchField';
-import { NewTutorDialog } from './NewTutorDialog';
+import { TutorDialog } from '../TutorDialog/TutorDialog';
 import styles from './TutorPicker.module.css';
 
 const RESULTS_LIMIT = 6;
@@ -248,14 +248,15 @@ export const TutorPicker = forwardRef<TutorPickerHandle, TutorPickerProps>(funct
         </p>
       )}
 
-      <NewTutorDialog
+      <TutorDialog
         open={creating}
         initialText={query.trim()}
+        createLabel="Cadastrar e vincular"
         onClose={() => {
           setCreating(false);
           setPendingFocus('input');
         }}
-        onCreated={(tutor) => {
+        onSaved={(tutor) => {
           setCreating(false);
           select(tutor);
         }}

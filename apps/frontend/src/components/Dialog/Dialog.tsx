@@ -8,6 +8,8 @@ interface DialogProps {
   onClose: () => void;
   title: string;
   description?: string;
+  // DS: sm 420px (padrão) · md 560px para formulários com mais conteúdo.
+  size?: 'sm' | 'md';
   children: ReactNode;
 }
 
@@ -17,7 +19,7 @@ interface DialogProps {
  * Vai para o <body> por portal: assim pode ter o próprio <form> mesmo quando
  * aberto de dentro de outro formulário.
  */
-export function Dialog({ open, onClose, title, description, children }: DialogProps) {
+export function Dialog({ open, onClose, title, description, size = 'sm', children }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const descriptionId = useId();
@@ -36,7 +38,7 @@ export function Dialog({ open, onClose, title, description, children }: DialogPr
   return createPortal(
     <dialog
       ref={dialogRef}
-      className={styles.dialog}
+      className={`${styles.dialog} ${styles[size]}`}
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
       // Esc e o botão de fechar passam por aqui para o estado do React acompanhar.

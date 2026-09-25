@@ -11,12 +11,19 @@
   margin-top: var(--space-1);
 }
 
+/* Ação secundária (ex.: excluir) fica longe do botão de salvar. */
+.extraAction {
+  display: flex;
+  margin-right: auto;
+}
+
 @media (max-width: 767px) {
   .actions {
     flex-direction: column-reverse;
   }
 
-  .actions button {
+  .actions button,
+  .extraAction {
     width: 100%;
   }
 }

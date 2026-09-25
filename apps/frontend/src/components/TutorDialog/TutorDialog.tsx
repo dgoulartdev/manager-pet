@@ -1,21 +1,35 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import type { TutorDto } from '@meupaciente/shared';
 import { ApiError, apiRequest } from '../../lib/api';
 import { describeCommonError, type FormMessage } from '../../lib/errors';
 import { digitsOnly, maskPhoneInput } from '../../lib/format';
-import { validateEmail } from '../../lib/validation';
+import { validateEmail, validatePhone } from '../../lib/validation';
 import { Alert } from '../Alert/Alert';
 import { Button } from '../Button/Button';
 import { Dialog } from '../Dialog/Dialog';
 import { TextField } from '../TextField/TextField';
-import styles from './NewTutorDialog.module.css';
+import styles from './TutorDialog.module.css';
 
-interface NewTutorDialogProps {
+interface TutorDialogProps {
   open: boolean;
-  // O que foi digitado na busca: vira o nome, ou o telefone se for só número.
-  initialText: string;
+  // Sem tutor, cadastra um novo; com tutor, edita os dados dele.
+  tutor?: TutorDto | null;
+  // Cadastro: o que foi digitado na busca vira o nome, ou o telefone se for só número.
+  initialText?: string;
+  // Texto do botão no cadastro (na edição é sempre "Salvar alterações").
+  createLabel?: string;
   onClose: () => void;
-  onCreated: (tutor: TutorDto) => void;
+  onSaved: (tutor: TutorDto) => void;
+  // Edição: conteúdo entre os campos e os botões (ex.: pacientes vinculados).
+  children?: ReactNode;
+  // Edição: ação à esquerda dos botões (ex.: excluir).
+  extraAction?: ReactNode;
+}
+
+interface Values {
+  name: string;
+  phone: string;
+  email: string;
 }
 
 interface FieldErrors {
@@ -24,38 +38,52 @@ interface FieldErrors {
   email?: string;
 }
 
-function validate(values: { name: string; phone: string; email: string }): FieldErrors {
+function validate(values: Values): FieldErrors {
   const errors: FieldErrors = {};
   const name = values.name.trim();
   if (name.length < 2) errors.name = 'Informe o nome do tutor, com pelo menos 2 caracteres.';
-  const phoneDigits = digitsOnly(values.phone);
-  if (phoneDigits && phoneDigits.length < 10)
-    errors.phone = 'Informe o DDD e o número, com 10 ou 11 dígitos.';
+  errors.phone = validatePhone(values.phone);
   if (values.email.trim()) errors.email = validateEmail(values.email);
   return errors;
 }
 
-export function NewTutorDialog({ open, initialText, onClose, onCreated }: NewTutorDialogProps) {
-  const [values, setValues] = useState({ name: '', phone: '', email: '' });
+function initialValues(tutor: TutorDto | null, initialText: string): Values {
+  if (tutor) {
+    return { name: tutor.name, phone: maskPhoneInput(tutor.phone ?? ''), email: tutor.email ?? '' };
+  }
+  const looksLikePhone = /^[\d\s()+.-]+$/.test(initialText) && digitsOnly(initialText).length >= 4;
+  return {
+    name: looksLikePhone ? '' : initialText,
+    phone: looksLikePhone ? maskPhoneInput(initialText) : '',
+    email: '',
+  };
+}
+
+/** Cadastro e edição de tutor: o mesmo formulário no seletor de tutor e na tela de tutores. */
+export function TutorDialog({
+  open,
+  tutor = null,
+  initialText = '',
+  createLabel = 'Cadastrar tutor',
+  onClose,
+  onSaved,
+  children,
+  extraAction,
+}: TutorDialogProps) {
+  const [values, setValues] = useState<Values>(() => initialValues(tutor, initialText));
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formMessage, setFormMessage] = useState<FormMessage | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Cada abertura começa do que foi digitado na busca.
+  // Cada abertura começa dos dados do tutor (edição) ou do que foi digitado na busca.
   useEffect(() => {
     if (!open) return;
-    const looksLikePhone =
-      /^[\d\s()+.-]+$/.test(initialText) && digitsOnly(initialText).length >= 4;
-    setValues({
-      name: looksLikePhone ? '' : initialText,
-      phone: looksLikePhone ? maskPhoneInput(initialText) : '',
-      email: '',
-    });
+    setValues(initialValues(tutor, initialText));
     setErrors({});
     setFormMessage(null);
-  }, [open, initialText]);
+  }, [open, tutor, initialText]);
 
-  function update(field: keyof FieldErrors, value: string) {
+  function update(field: keyof Values, value: string) {
     const next = { ...values, [field]: field === 'phone' ? maskPhoneInput(value) : value };
     setValues(next);
     if (errors[field]) setErrors(validate(next));
@@ -70,17 +98,18 @@ export function NewTutorDialog({ open, initialText, onClose, onCreated }: NewTut
 
     setSaving(true);
     setFormMessage(null);
+    // Telefone guardado só com dígitos: a busca por telefone depende disso.
+    // Na edição, campo esvaziado vai como null para limpar o valor salvo.
+    const body = {
+      name: values.name.trim(),
+      phone: digitsOnly(values.phone) || null,
+      email: values.email.trim() || null,
+    };
     try {
-      const tutor = await apiRequest<TutorDto>('/tutors', {
-        method: 'POST',
-        body: {
-          name: values.name.trim(),
-          // Telefone guardado só com dígitos: a busca por telefone depende disso.
-          phone: digitsOnly(values.phone) || undefined,
-          email: values.email.trim() || undefined,
-        },
-      });
-      onCreated(tutor);
+      const saved = tutor
+        ? await apiRequest<TutorDto>(`/tutors/${tutor.id}`, { method: 'PATCH', body })
+        : await apiRequest<TutorDto>('/tutors', { method: 'POST', body });
+      onSaved(saved);
     } catch (error) {
       const localErrors = validate(values);
       if (
@@ -101,8 +130,13 @@ export function NewTutorDialog({ open, initialText, onClose, onCreated }: NewTut
     <Dialog
       open={open}
       onClose={onClose}
-      title="Novo tutor"
-      description="Só o nome é obrigatório. O contato pode ser completado depois."
+      size={tutor ? 'md' : 'sm'}
+      title={tutor ? 'Editar tutor' : 'Novo tutor'}
+      description={
+        tutor
+          ? 'Os dados valem para todos os pacientes deste tutor.'
+          : 'Só o nome é obrigatório. O contato pode ser completado depois.'
+      }
     >
       <form className={styles.form} noValidate onSubmit={handleSubmit}>
         {formMessage && (
@@ -116,7 +150,8 @@ export function NewTutorDialog({ open, initialText, onClose, onCreated }: NewTut
           autoComplete="off"
           autoCapitalize="words"
           maxLength={120}
-          data-autofocus
+          // Só no cadastro: na edição o teclado do celular cobriria os dados ao abrir.
+          data-autofocus={tutor ? undefined : true}
           value={values.name}
           error={errors.name}
           onChange={(event) => update('name', event.target.value)}
@@ -146,12 +181,18 @@ export function NewTutorDialog({ open, initialText, onClose, onCreated }: NewTut
           error={errors.email}
           onChange={(event) => update('email', event.target.value)}
         />
+        {children}
         <div className={styles.actions}>
+          {extraAction && <div className={styles.extraAction}>{extraAction}</div>}
           <Button variant="secondary" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type="submit" loading={saving} loadingLabel="Cadastrando…">
-            Cadastrar e vincular
+          <Button
+            type="submit"
+            loading={saving}
+            loadingLabel={tutor ? 'Salvando…' : 'Cadastrando…'}
+          >
+            {tutor ? 'Salvar alterações' : createLabel}
           </Button>
         </div>
       </form>

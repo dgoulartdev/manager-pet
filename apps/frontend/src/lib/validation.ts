@@ -11,6 +11,13 @@ export function validateEmail(value: string): string | undefined {
   return undefined;
 }
 
+/** Telefone é opcional; quando informado, precisa de DDD (10 ou 11 dígitos). */
+export function validatePhone(value: string): string | undefined {
+  const digits = value.replace(/\D/g, '');
+  if (digits && digits.length < 10) return 'Informe o DDD e o número, com 10 ou 11 dígitos.';
+  return undefined;
+}
+
 export function meetsPasswordRule(value: string): boolean {
   return value.length >= PASSWORD_MIN_LENGTH && PASSWORD_PATTERN.test(value);
 }
