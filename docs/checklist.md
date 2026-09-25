@@ -28,7 +28,7 @@
 ## 3. Módulo Users
 - [x] `GET /users/me`
 - [x] `PATCH /users/me`
-- [x] `PATCH /users/me/password`
+- [x] `PATCH /users/me/password` (senha atual errada = 422 no campo; 5 tentativas/min)
 
 ## 4. Módulo Tutors
 - [x] `GET /tutors` (paginado + busca, com os pacientes de cada tutor)
@@ -87,7 +87,8 @@
 - [x] Testes unitários de validação de DTOs e do filtro RFC 7807
 - [x] Testes e2e dos fluxos principais (register→login→CRUD→logout)
 - [ ] Testes unitários dos services de users, tutors, locations e patients
-- [ ] Testes e2e de vacinas, foto do paciente, `/users/me` e forgot/reset de senha
+- [x] Testes e2e de `/users/me` e da troca de senha
+- [ ] Testes e2e de vacinas, foto do paciente e forgot/reset de senha
 
 ## 10. Frontend (PWA)
 - [x] Setup do projeto React + PWA (rotas, tokens do DS, fontes offline, ícone do manifest)
@@ -105,7 +106,7 @@
 - [x] Tela: vacinas do paciente (carteira com situação + registro)
 - [ ] Vacinas: editar/excluir e vínculo a um atendimento
 - [x] Tela: tutores e locais (lista com busca, cadastro, edição e exclusão respeitando os vínculos)
-- [ ] Tela: perfil do usuário (dados + troca de senha)
+- [x] Tela: perfil do usuário (dados + troca de senha, mantendo a sessão deste aparelho)
 
 ## 11. Pré-lançamento
 - [ ] Redigir documentos legais (termos de uso e política de privacidade/LGPD) — ainda não existem no repositório

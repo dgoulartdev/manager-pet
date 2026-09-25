@@ -61,10 +61,12 @@ Seed: `teste@meupaciente.com` / `teste123`.
   Segmented, Select, Tabs, Textarea (auto-grow), TextField, Toast, TutorPicker.
 - **Dados:** `lib/api.ts` (`apiRequest`, renovação do token com uma única chamada em andamento —
   a API faz rotação do refresh token), `lib/useApiQuery.ts` (caminho `null` = não buscar),
-  `lib/useListSearch.ts` (busca e página na URL, com atalho "/"), `auth/AuthContext.tsx`.
+  `lib/useListSearch.ts` (busca e página na URL, com atalho "/"), `auth/AuthContext.tsx`
+  (`updateUser` após salvar o perfil; `changePassword` entra de novo com a senha nova, porque a
+  API revoga todas as sessões na troca).
   Utilitários em `lib/` (datas, formatação, vacinas, pesagens, validação).
 - Rotas em português (`/pacientes`, `/pacientes/:id?aba=historico`, `/pacientes/:id/atendimentos/novo`,
-  `/tutores`, `/locais`).
+  `/tutores`, `/locais`, `/perfil`).
 
 ## Armadilhas conhecidas
 
