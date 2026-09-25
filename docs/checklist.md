@@ -104,7 +104,7 @@
 - [x] Tela: novo atendimento (local cadastrado/avulso/domicílio, peso, avaliação e conduta)
 - [x] Editar e excluir atendimento (a partir do histórico)
 - [x] Tela: vacinas do paciente (carteira com situação + registro)
-- [ ] Vacinas: editar/excluir e vínculo a um atendimento
+- [x] Vacinas: editar/excluir e vínculo a um atendimento (visível na carteira e no histórico)
 - [x] Tela: tutores e locais (lista com busca, cadastro, edição e exclusão respeitando os vínculos)
 - [x] Tela: perfil do usuário (dados + troca de senha, mantendo a sessão deste aparelho)
 
