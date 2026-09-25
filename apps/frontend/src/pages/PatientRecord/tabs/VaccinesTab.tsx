@@ -12,7 +12,7 @@ import {
 import { Badge, type BadgeTone } from '../../../components/Badge/Badge';
 import { Button } from '../../../components/Button/Button';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
-import { RegisterVaccineDialog } from './RegisterVaccineDialog';
+import { VaccineDialog } from './VaccineDialog';
 import styles from './VaccinesTab.module.css';
 
 const STATUS_TONES: Record<VaccineStatus, BadgeTone> = {
@@ -33,7 +33,7 @@ export function VaccinesTab({ patient, vaccines, onCreated }: VaccinesTabProps) 
   const [registering, setRegistering] = useState(false);
 
   const dialog = (
-    <RegisterVaccineDialog
+    <VaccineDialog
       open={registering}
       patient={patient}
       onClose={() => setRegistering(false)}

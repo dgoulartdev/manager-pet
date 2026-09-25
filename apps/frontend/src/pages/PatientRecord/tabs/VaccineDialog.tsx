@@ -8,9 +8,9 @@ import { Button } from '../../../components/Button/Button';
 import { Dialog } from '../../../components/Dialog/Dialog';
 import { TextField } from '../../../components/TextField/TextField';
 import { useToast } from '../../../components/Toast/Toast';
-import styles from './RegisterVaccineDialog.module.css';
+import styles from './VaccineDialog.module.css';
 
-interface RegisterVaccineDialogProps {
+interface VaccineDialogProps {
   open: boolean;
   patient: PatientDetailDto;
   onClose: () => void;
@@ -60,12 +60,12 @@ const emptyValues = (): Values => ({
  * Registro de vacina aplicada — também serve para histórico trazido de outra
  * clínica (ADR-009): a data de aplicação pode ser antiga.
  */
-export function RegisterVaccineDialog({
+export function VaccineDialog({
   open,
   patient,
   onClose,
   onCreated,
-}: RegisterVaccineDialogProps) {
+}: VaccineDialogProps) {
   const showToast = useToast();
   const [values, setValues] = useState<Values>(emptyValues);
   const [errors, setErrors] = useState<FieldErrors>({});
