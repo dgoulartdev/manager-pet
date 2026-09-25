@@ -14,7 +14,7 @@ import { Segmented } from '../../components/Segmented/Segmented';
 import { TextField } from '../../components/TextField/TextField';
 import { useToast } from '../../components/Toast/Toast';
 import { TutorPicker, type TutorPickerHandle } from '../../components/TutorPicker/TutorPicker';
-import styles from './NewPatientPage.module.css';
+import styles from './PatientFormPage.module.css';
 
 type SpeciesChoice = 'dog' | 'cat' | 'other';
 
@@ -88,7 +88,7 @@ function registeredMessage(name: string, sex: Sex | null): string {
   return `${name} ${sex === Sex.FEMALE ? 'cadastrada' : 'cadastrado'}`;
 }
 
-export function NewPatientPage() {
+export function PatientFormPage() {
   useDocumentTitle('Novo paciente');
   const navigate = useNavigate();
   const showToast = useToast();

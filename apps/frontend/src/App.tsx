@@ -6,7 +6,7 @@ import { AppointmentFormPage } from './pages/AppointmentForm/AppointmentFormPage
 import { ToastProvider } from './components/Toast/Toast';
 import { LocationsPage } from './pages/Locations/LocationsPage';
 import { LoginPage } from './pages/Login/LoginPage';
-import { NewPatientPage } from './pages/NewPatient/NewPatientPage';
+import { PatientFormPage } from './pages/PatientForm/PatientFormPage';
 import { PatientRecordPage } from './pages/PatientRecord/PatientRecordPage';
 import { PatientsPage } from './pages/Patients/PatientsPage';
 import { ProfilePage } from './pages/Profile/ProfilePage';
@@ -55,7 +55,7 @@ export function App() {
               }
             >
               <Route path="/pacientes" element={<PatientsPage />} />
-              <Route path="/pacientes/novo" element={<NewPatientPage />} />
+              <Route path="/pacientes/novo" element={<PatientFormPage />} />
               <Route path="/pacientes/:patientId" element={<PatientRecordPage />} />
               <Route
                 path="/pacientes/:patientId/atendimentos/novo"
