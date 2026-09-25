@@ -31,14 +31,14 @@
 - [x] `PATCH /users/me/password`
 
 ## 4. Módulo Tutors
-- [x] `GET /tutors` (paginado + busca)
+- [x] `GET /tutors` (paginado + busca, com os pacientes de cada tutor)
 - [x] `POST /tutors`
 - [x] `GET /tutors/:id`
 - [x] `PATCH /tutors/:id`
 - [x] `DELETE /tutors/:id` (bloquear se tiver pacientes)
 
 ## 5. Módulo Locations
-- [x] `GET /locations`
+- [x] `GET /locations` (paginado + busca, com a contagem de atendimentos)
 - [x] `POST /locations`
 - [x] `GET /locations/:id`
 - [x] `PATCH /locations/:id`
@@ -104,7 +104,7 @@
 - [x] Editar e excluir atendimento (a partir do histórico)
 - [x] Tela: vacinas do paciente (carteira com situação + registro)
 - [ ] Vacinas: editar/excluir e vínculo a um atendimento
-- [ ] Tela: tutores e locais (CRUD simples)
+- [x] Tela: tutores e locais (lista com busca, cadastro, edição e exclusão respeitando os vínculos)
 - [ ] Tela: perfil do usuário (dados + troca de senha)
 
 ## 11. Pré-lançamento

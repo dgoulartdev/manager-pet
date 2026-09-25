@@ -53,13 +53,18 @@ Seed: `teste@meupaciente.com` / `teste123`.
   o único sinal (ícone/texto junto); dado clínico (peso, datas, telefone) em JetBrains Mono;
   terracota só em avatar de paciente, marcador de timeline e gráfico de peso; teal só em ações.
 - **Peças prontas** (`src/components`): AppShell, AuthLayout, Alert, Avatar, Badge, BrandMark,
-  Button/ButtonLink (primary, secondary, ghost, destructive), Checkbox, Dialog (sobre `<dialog>`,
-  vira bottom sheet no mobile, foco no elemento com `data-autofocus`), EmptyState, PasswordStrength,
-  PhotoPicker, SearchField, Segmented, Select, Tabs, Textarea (auto-grow), TextField, Toast, TutorPicker.
+  Button/ButtonLink (primary, secondary, ghost, destructive), Checkbox, DeleteDialog (confirmação ou,
+  com vínculos/409, explicação do bloqueio), Dialog (sobre `<dialog>`, `size` sm/md, vira bottom sheet
+  no mobile, foco no elemento com `data-autofocus`), EmptyState, ListPage (estilos de tela de lista:
+  tabela ≥ 768px e cards abaixo; Pagination; ListSkeleton), LocationDialog e TutorDialog (cadastro e
+  edição, usados nas telas e nos atalhos dos formulários), PasswordStrength, PhotoPicker, SearchField,
+  Segmented, Select, Tabs, Textarea (auto-grow), TextField, Toast, TutorPicker.
 - **Dados:** `lib/api.ts` (`apiRequest`, renovação do token com uma única chamada em andamento —
   a API faz rotação do refresh token), `lib/useApiQuery.ts` (caminho `null` = não buscar),
-  `auth/AuthContext.tsx`. Utilitários em `lib/` (datas, formatação, vacinas, pesagens, validação).
-- Rotas em português (`/pacientes`, `/pacientes/:id?aba=historico`, `/pacientes/:id/atendimentos/novo`).
+  `lib/useListSearch.ts` (busca e página na URL, com atalho "/"), `auth/AuthContext.tsx`.
+  Utilitários em `lib/` (datas, formatação, vacinas, pesagens, validação).
+- Rotas em português (`/pacientes`, `/pacientes/:id?aba=historico`, `/pacientes/:id/atendimentos/novo`,
+  `/tutores`, `/locais`).
 
 ## Armadilhas conhecidas
 
@@ -70,7 +75,9 @@ Seed: `teste@meupaciente.com` / `teste123`.
 - O painel de navegador do app costuma estar oculto: sem screenshots e com `document.hasFocus()` falso
   (eventos de foco não disparam). Para verificação visual, usar Chrome headless via DevTools Protocol
   (`Emulation.setDeviceMetricsOverride`, `setEmulatedMedia` para o tema, `setFocusEmulationEnabled`)
-  com o refresh token injetado no `localStorage`.
+  com o refresh token injetado no `localStorage`. Para testar diálogos, clicar com
+  `Input.dispatchMouseEvent`: `.click()` não conta como ativação do usuário e o Chrome agrupa os
+  `<dialog>` abertos assim (um Esc fecha todos).
 
 ## Fluxo de trabalho
 
