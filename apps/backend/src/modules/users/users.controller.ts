@@ -1,4 +1,5 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, UseGuards } from '@nestjs/common';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../../common/types/authenticated-user';
 import { UsersService } from './users.service';
@@ -19,6 +20,9 @@ export class UsersController {
     return this.usersService.updateProfile(user.id, dto);
   }
 
+  // Mesmo limite do login: impede testar senhas atuais em sequência.
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @Patch('me/password')
   @HttpCode(HttpStatus.NO_CONTENT)
   async changePassword(

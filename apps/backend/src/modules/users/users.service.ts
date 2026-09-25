@@ -2,7 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { compare, hash } from 'bcryptjs';
 import { Prisma } from '@prisma/client';
@@ -51,8 +51,13 @@ export class UsersService {
     }
 
     const valid = await compare(dto.current_password, user.password);
+    // 422 no campo, não 401: a sessão é válida, o valor informado é que está
+    // errado (um 401 faria o cliente renovar o token e repetir a requisição).
     if (!valid) {
-      throw new UnauthorizedException('Senha atual incorreta.');
+      throw new UnprocessableEntityException({
+        detail: 'Senha atual incorreta.',
+        errors: [{ field: 'current_password', message: 'Senha atual incorreta.' }],
+      });
     }
 
     const passwordHash = await hash(dto.new_password, 10);

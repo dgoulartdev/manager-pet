@@ -13,7 +13,9 @@ describe('Fluxo principal (e2e)', () => {
   let app: INestApplication;
 
   const email = `e2e-${Date.now()}@example.com`;
+  const otherEmail = `other-${Date.now()}@example.com`;
   const password = 'senha123';
+  const newPassword = 'novaSenha456';
 
   let accessToken: string;
   let refreshToken: string;
@@ -258,7 +260,7 @@ describe('Fluxo principal (e2e)', () => {
   it('não enxerga recurso de outro usuário (ownership)', async () => {
     const other = await request(app.getHttpServer())
       .post('/v1/auth/register')
-      .send({ name: 'Outro Usuário', email: `other-${Date.now()}@example.com`, password })
+      .send({ name: 'Outro Usuário', email: otherEmail, password })
       .expect(201);
 
     await request(app.getHttpServer())
@@ -303,6 +305,76 @@ describe('Fluxo principal (e2e)', () => {
     await request(app.getHttpServer())
       .post('/v1/auth/refresh')
       .send({ refresh_token: refreshToken })
+      .expect(401);
+  });
+
+  it('entra de novo para testar o perfil', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/v1/auth/login')
+      .send({ email, password })
+      .expect(200);
+
+    accessToken = res.body.access_token;
+    refreshToken = res.body.refresh_token;
+  });
+
+  it('devolve e atualiza o perfil do usuário autenticado', async () => {
+    const me = await request(app.getHttpServer())
+      .get('/v1/users/me')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(me.body).toMatchObject({ email, name: 'Tutor E2E' });
+
+    const updated = await request(app.getHttpServer())
+      .patch('/v1/users/me')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: 'Veterinária E2E' })
+      .expect(200);
+    expect(updated.body).toMatchObject({ email, name: 'Veterinária E2E' });
+  });
+
+  it('rejeita no perfil o e-mail de outra conta (409)', async () => {
+    await request(app.getHttpServer())
+      .patch('/v1/users/me')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ email: otherEmail })
+      .expect(409);
+  });
+
+  it('rejeita troca de senha com a senha atual errada (422 no campo, sem derrubar a sessão)', async () => {
+    const res = await request(app.getHttpServer())
+      .patch('/v1/users/me/password')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ current_password: 'errada123', new_password: newPassword })
+      .expect(422);
+
+    expect(res.body.errors).toEqual([
+      expect.objectContaining({ field: 'current_password' }),
+    ]);
+  });
+
+  it('troca a senha e revoga as sessões abertas', async () => {
+    await request(app.getHttpServer())
+      .patch('/v1/users/me/password')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ current_password: password, new_password: newPassword })
+      .expect(204);
+
+    await request(app.getHttpServer())
+      .post('/v1/auth/refresh')
+      .send({ refresh_token: refreshToken })
+      .expect(401);
+  });
+
+  it('entra com a nova senha e não mais com a antiga', async () => {
+    await request(app.getHttpServer())
+      .post('/v1/auth/login')
+      .send({ email, password: newPassword })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .post('/v1/auth/login')
+      .send({ email, password })
       .expect(401);
   });
 });

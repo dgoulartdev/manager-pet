@@ -264,6 +264,11 @@ paths:
       tags: [Users]
       summary: Alterar senha do veterinário autenticado
       operationId: changePassword
+      description: |
+        Revoga todas as sessões (refresh tokens) do usuário, inclusive a atual:
+        o cliente precisa entrar de novo com a nova senha. Senha atual incorreta
+        responde 422 com erro no campo `current_password`. Limite de 5
+        tentativas por minuto.
       requestBody:
         required: true
         content:
@@ -277,6 +282,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   # ── TUTORS ────────────────────────────────────────────────────────────────
 
