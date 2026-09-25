@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { ArrowLeft, ClipboardList, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, ClipboardList, Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { LocationType, type AppointmentDto } from '@meupaciente/shared';
+import { LocationType, type AppointmentDto, type VaccineDto } from '@meupaciente/shared';
 import { apiRequest } from '../../../lib/api';
+import { appointmentTitle, describeLocation } from '../../../lib/appointments';
 import { formatDate, formatDayMonth, formatLongDate, formatMonthYear } from '../../../lib/dates';
+import { pluralize } from '../../../lib/format';
 import { formatWeight } from '../../../lib/weights';
 import { Alert } from '../../../components/Alert/Alert';
 import { Button, ButtonLink } from '../../../components/Button/Button';
@@ -15,9 +17,11 @@ import styles from './HistoryTab.module.css';
 interface HistoryTabProps {
   appointments: AppointmentDto[]; // mais recente primeiro (ordem da API)
   locationNames: Map<string, string>;
+  // Vacinas do paciente: cada atendimento mostra as que foram aplicadas nele.
+  vaccines: VaccineDto[] | undefined;
   patientId: string;
   newAppointmentPath: string;
-  // Depois de excluir um atendimento: recarrega a lista.
+  // Depois de excluir um atendimento: recarrega a lista (e as vacinas, que perdem o vínculo).
   onChanged: () => void;
 }
 
@@ -31,27 +35,6 @@ const SECTIONS: { key: keyof AppointmentDto; label: string }[] = [
   { key: 'notes', label: 'Observações' },
 ];
 
-export function describeLocation(
-  appointment: AppointmentDto,
-  locationNames: Map<string, string>,
-): string {
-  switch (appointment.location_type) {
-    case LocationType.REGISTERED:
-      return (
-        (appointment.location_id && locationNames.get(appointment.location_id)) ||
-        'Local cadastrado'
-      );
-    case LocationType.AD_HOC:
-      return appointment.ad_hoc_location_name ?? 'Local avulso';
-    case LocationType.HOME_VISIT:
-      return 'Atendimento domiciliar';
-  }
-}
-
-function titleOf(appointment: AppointmentDto): string {
-  return appointment.diagnosis ?? appointment.chief_complaint ?? 'Atendimento';
-}
-
 /**
  * Linha do tempo + evolução do atendimento selecionado lado a lado (≥ 1024px):
  * comparar atendimentos sem perder o lugar na lista. No mobile vira navegação
@@ -60,6 +43,7 @@ function titleOf(appointment: AppointmentDto): string {
 export function HistoryTab({
   appointments,
   locationNames,
+  vaccines,
   patientId,
   newAppointmentPath,
   onChanged,
@@ -129,7 +113,7 @@ export function HistoryTab({
                     >
                       <span className={styles.date}>{formatDayMonth(appointment.date)}</span>
                       <span className={styles.itemText}>
-                        <span className={styles.itemTitle}>{titleOf(appointment)}</span>
+                        <span className={styles.itemTitle}>{appointmentTitle(appointment)}</span>
                         <span className={styles.itemMeta}>{meta.join(' · ')}</span>
                       </span>
                     </Link>
@@ -149,6 +133,7 @@ export function HistoryTab({
         <AppointmentDetail
           appointment={selected}
           locationNames={locationNames}
+          vaccines={vaccines?.filter((vaccine) => vaccine.appointment_id === selected.id)}
           editPath={`/pacientes/${patientId}/atendimentos/${selected.id}/editar`}
           onDeleted={onChanged}
         />
@@ -160,11 +145,14 @@ export function HistoryTab({
 function AppointmentDetail({
   appointment,
   locationNames,
+  vaccines,
   editPath,
   onDeleted,
 }: {
   appointment: AppointmentDto;
   locationNames: Map<string, string>;
+  // Vacinas aplicadas neste atendimento; indefinido enquanto carregam.
+  vaccines: VaccineDto[] | undefined;
   editPath: string;
   onDeleted: () => void;
 }) {
@@ -187,7 +175,11 @@ function AppointmentDetail({
             >
               Editar
             </ButtonLink>
-            <DeleteAppointment appointment={appointment} onDeleted={onDeleted} />
+            <DeleteAppointment
+              appointment={appointment}
+              linkedVaccines={vaccines?.length ?? 0}
+              onDeleted={onDeleted}
+            />
           </div>
         </div>
         <dl className={styles.facts}>
@@ -208,6 +200,7 @@ function AppointmentDetail({
             </dd>
           </div>
         </dl>
+        {vaccines && <AppointmentVaccines appointmentId={appointment.id} vaccines={vaccines} />}
       </header>
 
       {sections.length === 0 ? (
@@ -236,9 +229,11 @@ function AppointmentDetail({
  */
 function DeleteAppointment({
   appointment,
+  linkedVaccines,
   onDeleted,
 }: {
   appointment: AppointmentDto;
+  linkedVaccines: number;
   onDeleted: () => void;
 }) {
   const showToast = useToast();
@@ -279,7 +274,17 @@ function DeleteAppointment({
         open={open}
         onClose={() => setOpen(false)}
         title={`Excluir o atendimento de ${formatDate(appointment.date)}?`}
-        description="O peso e as anotações deste atendimento serão apagados. Vacinas registradas nele continuam na carteira. Não é possível desfazer."
+        description={[
+          'O peso e as anotações deste atendimento serão apagados.',
+          linkedVaccines === 1
+            ? 'A vacina registrada nele continua na carteira.'
+            : linkedVaccines > 1
+              ? `As ${pluralize(linkedVaccines, 'vacina registrada', 'vacinas registradas')} nele continuam na carteira.`
+              : null,
+          'Não é possível desfazer.',
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
         {failed && (
           <Alert tone="error" title="Não foi possível excluir">
@@ -301,5 +306,46 @@ function DeleteAppointment({
         </div>
       </Dialog>
     </>
+  );
+}
+
+/**
+ * Vacinas aplicadas no atendimento (vínculo da ADR-009). Cada uma abre a
+ * edição na carteira; o atalho registra uma nova já vinculada a este atendimento.
+ */
+function AppointmentVaccines({
+  appointmentId,
+  vaccines,
+}: {
+  appointmentId: string;
+  vaccines: VaccineDto[];
+}) {
+  return (
+    <section className={styles.vaccines} aria-labelledby="atendimento-vacinas">
+      <h4 id="atendimento-vacinas" className={styles.sectionLabel}>
+        Vacinas aplicadas
+      </h4>
+      <ul className={styles.vaccineList}>
+        {vaccines.map((vaccine) => (
+          <li key={vaccine.id}>
+            <Link to={`?aba=vacinas&vacina=${vaccine.id}`} replace className={styles.vaccineChip}>
+              <Syringe size={16} strokeWidth={1.75} aria-hidden="true" />
+              {vaccine.name}
+              {vaccine.batch && <span className={styles.vaccineBatch}>Lote {vaccine.batch}</span>}
+            </Link>
+          </li>
+        ))}
+        <li>
+          <Link
+            to={`?aba=vacinas&registrar=${appointmentId}`}
+            replace
+            className={styles.registerVaccine}
+          >
+            <Plus size={16} strokeWidth={2} aria-hidden="true" />
+            Registrar vacina
+          </Link>
+        </li>
+      </ul>
+    </section>
   );
 }

@@ -34,18 +34,31 @@
   list-style: none;
 }
 
-/* Mobile: card com vacina + situação no topo e as datas embaixo. */
+/* Mobile: card com vacina, situação e lápis no topo; as datas embaixo. Abre a edição. */
 .row {
   display: grid;
   grid-template-areas:
-    'vaccine status'
-    'applied next';
-  grid-template-columns: minmax(0, 1fr) auto;
+    'vaccine status edit'
+    'applied next next';
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: var(--space-2) var(--space-3);
+  width: 100%;
   padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-card);
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.row:hover {
+  background: var(--color-hover);
+}
+
+.row:focus-visible {
+  outline-offset: -3px;
 }
 
 /* Dose anterior de uma vacina já reforçada: fica no histórico, sem competir. */
@@ -73,17 +86,32 @@
   text-overflow: ellipsis;
 }
 
+/* Vínculo com o atendimento em que a dose foi aplicada. */
+.appointment {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: 2px;
+  font: var(--type-caption);
+  color: var(--color-text-secondary);
+}
+
+.appointment svg {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
 .date {
   font: 500 14px/1.5 var(--font-mono);
   font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
 }
 
-.date:nth-child(2) {
+.applied {
   grid-area: applied;
 }
 
-.date:nth-child(3) {
+.next {
   grid-area: next;
   text-align: right;
 }
@@ -98,6 +126,18 @@
   justify-self: end;
 }
 
+.editIcon {
+  grid-area: edit;
+  align-self: center;
+  justify-self: end;
+  color: var(--color-text-muted);
+}
+
+/* O vermelho fica para o botão da confirmação; aqui só o texto sinaliza. */
+.deleteButton {
+  color: var(--color-error-fg);
+}
+
 /* ── tabela (≥ 768px) ──────────────────────────────────────────────── */
 @media (min-width: 768px) {
   .table {
@@ -110,7 +150,7 @@
 
   .columns,
   .row {
-    --columns: minmax(0, 2fr) 120px 120px 170px;
+    --columns: minmax(0, 2fr) 120px 120px 170px 20px;
   }
 
   .columns {
@@ -142,18 +182,19 @@
     border-radius: 0;
   }
 
-  .row + .row {
+  .list li + li .row {
     border-top: 1px solid var(--color-divider);
   }
 
   .vaccine,
-  .date:nth-child(2),
-  .date:nth-child(3),
-  .status {
+  .applied,
+  .next,
+  .status,
+  .editIcon {
     grid-area: auto;
   }
 
-  .date:nth-child(3) {
+  .next {
     text-align: left;
   }
 

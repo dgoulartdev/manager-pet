@@ -175,6 +175,57 @@
   color: var(--color-text-secondary);
 }
 
+/* ── vacinas aplicadas no atendimento ──────────────────────────────── */
+.vaccines .sectionLabel {
+  margin-bottom: var(--space-2);
+}
+
+.vaccineList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vaccineChip,
+.registerVaccine {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-full);
+  font: var(--type-small);
+  font-weight: 600;
+  transition: background-color var(--transition-fast);
+}
+
+.vaccineChip {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.vaccineChip svg {
+  color: var(--color-text-muted);
+}
+
+.vaccineBatch {
+  font: 500 12px/1.5 var(--font-mono);
+  color: var(--color-text-muted);
+}
+
+.registerVaccine {
+  border: 1px dashed var(--color-border-strong);
+}
+
+.vaccineChip:hover,
+.registerVaccine:hover {
+  background: var(--color-hover);
+  text-decoration: none;
+}
+
 .sections {
   display: flex;
   flex-direction: column;

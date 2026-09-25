@@ -193,9 +193,14 @@ export function PatientRecordPage() {
               <HistoryTab
                 appointments={appointments}
                 locationNames={locationNames}
+                vaccines={vaccines}
                 patientId={patient.id}
                 newAppointmentPath={newAppointmentPath}
-                onChanged={appointmentsQuery.retry}
+                onChanged={() => {
+                  appointmentsQuery.retry();
+                  // A API desfaz o vínculo das vacinas do atendimento excluído.
+                  vaccinesQuery.retry();
+                }}
               />
             )}
           </SectionState>
@@ -203,7 +208,12 @@ export function PatientRecordPage() {
         {tab === 'vacinas' && (
           <SectionState query={vaccinesQuery} what="as vacinas">
             {vaccines && (
-              <VaccinesTab patient={patient} vaccines={vaccines} onCreated={vaccinesQuery.retry} />
+              <VaccinesTab
+                patient={patient}
+                vaccines={vaccines}
+                appointments={appointments}
+                onChanged={vaccinesQuery.retry}
+              />
             )}
           </SectionState>
         )}
