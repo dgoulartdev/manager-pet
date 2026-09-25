@@ -97,6 +97,57 @@
   gap: var(--space-5);
 }
 
+/* ── edição: tutor fixo ────────────────────────────────────────────── */
+.fixedTutor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tutorRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.tutorText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tutorName {
+  overflow: hidden;
+  font: var(--type-h6);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tutorPhone {
+  font: 500 13px/1.5 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+}
+
+.tutorNote {
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.loading {
+  height: 480px;
+  margin-top: var(--space-12);
+  border-radius: var(--radius-lg);
+  background: var(--color-subtle-surface);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .nextSteps {
   display: none;
 }

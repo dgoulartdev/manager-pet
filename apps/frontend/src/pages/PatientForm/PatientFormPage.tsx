@@ -1,14 +1,17 @@
-import { useRef, useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, CircleCheck } from 'lucide-react';
-import { Sex, type PatientDto, type TutorDto } from '@meupaciente/shared';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ChevronRight, CircleCheck, SearchX } from 'lucide-react';
+import { Sex, type PatientDetailDto, type PatientDto, type TutorDto } from '@meupaciente/shared';
 import { ApiError, apiRequest } from '../../lib/api';
 import { describeCommonError, type FormMessage } from '../../lib/errors';
 import { todayIso } from '../../lib/dates';
-import { formatAge } from '../../lib/format';
+import { formatAge, formatPhone } from '../../lib/format';
+import { useApiQuery } from '../../lib/useApiQuery';
 import { useDocumentTitle } from '../../lib/useDocumentTitle';
 import { Alert } from '../../components/Alert/Alert';
+import { Avatar } from '../../components/Avatar/Avatar';
 import { Button, ButtonLink } from '../../components/Button/Button';
+import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { PhotoPicker } from '../../components/PhotoPicker/PhotoPicker';
 import { Segmented } from '../../components/Segmented/Segmented';
 import { TextField } from '../../components/TextField/TextField';
@@ -78,6 +81,25 @@ function validate(values: FormValues): FieldErrors {
   return errors;
 }
 
+// Edição: a espécie (texto livre na API) volta para Cão, Gato ou Outra.
+function fromPatient(patient: PatientDetailDto): FormValues {
+  const species = patient.species?.trim() ?? '';
+  const known = (Object.keys(SPECIES_VALUES) as (keyof typeof SPECIES_VALUES)[]).find(
+    (choice) => SPECIES_VALUES[choice].toLowerCase() === species.toLowerCase(),
+  );
+  return {
+    name: patient.name,
+    species: known ?? (species ? 'other' : null),
+    otherSpecies: known ? '' : species,
+    sex: patient.sex === Sex.UNKNOWN ? null : patient.sex,
+    birthDate: patient.birth_date ?? '',
+    breed: patient.breed ?? '',
+    color: patient.color ?? '',
+    tutor: patient.tutor,
+    photo: null,
+  };
+}
+
 function speciesToApi(values: FormValues): string | undefined {
   if (values.species === 'other') return values.otherSpecies.trim();
   return values.species ? SPECIES_VALUES[values.species] : undefined;
@@ -88,11 +110,19 @@ function registeredMessage(name: string, sex: Sex | null): string {
   return `${name} ${sex === Sex.FEMALE ? 'cadastrada' : 'cadastrado'}`;
 }
 
+/**
+ * Cadastro e edição de paciente (mesmo formulário). Na edição o tutor fica
+ * fixo: a API não troca o tutor de um paciente.
+ */
 export function PatientFormPage() {
-  useDocumentTitle('Novo paciente');
+  const { patientId } = useParams();
+  const editing = Boolean(patientId);
+  useDocumentTitle(editing ? 'Editar paciente' : 'Novo paciente');
   const navigate = useNavigate();
   const showToast = useToast();
 
+  const patientQuery = useApiQuery<PatientDetailDto>(editing ? `/patients/${patientId}` : null);
+  const [ready, setReady] = useState(!editing);
   const [values, setValues] = useState<FormValues>(EMPTY_FORM);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formMessage, setFormMessage] = useState<FormMessage | null>(null);
@@ -104,6 +134,13 @@ export function PatientFormPage() {
   const birthDateRef = useRef<HTMLInputElement>(null);
   const tutorRef = useRef<TutorPickerHandle>(null);
   const topRef = useRef<HTMLDivElement>(null);
+
+  // Edição: preenche o formulário uma vez, quando o paciente chega.
+  useEffect(() => {
+    if (ready || !patientQuery.data) return;
+    setValues(fromPatient(patientQuery.data));
+    setReady(true);
+  }, [ready, patientQuery.data]);
 
   function update<K extends keyof FormValues>(field: K, value: FormValues[K]) {
     const next = { ...values, [field]: value };
@@ -135,20 +172,43 @@ export function PatientFormPage() {
     setFormMessage(null);
     let patient: PatientDto;
     try {
-      patient = await apiRequest<PatientDto>('/patients', {
-        method: 'POST',
-        body: {
-          tutor_id: values.tutor!.id,
-          name: values.name.trim(),
-          species: speciesToApi(values),
-          sex: values.sex ?? undefined,
-          birth_date: values.birthDate || undefined,
-          breed: values.breed.trim() || undefined,
-          color: values.color.trim() || undefined,
-        },
-      });
+      patient = editing
+        ? await apiRequest<PatientDto>(`/patients/${patientId}`, {
+            method: 'PATCH',
+            // Campo esvaziado vai como null e limpa o valor salvo. Sexo sem
+            // escolha não vai: o que está gravado continua.
+            body: {
+              name: values.name.trim(),
+              species: speciesToApi(values) ?? null,
+              sex: values.sex ?? undefined,
+              birth_date: values.birthDate || null,
+              breed: values.breed.trim() || null,
+              color: values.color.trim() || null,
+            },
+          })
+        : await apiRequest<PatientDto>('/patients', {
+            method: 'POST',
+            body: {
+              tutor_id: values.tutor!.id,
+              name: values.name.trim(),
+              species: speciesToApi(values),
+              sex: values.sex ?? undefined,
+              birth_date: values.birthDate || undefined,
+              breed: values.breed.trim() || undefined,
+              color: values.color.trim() || undefined,
+            },
+          });
     } catch (error) {
       setSubmitting(null);
+      if (editing && error instanceof ApiError && error.status === 404) {
+        setFormMessage({
+          tone: 'error',
+          title: 'Este paciente não existe mais',
+          description: 'Ele pode ter sido excluído em outra aba ou aparelho.',
+        });
+        topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
       if (error instanceof ApiError && error.status === 404) {
         // O tutor foi removido enquanto o formulário estava aberto.
         setValues((current) => ({ ...current, tutor: null }));
@@ -172,7 +232,9 @@ export function PatientFormPage() {
       }
     }
 
-    const title = registeredMessage(patient.name, values.sex);
+    const title = editing
+      ? `Dados de ${patient.name} atualizados`
+      : registeredMessage(patient.name, values.sex);
     if (photoFailed) {
       showToast({
         tone: 'warning',
@@ -199,7 +261,8 @@ export function PatientFormPage() {
     }
 
     if (!photoFailed) showToast({ tone: 'success', title });
-    navigate(`/pacientes/${patient.id}`);
+    // Na edição, voltar do prontuário não reabre o formulário já salvo.
+    navigate(`/pacientes/${patient.id}`, { replace: editing });
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -207,20 +270,61 @@ export function PatientFormPage() {
     void save('open');
   }
 
+  const loadError = patientQuery.error;
+  if (loadError instanceof ApiError && [400, 404].includes(loadError.status)) {
+    return (
+      <div className={styles.page}>
+        <EmptyState
+          icon={<SearchX size={24} strokeWidth={1.75} />}
+          title="Paciente não encontrado"
+          description="Ele pode ter sido excluído, ou o endereço está incompleto."
+          action={<ButtonLink to="/pacientes">Voltar para pacientes</ButtonLink>}
+        />
+      </div>
+    );
+  }
+  if (loadError) {
+    return (
+      <div className={styles.page}>
+        <Alert tone="error" title="Não foi possível abrir o formulário">
+          Verifique sua conexão e recarregue a página.
+        </Alert>
+      </div>
+    );
+  }
+  if (!ready) {
+    return (
+      <div className={styles.page} role="status">
+        <span className="visually-hidden">Carregando formulário</span>
+        <div className={styles.loading} aria-hidden="true" />
+      </div>
+    );
+  }
+
   const age = formatAge(values.birthDate || null);
+  const recordPath = `/pacientes/${patientId}`;
+  const heading = editing ? 'Editar paciente' : 'Novo paciente';
 
   return (
     <div className={styles.page} ref={topRef}>
       <nav aria-label="Você está em" className={styles.breadcrumb}>
         <Link to="/pacientes">Pacientes</Link>
         <ChevronRight size={16} strokeWidth={1.75} aria-hidden="true" />
-        <span aria-current="page">Novo paciente</span>
+        {editing && patientQuery.data && (
+          <>
+            <Link to={recordPath}>{patientQuery.data.name}</Link>
+            <ChevronRight size={16} strokeWidth={1.75} aria-hidden="true" />
+          </>
+        )}
+        <span aria-current="page">{heading}</span>
       </nav>
 
       <header className={styles.header}>
-        <h1 className={styles.title}>Novo paciente</h1>
+        <h1 className={styles.title}>{heading}</h1>
         <p className={styles.subtitle}>
-          Só nome e tutor são obrigatórios. O resto você completa no primeiro atendimento.
+          {editing
+            ? 'Só o nome é obrigatório. O tutor continua o mesmo do cadastro.'
+            : 'Só nome e tutor são obrigatórios. O resto você completa no primeiro atendimento.'}
         </p>
       </header>
 
@@ -316,53 +420,90 @@ export function PatientFormPage() {
             <h2 id="secao-tutor" className={styles.sectionTitle}>
               Tutor
             </h2>
-            <TutorPicker
-              ref={tutorRef}
-              labelHidden
-              value={values.tutor}
-              error={errors.tutor}
-              onChange={(tutor) => update('tutor', tutor)}
-            />
+            {editing && values.tutor ? (
+              <FixedTutor tutor={values.tutor} />
+            ) : (
+              <TutorPicker
+                ref={tutorRef}
+                labelHidden
+                value={values.tutor}
+                error={errors.tutor}
+                onChange={(tutor) => update('tutor', tutor)}
+              />
+            )}
           </section>
         </div>
 
         <aside className={styles.side}>
           <div className={styles.card}>
-            <PhotoPicker file={values.photo} onChange={(photo) => update('photo', photo)} />
+            <PhotoPicker
+              file={values.photo}
+              currentUrl={patientQuery.data?.photo_url}
+              onChange={(photo) => update('photo', photo)}
+            />
           </div>
-          <div className={`${styles.card} ${styles.nextSteps}`}>
-            <p className={styles.nextTitle}>Depois de salvar</p>
-            <ul>
-              <li>
-                <CircleCheck size={18} strokeWidth={1.75} aria-hidden="true" />O prontuário do
-                paciente abre em seguida
-              </li>
-              <li>
-                <CircleCheck size={18} strokeWidth={1.75} aria-hidden="true" />
-                Peso e vacinas você registra a partir dele
-              </li>
-            </ul>
-          </div>
+          {!editing && (
+            <div className={`${styles.card} ${styles.nextSteps}`}>
+              <p className={styles.nextTitle}>Depois de salvar</p>
+              <ul>
+                <li>
+                  <CircleCheck size={18} strokeWidth={1.75} aria-hidden="true" />O prontuário do
+                  paciente abre em seguida
+                </li>
+                <li>
+                  <CircleCheck size={18} strokeWidth={1.75} aria-hidden="true" />
+                  Peso e vacinas você registra a partir dele
+                </li>
+              </ul>
+            </div>
+          )}
         </aside>
 
         <div className={styles.actions}>
-          <ButtonLink to="/pacientes" variant="ghost" className={styles.cancel}>
+          <ButtonLink
+            to={editing ? recordPath : '/pacientes'}
+            variant="ghost"
+            className={styles.cancel}
+          >
             Cancelar
           </ButtonLink>
-          <Button
-            variant="secondary"
-            className={styles.saveAnother}
-            loading={submitting === 'another'}
-            loadingLabel="Salvando…"
-            onClick={() => void save('another')}
-          >
-            Salvar e cadastrar outro
-          </Button>
+          {!editing && (
+            <Button
+              variant="secondary"
+              className={styles.saveAnother}
+              loading={submitting === 'another'}
+              loadingLabel="Salvando…"
+              onClick={() => void save('another')}
+            >
+              Salvar e cadastrar outro
+            </Button>
+          )}
           <Button type="submit" loading={submitting === 'open'} loadingLabel="Salvando…">
-            Salvar paciente
+            {editing ? 'Salvar alterações' : 'Salvar paciente'}
           </Button>
         </div>
       </form>
+    </div>
+  );
+}
+
+// Edição: o tutor aparece, mas não muda. O contato dele se corrige na tela de tutores.
+function FixedTutor({ tutor }: { tutor: TutorDto }) {
+  const phone = formatPhone(tutor.phone);
+
+  return (
+    <div className={styles.fixedTutor}>
+      <div className={styles.tutorRow}>
+        <Avatar name={tutor.name} kind="person" />
+        <div className={styles.tutorText}>
+          <span className={styles.tutorName}>{tutor.name}</span>
+          {phone && <span className={styles.tutorPhone}>{phone}</span>}
+        </div>
+      </div>
+      <p className={styles.tutorNote}>
+        O tutor não muda depois do cadastro. Para corrigir telefone ou e-mail,{' '}
+        <Link to={`/tutores?q=${encodeURIComponent(tutor.name)}`}>edite em Tutores</Link>.
+      </p>
     </div>
   );
 }

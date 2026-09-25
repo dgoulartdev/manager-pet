@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Sex, type PatientDetailDto } from '@meupaciente/shared';
 import { apiRequest } from '../../../lib/api';
 import { formatDate } from '../../../lib/dates';
@@ -8,7 +8,7 @@ import { formatAge, formatPhone, pluralize } from '../../../lib/format';
 import { ACCEPTED_PHOTO_TYPES, validatePhoto } from '../../../lib/photo';
 import { Alert } from '../../../components/Alert/Alert';
 import { Avatar } from '../../../components/Avatar/Avatar';
-import { Button } from '../../../components/Button/Button';
+import { Button, ButtonLink } from '../../../components/Button/Button';
 import { Dialog } from '../../../components/Dialog/Dialog';
 import { useToast } from '../../../components/Toast/Toast';
 import styles from './OverviewTab.module.css';
@@ -50,9 +50,19 @@ export function OverviewTab({
   return (
     <div className={styles.layout}>
       <section className={styles.card} aria-labelledby="dados-identificacao">
-        <h2 id="dados-identificacao" className={styles.cardTitle}>
-          Identificação
-        </h2>
+        <div className={styles.cardHeader}>
+          <h2 id="dados-identificacao" className={styles.cardTitle}>
+            Identificação
+          </h2>
+          <ButtonLink
+            to={`/pacientes/${patient.id}/editar`}
+            variant="secondary"
+            aria-label={`Editar dados de ${patient.name}`}
+            icon={<Pencil size={16} strokeWidth={1.75} aria-hidden="true" />}
+          >
+            Editar
+          </ButtonLink>
+        </div>
         <dl className={styles.fields}>
           {fields.map((field) => (
             <div key={field.label} className={styles.field}>

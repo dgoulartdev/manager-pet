@@ -57,6 +57,7 @@ export function App() {
               <Route path="/pacientes" element={<PatientsPage />} />
               <Route path="/pacientes/novo" element={<PatientFormPage />} />
               <Route path="/pacientes/:patientId" element={<PatientRecordPage />} />
+              <Route path="/pacientes/:patientId/editar" element={<PatientFormPage />} />
               <Route
                 path="/pacientes/:patientId/atendimentos/novo"
                 element={<AppointmentFormPage />}

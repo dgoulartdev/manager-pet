@@ -22,6 +22,19 @@
   font: var(--type-h6);
 }
 
+/* Título com ação ao lado (Editar): o espaçamento passa para a linha toda. */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.cardHeader .cardTitle {
+  margin-bottom: 0;
+}
+
 /* ── identificação: lista de definições em 2 colunas ───────────────── */
 /* Valores curtos: duas colunas já no celular, para não empurrar o resto para baixo. */
 .fields {
