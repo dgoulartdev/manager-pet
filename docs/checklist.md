@@ -99,7 +99,7 @@
 - [x] Estrutura do app (barra lateral, trilho no tablet, abas no mobile)
 - [x] Tela: lista de pacientes + busca (API passou a incluir o resumo do tutor)
 - [x] Tela: cadastro de paciente (espécie Cão/Gato/Outra, foto, criação de tutor sem sair do formulário)
-- [ ] Edição de paciente (a partir do prontuário)
+- [x] Edição de paciente (a partir do prontuário; o tutor não muda depois do cadastro)
 - [x] Tela: prontuário do paciente (dados, timeline de atendimentos, pesagens, foto, exclusão)
 - [x] Tela: novo atendimento (local cadastrado/avulso/domicílio, peso, avaliação e conduta)
 - [x] Editar e excluir atendimento (a partir do histórico)
