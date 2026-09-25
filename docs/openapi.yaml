@@ -285,12 +285,16 @@ paths:
       tags: [Tutors]
       summary: Listar tutores
       operationId: listTutors
+      description: |
+        Cada item traz o total de pacientes vinculados e os primeiros nomes
+        (até 3, em ordem alfabética) — o suficiente para reconhecer o tutor pelo
+        animal e saber se ele pode ser removido.
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
         - name: q
           in: query
-          description: Busca por nome, e-mail ou telefone
+          description: Busca por nome, e-mail, telefone ou nome de um paciente do tutor
           schema:
             type: string
             example: "Maria"
@@ -612,9 +616,18 @@ paths:
       tags: [Locations]
       summary: Listar locais de atendimento cadastrados
       operationId: listLocations
+      description: |
+        Cada item traz quantos atendimentos usam o local — local em uso não
+        pode ser removido.
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - name: q
+          in: query
+          description: Busca por nome, endereço ou telefone
+          schema:
+            type: string
+            example: "Vida Animal"
       responses:
         "200":
           description: Lista paginada de locais
@@ -624,6 +637,8 @@ paths:
                 $ref: "#/components/schemas/LocationListResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
 
     post:
       tags: [Locations]
@@ -1242,6 +1257,36 @@ components:
           type: [string, "null"]
           format: email
 
+    TutorPatientSummary:
+      type: object
+      description: Paciente resumido na listagem de tutores
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Mimi"
+
+    TutorListItem:
+      allOf:
+        - $ref: "#/components/schemas/Tutor"
+        - type: object
+          required: [patients_count, patients]
+          properties:
+            patients_count:
+              type: integer
+              minimum: 0
+              description: Total de pacientes vinculados ao tutor
+              example: 2
+            patients:
+              type: array
+              maxItems: 3
+              description: Primeiros pacientes do tutor, em ordem alfabética
+              items:
+                $ref: "#/components/schemas/TutorPatientSummary"
+
     TutorListResponse:
       type: object
       required: [data, pagination]
@@ -1249,7 +1294,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Tutor"
+            $ref: "#/components/schemas/TutorListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 
@@ -1459,6 +1504,18 @@ components:
         phone:
           type: [string, "null"]
 
+    LocationListItem:
+      allOf:
+        - $ref: "#/components/schemas/Location"
+        - type: object
+          required: [appointments_count]
+          properties:
+            appointments_count:
+              type: integer
+              minimum: 0
+              description: Quantos atendimentos usam o local
+              example: 12
+
     LocationListResponse:
       type: object
       required: [data, pagination]
@@ -1466,7 +1523,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Location"
+            $ref: "#/components/schemas/LocationListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 

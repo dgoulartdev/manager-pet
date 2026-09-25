@@ -4,13 +4,23 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma, Tutor } from '@prisma/client';
-import type { PaginatedResponse, TutorDto } from '@meupaciente/shared';
+import type {
+  PaginatedResponse,
+  TutorDto,
+  TutorListItemDto,
+} from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { paginate } from '../../common/pagination';
-import { toTutorDto } from '../../common/mappers/tutor.mapper';
+import {
+  toTutorDto,
+  toTutorListItemDto,
+} from '../../common/mappers/tutor.mapper';
 import { CreateTutorDto } from './dto/create-tutor.dto';
 import { UpdateTutorDto } from './dto/update-tutor.dto';
 import { ListTutorsQueryDto } from './dto/list-tutors-query.dto';
+
+// Quantos nomes de paciente cada item da listagem traz (o total vem à parte).
+const PATIENT_NAMES_PER_TUTOR = 3;
 
 @Injectable()
 export class TutorsService {
@@ -31,7 +41,7 @@ export class TutorsService {
   async findAll(
     userId: string,
     query: ListTutorsQueryDto,
-  ): Promise<PaginatedResponse<TutorDto>> {
+  ): Promise<PaginatedResponse<TutorListItemDto>> {
     const { page, per_page, q } = query;
 
     const where: Prisma.TutorWhereInput = {
@@ -42,6 +52,12 @@ export class TutorsService {
               { name: { contains: q, mode: 'insensitive' } },
               { email: { contains: q, mode: 'insensitive' } },
               { phone: { contains: q } },
+              // Quem lembra do animal e não do dono também encontra o tutor.
+              {
+                patients: {
+                  some: { name: { contains: q, mode: 'insensitive' } },
+                },
+              },
             ],
           }
         : {}),
@@ -53,11 +69,21 @@ export class TutorsService {
         orderBy: { created_at: 'desc' },
         skip: (page - 1) * per_page,
         take: per_page,
+        // Pacientes vinculados: a lista mostra de quem é o tutor e se ele pode
+        // ser excluído sem uma requisição por linha.
+        include: {
+          patients: {
+            select: { id: true, name: true },
+            orderBy: { name: 'asc' },
+            take: PATIENT_NAMES_PER_TUTOR,
+          },
+          _count: { select: { patients: true } },
+        },
       }),
       this.prisma.tutor.count({ where }),
     ]);
 
-    return paginate(tutors.map(toTutorDto), total, page, per_page);
+    return paginate(tutors.map(toTutorListItemDto), total, page, per_page);
   }
 
   async findOne(userId: string, id: string): Promise<TutorDto> {

@@ -132,6 +132,27 @@ describe('Fluxo principal (e2e)', () => {
     });
   });
 
+  it('lista tutores com os pacientes vinculados, buscando pelo nome do paciente', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/v1/tutors?q=miau')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0]).toMatchObject({
+      id: tutorId,
+      patients_count: 1,
+      patients: [{ id: patientId, name: 'Miau' }],
+    });
+  });
+
+  it('não remove tutor com pacientes vinculados (409)', async () => {
+    await request(app.getHttpServer())
+      .delete(`/v1/tutors/${tutorId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(409);
+  });
+
   it('rejeita atendimento REGISTERED sem location_id (422)', async () => {
     await request(app.getHttpServer())
       .post('/v1/appointments')
@@ -159,6 +180,32 @@ describe('Fluxo principal (e2e)', () => {
 
     appointmentId = res.body.id;
     expect(res.body.location_id).toBe(locationId);
+  });
+
+  it('lista locais com a contagem de atendimentos, com busca', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/v1/locations?q=central')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0]).toMatchObject({
+      id: locationId,
+      appointments_count: 1,
+    });
+
+    const none = await request(app.getHttpServer())
+      .get('/v1/locations?q=inexistente')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(none.body.data).toHaveLength(0);
+  });
+
+  it('não remove local usado em atendimento (409)', async () => {
+    await request(app.getHttpServer())
+      .delete(`/v1/locations/${locationId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(409);
   });
 
   it('lista atendimentos filtrando por paciente', async () => {
@@ -223,6 +270,13 @@ describe('Fluxo principal (e2e)', () => {
   it('remove o atendimento criado', async () => {
     await request(app.getHttpServer())
       .delete(`/v1/appointments/${appointmentId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(204);
+  });
+
+  it('remove o local depois que nenhum atendimento o usa', async () => {
+    await request(app.getHttpServer())
+      .delete(`/v1/locations/${locationId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(204);
   });

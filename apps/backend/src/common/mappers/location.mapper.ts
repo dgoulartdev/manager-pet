@@ -1,5 +1,5 @@
 import { Location } from '@prisma/client';
-import type { LocationDto } from '@meupaciente/shared';
+import type { LocationDto, LocationListItemDto } from '@meupaciente/shared';
 
 export function toLocationDto(location: Location): LocationDto {
   return {
@@ -9,5 +9,14 @@ export function toLocationDto(location: Location): LocationDto {
     phone: location.phone,
     created_at: location.created_at.toISOString(),
     updated_at: location.updated_at.toISOString(),
+  };
+}
+
+export function toLocationListItemDto(
+  location: Location & { _count: { appointments: number } },
+): LocationListItemDto {
+  return {
+    ...toLocationDto(location),
+    appointments_count: location._count.appointments,
   };
 }
