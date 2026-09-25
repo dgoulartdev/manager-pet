@@ -10,6 +10,7 @@ import { PatientRecordPage } from './pages/PatientRecord/PatientRecordPage';
 import { PatientsPage } from './pages/Patients/PatientsPage';
 import { ProfilePlaceholder, SectionPlaceholder } from './pages/Placeholder/SectionPlaceholder';
 import { RegisterPage } from './pages/Register/RegisterPage';
+import { TutorsPage } from './pages/Tutors/TutorsPage';
 import { UnderConstructionPage } from './pages/UnderConstruction/UnderConstructionPage';
 import styles from './App.module.css';
 
@@ -63,15 +64,7 @@ export function App() {
                 path="/pacientes/:patientId/atendimentos/:appointmentId/editar"
                 element={<AppointmentFormPage />}
               />
-              <Route
-                path="/tutores"
-                element={
-                  <SectionPlaceholder
-                    title="Tutores"
-                    description="Cadastro e busca dos tutores dos seus pacientes."
-                  />
-                }
-              />
+              <Route path="/tutores" element={<TutorsPage />} />
               <Route
                 path="/locais"
                 element={

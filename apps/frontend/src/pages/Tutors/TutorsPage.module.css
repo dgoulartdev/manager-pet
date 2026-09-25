@@ -1,0 +1,134 @@
+/* Estrutura da lista em ListPage.module.css; aqui só as células de tutor. */
+.tutors {
+  --columns: minmax(0, 1.5fr) 168px minmax(0, 1.2fr) 20px;
+}
+
+.tutorCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.phoneCell {
+  display: flex;
+  min-width: 0;
+  color: var(--color-text-secondary);
+}
+
+.patientsCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.pawIcon {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.patientNames {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Card do mobile: tutor e lápis em cima; telefone e pacientes alinhados ao nome. */
+@media (max-width: 767px) {
+  .row {
+    grid-template-areas:
+      'tutor edit'
+      'phone phone'
+      'patients patients';
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: var(--space-1);
+  }
+
+  .tutorCell {
+    grid-area: tutor;
+    margin-bottom: var(--space-1);
+  }
+
+  .phoneCell,
+  .patientsCell {
+    /* Avatar (40) + espaço (12). */
+    padding-left: 52px;
+  }
+
+  .phoneCell {
+    grid-area: phone;
+  }
+
+  /* Sem telefone, a linha some do card (na tabela fica o travessão). */
+  .phoneCell[data-missing] {
+    display: none;
+  }
+
+  .patientsCell {
+    grid-area: patients;
+  }
+
+  .editIcon {
+    grid-area: edit;
+  }
+}
+
+/* ── diálogo de edição ─────────────────────────────────────────────── */
+
+/* O vermelho fica para o botão da confirmação; aqui só o texto sinaliza. */
+.deleteButton {
+  color: var(--color-error-fg);
+}
+
+.linked {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-divider);
+}
+
+.linkedTitle {
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-label);
+}
+
+.linkedEmpty {
+  font: var(--type-small);
+  color: var(--color-text-muted);
+}
+
+.linkedList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.patientLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font: var(--type-small);
+  font-weight: 600;
+  transition: background-color var(--transition-fast);
+}
+
+.patientLink:hover {
+  background: var(--color-hover);
+  text-decoration: none;
+}
+
+.patientLink svg {
+  color: var(--color-text-muted);
+}
