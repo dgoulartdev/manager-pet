@@ -15,8 +15,9 @@ interface DeleteDialogProps {
   // Vínculos que a API não deixa apagar (responde 409). Se a lista já sabe
   // que existem, a explicação aparece no lugar da confirmação; um 409
   // inesperado (vínculo criado em outra aba) leva à mesma explicação.
-  blocked: boolean;
-  blockedReason: { title: string; description: string };
+  // Sem blockedReason, é uma confirmação simples.
+  blocked?: boolean;
+  blockedReason?: { title: string; description: string };
   onConfirm: () => Promise<void>;
   // 409: os dados da tela estavam desatualizados (ex.: recarregar a lista).
   onConflict?: () => void;
@@ -24,15 +25,16 @@ interface DeleteDialogProps {
 }
 
 /**
- * Exclusão de cadastro com vínculos (tutor com pacientes, local com
- * atendimentos). DS: vínculo que impede a exclusão é aviso explicativo, não erro.
+ * Confirmação de exclusão (DS: descreve a consequência real). Para cadastros
+ * com vínculos (tutor com pacientes, local com atendimentos), o bloqueio da
+ * API vira um aviso explicativo, não um erro.
  */
 export function DeleteDialog({
   open,
   name,
   consequence,
   confirmLabel,
-  blocked,
+  blocked = false,
   blockedReason,
   onConfirm,
   onConflict,
@@ -42,7 +44,7 @@ export function DeleteDialog({
   const [failed, setFailed] = useState(false);
   const [conflict, setConflict] = useState(false);
   const backRef = useRef<HTMLButtonElement>(null);
-  const isBlocked = blocked || conflict;
+  const isBlocked = Boolean(blockedReason) && (blocked || conflict);
 
   useEffect(() => {
     if (!open) return;
@@ -62,7 +64,7 @@ export function DeleteDialog({
     try {
       await onConfirm();
     } catch (error) {
-      if (error instanceof ApiError && error.status === 409) {
+      if (blockedReason && error instanceof ApiError && error.status === 409) {
         setConflict(true);
         onConflict?.();
       } else {
@@ -79,7 +81,7 @@ export function DeleteDialog({
       title={isBlocked ? `Não é possível excluir ${name}` : `Excluir ${name}?`}
       description={isBlocked ? undefined : `${consequence} Não é possível desfazer.`}
     >
-      {isBlocked ? (
+      {isBlocked && blockedReason ? (
         <Alert tone="warning" title={blockedReason.title}>
           {blockedReason.description}
         </Alert>
