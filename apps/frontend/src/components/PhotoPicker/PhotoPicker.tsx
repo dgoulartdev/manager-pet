@@ -7,13 +7,15 @@ import styles from './PhotoPicker.module.css';
 interface PhotoPickerProps {
   file: File | null;
   onChange: (file: File | null) => void;
+  // Edição: a foto que o paciente já tem, mostrada enquanto nenhuma nova é escolhida.
+  currentUrl?: string | null;
 }
 
 /**
  * Foto opcional do paciente. Valida tipo e tamanho aqui, antes de enviar:
- * a foto só sobe depois que o paciente é criado (a API exige o id).
+ * a foto só sobe depois que o paciente é salvo (a API exige o id).
  */
-export function PhotoPicker({ file, onChange }: PhotoPickerProps) {
+export function PhotoPicker({ file, onChange, currentUrl = null }: PhotoPickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const hintId = useId();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -29,6 +31,8 @@ export function PhotoPicker({ file, onChange }: PhotoPickerProps) {
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
   }, [file]);
+
+  const shownUrl = previewUrl ?? currentUrl;
 
   function accept(candidate: File | undefined) {
     if (!candidate) return;
@@ -51,7 +55,7 @@ export function PhotoPicker({ file, onChange }: PhotoPickerProps) {
         type="button"
         className={styles.dropzone}
         data-dragging={dragging || undefined}
-        data-filled={previewUrl ? true : undefined}
+        data-filled={shownUrl ? true : undefined}
         tabIndex={-1}
         aria-hidden="true"
         onClick={() => inputRef.current?.click()}
@@ -62,8 +66,8 @@ export function PhotoPicker({ file, onChange }: PhotoPickerProps) {
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
       >
-        {previewUrl ? (
-          <img className={styles.preview} src={previewUrl} alt="" />
+        {shownUrl ? (
+          <img className={styles.preview} src={shownUrl} alt="" />
         ) : (
           <>
             <Camera size={24} strokeWidth={1.75} aria-hidden="true" />
@@ -88,7 +92,7 @@ export function PhotoPicker({ file, onChange }: PhotoPickerProps) {
             aria-describedby={hintId}
             onClick={() => inputRef.current?.click()}
           >
-            {file ? 'Trocar foto' : 'Escolher foto'}
+            {shownUrl ? 'Trocar foto' : 'Escolher foto'}
           </Button>
           {file && (
             <Button
@@ -99,7 +103,8 @@ export function PhotoPicker({ file, onChange }: PhotoPickerProps) {
                 setError(null);
               }}
             >
-              Remover
+              {/* Com foto atual, tirar a escolhida só volta para ela. */}
+              {currentUrl ? 'Manter a atual' : 'Remover'}
             </Button>
           )}
         </div>
