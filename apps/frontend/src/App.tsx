@@ -4,11 +4,12 @@ import { AuthProvider, useAuth } from './auth/AuthContext';
 import { AppShell } from './components/AppShell/AppShell';
 import { AppointmentFormPage } from './pages/AppointmentForm/AppointmentFormPage';
 import { ToastProvider } from './components/Toast/Toast';
+import { LocationsPage } from './pages/Locations/LocationsPage';
 import { LoginPage } from './pages/Login/LoginPage';
 import { NewPatientPage } from './pages/NewPatient/NewPatientPage';
 import { PatientRecordPage } from './pages/PatientRecord/PatientRecordPage';
 import { PatientsPage } from './pages/Patients/PatientsPage';
-import { ProfilePlaceholder, SectionPlaceholder } from './pages/Placeholder/SectionPlaceholder';
+import { ProfilePlaceholder } from './pages/Placeholder/SectionPlaceholder';
 import { RegisterPage } from './pages/Register/RegisterPage';
 import { TutorsPage } from './pages/Tutors/TutorsPage';
 import { UnderConstructionPage } from './pages/UnderConstruction/UnderConstructionPage';
@@ -65,15 +66,7 @@ export function App() {
                 element={<AppointmentFormPage />}
               />
               <Route path="/tutores" element={<TutorsPage />} />
-              <Route
-                path="/locais"
-                element={
-                  <SectionPlaceholder
-                    title="Locais"
-                    description="Clínicas e consultórios onde você atende."
-                  />
-                }
-              />
+              <Route path="/locais" element={<LocationsPage />} />
               <Route path="/perfil" element={<ProfilePlaceholder />} />
             </Route>
 
