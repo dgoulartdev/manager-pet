@@ -1,0 +1,241 @@
+/*
+ * Telas de lista (pacientes, tutores, locais): cabeçalho, busca e a lista que
+ * é tabela a partir de 768px e cards abaixo disso (DS: sem scroll horizontal).
+ * Cada tela define as colunas em --columns e, no mobile, o arranjo do card.
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-24);
+}
+
+/* ── cabeçalho ─────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.title {
+  font: var(--type-h1);
+  font-size: 28px;
+  letter-spacing: var(--tracking-h1);
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+}
+
+/* No mobile a ação principal é o botão flutuante. */
+.headerAction {
+  display: none;
+}
+
+.search {
+  max-width: 560px;
+}
+
+/* ── lista ─────────────────────────────────────────────────────────── */
+.columns {
+  display: none;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: opacity var(--transition-fast);
+}
+
+/* Troca de página ou busca: mantém a lista anterior, esmaecida, até chegar a nova. */
+.list[data-refreshing] {
+  opacity: 0.55;
+}
+
+/* Mobile: cada item é um card. Serve para link (<a>) e para botão. */
+.row {
+  display: grid;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  width: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+  box-shadow: var(--shadow-xs);
+  color: var(--color-text-primary);
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.row:hover {
+  background: var(--color-hover);
+  text-decoration: none;
+}
+
+.row:focus-visible {
+  outline-offset: -3px;
+}
+
+/* ── células ───────────────────────────────────────────────────────── */
+.stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  font: var(--type-h6);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  overflow: hidden;
+  font: var(--type-small);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Dado clínico/contato (telefone, contagens): JetBrains Mono tabular. */
+.data {
+  font: 500 13px/1.5 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.missing {
+  color: var(--color-text-muted);
+}
+
+/* Sempre na borda direita, mesmo quando a coluna alarga por causa da linha de baixo. */
+.trailingIcon {
+  justify-self: end;
+  color: var(--color-text-muted);
+}
+
+/* ── estados ───────────────────────────────────────────────────────── */
+.errorBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+/* ── botão flutuante (só mobile) ───────────────────────────────────── */
+.fab {
+  position: fixed;
+  right: var(--space-4);
+  bottom: calc(64px + var(--space-4) + env(safe-area-inset-bottom, 0px));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.fab:hover {
+  background: var(--color-action-primary-hover);
+}
+
+/* ── tabela (≥ 768px) ──────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .page {
+    padding: var(--space-10) var(--space-8) var(--space-16);
+  }
+
+  .title {
+    font-size: 36px;
+  }
+
+  .headerAction {
+    display: inline-flex;
+    flex: none;
+  }
+
+  .fab {
+    display: none;
+  }
+
+  .card {
+    overflow: clip;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-card);
+    box-shadow: var(--shadow-xs);
+  }
+
+  .columns {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: var(--columns);
+    gap: var(--space-4);
+    align-items: center;
+    height: 44px;
+    padding: 0 var(--space-5);
+    border-bottom: 1px solid var(--color-divider);
+    background: var(--color-subtle-surface);
+    font: var(--type-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--color-text-muted);
+  }
+
+  .list {
+    gap: 0;
+  }
+
+  .list li + li .row {
+    border-top: 1px solid var(--color-divider);
+  }
+
+  .row {
+    grid-template-columns: var(--columns);
+    gap: var(--space-4);
+    min-height: 68px;
+    padding: var(--space-3) var(--space-5);
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .errorBox {
+    padding: var(--space-5);
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--space-12) var(--space-10) var(--space-16);
+  }
+}

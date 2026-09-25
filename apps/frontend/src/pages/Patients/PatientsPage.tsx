@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, PawPrint, Plus, RotateCw, SearchX } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronRight, PawPrint, Plus, RotateCw, SearchX } from 'lucide-react';
 import type { PatientListItemDto, PatientListResponse } from '@meupaciente/shared';
 import { useAuth } from '../../auth/AuthContext';
 import {
@@ -14,16 +14,18 @@ import {
 } from '../../lib/format';
 import { useApiQuery } from '../../lib/useApiQuery';
 import { useDocumentTitle } from '../../lib/useDocumentTitle';
+import { useListSearch } from '../../lib/useListSearch';
 import { Alert } from '../../components/Alert/Alert';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Button, ButtonLink } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
+import { ListSkeleton } from '../../components/ListPage/ListSkeleton';
+import { Pagination } from '../../components/ListPage/Pagination';
 import { SearchField } from '../../components/SearchField/SearchField';
+import list from '../../components/ListPage/ListPage.module.css';
 import styles from './PatientsPage.module.css';
 
 const PER_PAGE = 20;
-const SEARCH_DEBOUNCE_MS = 300;
-
 
 export function PatientsPage() {
   useDocumentTitle('Pacientes');
@@ -31,41 +33,7 @@ export function PatientsPage() {
   const userName = state.status === 'authenticated' ? state.user.name : '';
 
   // Busca e página vivem na URL: voltar do prontuário devolve a mesma lista.
-  const [searchParams, setSearchParams] = useSearchParams();
-  const query = searchParams.get('q') ?? '';
-  const page = Math.max(1, Number(searchParams.get('pagina')) || 1);
-
-  const [searchText, setSearchText] = useState(query);
-  const searchRef = useRef<HTMLInputElement>(null);
-
-  // Voltar/avançar no navegador muda a URL: a caixa de busca acompanha.
-  useEffect(() => {
-    setSearchText((current) => (current.trim() === query ? current : query));
-  }, [query]);
-
-  // Digitação atualiza a URL (e a busca) só depois de uma pausa.
-  useEffect(() => {
-    const term = searchText.trim();
-    if (term === query) return;
-    const timer = window.setTimeout(() => {
-      setSearchParams(term ? { q: term } : {}, { replace: true });
-    }, SEARCH_DEBOUNCE_MS);
-    return () => window.clearTimeout(timer);
-  }, [searchText, query, setSearchParams]);
-
-  // Atalho do DS: "/" leva à busca de qualquer ponto da tela.
-  useEffect(() => {
-    function focusSearch(event: KeyboardEvent) {
-      const target = event.target instanceof Element ? event.target : null;
-      const typing = target?.closest('input, textarea, select, [contenteditable="true"]');
-      if (event.key === '/' && !typing && !event.metaKey && !event.ctrlKey) {
-        event.preventDefault();
-        searchRef.current?.focus();
-      }
-    }
-    window.addEventListener('keydown', focusSearch);
-    return () => window.removeEventListener('keydown', focusSearch);
-  }, []);
+  const { query, page, searchText, setSearchText, searchRef, goToPage } = useListSearch();
 
   const params = new URLSearchParams({ page: String(page), per_page: String(PER_PAGE) });
   if (query) params.set('q', toSearchTerm(query));
@@ -77,23 +45,15 @@ export function PatientsPage() {
     if (data && !query) setRegisteredTotal(data.pagination.total);
   }, [data, query]);
 
-  function goToPage(nextPage: number) {
-    const next = new URLSearchParams(searchParams);
-    if (nextPage > 1) next.set('pagina', String(nextPage));
-    else next.delete('pagina');
-    setSearchParams(next);
-    window.scrollTo({ top: 0 });
-  }
-
   const hasNoPatients = !query && data?.pagination.total === 0;
   const greeting = `${greetingFor()}, ${firstNameOf(userName)}`;
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.heading}>
-          <h1 className={styles.title}>Pacientes</h1>
-          <p className={styles.subtitle}>
+    <div className={list.page}>
+      <header className={list.header}>
+        <div className={list.heading}>
+          <h1 className={list.title}>Pacientes</h1>
+          <p className={list.subtitle}>
             {greeting}
             {registeredTotal !== null && registeredTotal > 0 && (
               <> · {pluralize(registeredTotal, 'paciente cadastrado', 'pacientes cadastrados')}</>
@@ -104,7 +64,7 @@ export function PatientsPage() {
         {!hasNoPatients && (
           <ButtonLink
             to="/pacientes/novo"
-            className={styles.newButton}
+            className={list.headerAction}
             icon={<Plus size={18} strokeWidth={2} aria-hidden="true" />}
           >
             Novo paciente
@@ -115,7 +75,7 @@ export function PatientsPage() {
       {!hasNoPatients && (
         <SearchField
           ref={searchRef}
-          className={styles.search}
+          className={list.search}
           label="Buscar pacientes"
           placeholder="Paciente, tutor ou telefone"
           shortcut="/"
@@ -124,29 +84,40 @@ export function PatientsPage() {
         />
       )}
 
-      <section className={styles.card} aria-labelledby="lista-pacientes" aria-busy={loading}>
+      <section
+        className={`${list.card} ${styles.patients}`}
+        aria-labelledby="lista-pacientes"
+        aria-busy={loading}
+      >
         <h2 id="lista-pacientes" className="visually-hidden">
           {query ? `Resultados para ${query}` : 'Lista de pacientes'}
         </h2>
 
         {error ? (
-          <div className={styles.errorBox}>
+          <div className={list.errorBox}>
             <Alert tone="error" title="Não foi possível carregar os pacientes">
               Verifique sua conexão e tente de novo.
             </Alert>
-            <Button variant="secondary" icon={<RotateCw size={18} strokeWidth={1.75} aria-hidden="true" />} onClick={retry}>
+            <Button
+              variant="secondary"
+              icon={<RotateCw size={18} strokeWidth={1.75} aria-hidden="true" />}
+              onClick={retry}
+            >
               Tentar de novo
             </Button>
           </div>
         ) : !data ? (
-          <ListSkeleton />
+          <ListSkeleton label="Carregando pacientes" />
         ) : hasNoPatients ? (
           <EmptyState
             icon={<PawPrint size={24} strokeWidth={1.75} />}
             title="Cadastre o primeiro paciente"
             description="Só nome e tutor são obrigatórios. Peso, vacinas e histórico você registra a cada atendimento."
             action={
-              <ButtonLink to="/pacientes/novo" icon={<Plus size={18} strokeWidth={2} aria-hidden="true" />}>
+              <ButtonLink
+                to="/pacientes/novo"
+                icon={<Plus size={18} strokeWidth={2} aria-hidden="true" />}
+              >
                 Cadastrar paciente
               </ButtonLink>
             }
@@ -164,22 +135,20 @@ export function PatientsPage() {
           />
         ) : (
           <>
-            <div className={styles.columns} aria-hidden="true">
+            <div className={list.columns} aria-hidden="true">
               <span>Paciente</span>
               <span>Tutor</span>
               <span>Idade</span>
             </div>
-            <ul className={styles.list} data-refreshing={loading || undefined}>
+            <ul className={list.list} data-refreshing={loading || undefined}>
               {data.data.map((patient) => (
                 <PatientRow key={patient.id} patient={patient} />
               ))}
             </ul>
             <Pagination
-              page={data.pagination.page}
-              totalPages={data.pagination.total_pages}
-              total={data.pagination.total}
+              pagination={data.pagination}
               shown={data.data.length}
-              perPage={data.pagination.per_page}
+              unit={['paciente', 'pacientes']}
               onChange={goToPage}
             />
           </>
@@ -188,7 +157,7 @@ export function PatientsPage() {
 
       {/* Mobile: a ação principal vira botão flutuante acima das abas. */}
       {!hasNoPatients && (
-        <Link to="/pacientes/novo" className={styles.fab} aria-label="Novo paciente">
+        <Link to="/pacientes/novo" className={list.fab} aria-label="Novo paciente">
           <Plus size={24} strokeWidth={2} aria-hidden="true" />
         </Link>
       )}
@@ -203,22 +172,18 @@ function PatientRow({ patient }: { patient: PatientListItemDto }) {
 
   return (
     <li>
-      <Link to={`/pacientes/${patient.id}`} className={styles.row}>
+      <Link to={`/pacientes/${patient.id}`} className={`${list.row} ${styles.row}`}>
         <span className={styles.patientCell}>
-          <Avatar
-            name={patient.name}
-            kind="patient"
-            photoUrl={patient.photo_url}
-          />
-          <span className={styles.stack}>
-            <span className={styles.patientName}>{patient.name}</span>
-            {details && <span className={styles.meta}>{details}</span>}
+          <Avatar name={patient.name} kind="patient" photoUrl={patient.photo_url} />
+          <span className={list.stack}>
+            <span className={list.name}>{patient.name}</span>
+            {details && <span className={list.meta}>{details}</span>}
           </span>
         </span>
         <span className={styles.tutorCell}>
           <span className="visually-hidden">Tutor: </span>
           <span className={styles.tutorName}>{patient.tutor.name}</span>
-          {phone && <span className={styles.phone}>{phone}</span>}
+          {phone && <span className={`${list.data} ${styles.phone}`}>{phone}</span>}
         </span>
         <span className={styles.ageCell}>
           {age ? (
@@ -227,88 +192,19 @@ function PatientRow({ patient }: { patient: PatientListItemDto }) {
               {age}
             </>
           ) : (
-            <span className={styles.missing}>
+            <span className={list.missing}>
               <span className="visually-hidden">Idade não informada</span>
               <span aria-hidden="true">—</span>
             </span>
           )}
         </span>
-        <ChevronRight className={styles.chevron} size={18} strokeWidth={1.75} aria-hidden="true" />
+        <ChevronRight
+          className={`${list.trailingIcon} ${styles.chevron}`}
+          size={18}
+          strokeWidth={1.75}
+          aria-hidden="true"
+        />
       </Link>
     </li>
-  );
-}
-
-interface PaginationProps {
-  page: number;
-  totalPages: number;
-  total: number;
-  shown: number;
-  perPage: number;
-  onChange: (page: number) => void;
-}
-
-function Pagination({ page, totalPages, total, shown, perPage, onChange }: PaginationProps) {
-  const first = (page - 1) * perPage + 1;
-  const last = first + shown - 1;
-
-  return (
-    <nav className={styles.pagination} aria-label="Paginação">
-      <p className={styles.range}>
-        {totalPages > 1 ? (
-          <>
-            <span className={styles.number}>
-              {first}–{last}
-            </span>{' '}
-            de <span className={styles.number}>{total.toLocaleString('pt-BR')}</span>
-          </>
-        ) : (
-          pluralize(total, 'paciente', 'pacientes')
-        )}
-      </p>
-      {totalPages > 1 && (
-        <div className={styles.pageButtons}>
-          <Button
-            variant="secondary"
-            size="sm"
-            aria-label="Página anterior"
-            disabled={page <= 1}
-            onClick={() => onChange(page - 1)}
-          >
-            <ChevronLeft size={18} strokeWidth={1.75} aria-hidden="true" />
-          </Button>
-          <span className={styles.pageInfo}>
-            Página {page} de {totalPages}
-          </span>
-          <Button
-            variant="secondary"
-            size="sm"
-            aria-label="Próxima página"
-            disabled={page >= totalPages}
-            onClick={() => onChange(page + 1)}
-          >
-            <ChevronRight size={18} strokeWidth={1.75} aria-hidden="true" />
-          </Button>
-        </div>
-      )}
-    </nav>
-  );
-}
-
-// DS: esqueleto de 5 linhas no carregamento.
-function ListSkeleton() {
-  return (
-    <div className={styles.skeleton} role="status">
-      <span className="visually-hidden">Carregando pacientes</span>
-      {Array.from({ length: 5 }, (_, index) => (
-        <div key={index} className={styles.skeletonRow} aria-hidden="true">
-          <span className={styles.skeletonAvatar} />
-          <span className={styles.skeletonLines}>
-            <span />
-            <span />
-          </span>
-        </div>
-      ))}
-    </div>
   );
 }
