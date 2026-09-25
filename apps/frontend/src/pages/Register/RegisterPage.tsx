@@ -4,7 +4,12 @@ import { useAuth } from '../../auth/AuthContext';
 import { ApiError } from '../../lib/api';
 import { describeCommonError, type FormMessage } from '../../lib/errors';
 import { prefersRememberedSession } from '../../lib/session';
-import { meetsPasswordRule, validateEmail } from '../../lib/validation';
+import {
+  PASSWORD_HINT,
+  validateEmail,
+  validateNewPassword,
+  validatePersonName,
+} from '../../lib/validation';
 import { Alert } from '../../components/Alert/Alert';
 import { AuthLayout } from '../../components/AuthLayout/AuthLayout';
 import form from '../../components/AuthLayout/AuthForm.module.css';
@@ -15,29 +20,16 @@ import { PasswordField } from '../../components/TextField/PasswordField';
 import { TextField } from '../../components/TextField/TextField';
 import styles from './RegisterPage.module.css';
 
-const PASSWORD_HINT = '8 ou mais caracteres, com letras e números.';
-
 interface FieldErrors {
   name?: string;
   email?: string;
   password?: string;
 }
 
-function validateName(value: string): string | undefined {
-  const name = value.trim();
-  if (!name) return 'Informe seu nome.';
-  if (name.length < 2) return 'Use pelo menos 2 caracteres.';
-  return undefined;
-}
-
-function validatePassword(value: string): string | undefined {
-  if (!value) return 'Crie uma senha.';
-  if (!meetsPasswordRule(value)) return 'Use 8 ou mais caracteres, com pelo menos uma letra e um número.';
-  return undefined;
-}
+const validatePassword = (value: string) => validateNewPassword(value, 'Crie uma senha.');
 
 const VALIDATORS: Record<keyof FieldErrors, (value: string) => string | undefined> = {
-  name: validateName,
+  name: validatePersonName,
   email: validateEmail,
   password: validatePassword,
 };
@@ -89,7 +81,7 @@ export function RegisterPage() {
     if (submitting) return;
 
     const errors: FieldErrors = {
-      name: validateName(values.name),
+      name: validatePersonName(values.name),
       email: validateEmail(values.email),
       password: validatePassword(values.password),
     };
