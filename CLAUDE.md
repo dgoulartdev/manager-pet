@@ -47,7 +47,9 @@ Seed: `teste@meupaciente.com` / `teste123`.
 
 - **Estilo:** CSS Modules + `src/styles/tokens.css`. Componentes usam **só tokens semânticos**
   (`--color-*`, `--type-*`, `--space-*`…), nunca primitivos (`--primary-600`) nem HEX. Tema escuro
-  redefine só os semânticos em `[data-theme='dark']` (segue o sistema operacional).
+  redefine só os semânticos em `[data-theme='dark']`. O tema segue o sistema
+  operacional ou a escolha feita no Perfil (Sistema / Claro / Escuro, salva no aparelho em
+  `lib/theme.ts` e aplicada antes do CSS pelo script do `index.html`).
 - **Regras do DS aplicadas:** alvos ≥ 44px; campos ≥ 48px (52px no mobile); texto de input 16px;
   rótulo sempre visível e opcional marcado com "(opcional)"; uma ação primária por tela; cor nunca é
   o único sinal (ícone/texto junto); dado clínico (peso, datas, telefone) em JetBrains Mono;
