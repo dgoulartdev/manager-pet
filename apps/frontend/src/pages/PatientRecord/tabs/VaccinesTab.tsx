@@ -8,24 +8,16 @@ import { pluralize } from '../../../lib/format';
 import {
   describeVaccineStatus,
   nextDose,
-  type VaccineStatus,
+  VACCINE_STATUS_TONES,
   type VaccineWithStatus,
 } from '../../../lib/vaccines';
-import { Badge, type BadgeTone } from '../../../components/Badge/Badge';
+import { Badge } from '../../../components/Badge/Badge';
 import { Button } from '../../../components/Button/Button';
 import { DeleteDialog } from '../../../components/DeleteDialog/DeleteDialog';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
 import { useToast } from '../../../components/Toast/Toast';
 import { VaccineDialog } from './VaccineDialog';
 import styles from './VaccinesTab.module.css';
-
-const STATUS_TONES: Record<VaccineStatus, BadgeTone> = {
-  overdue: 'error',
-  'due-soon': 'warning',
-  'up-to-date': 'success',
-  'no-next-dose': 'neutral',
-  superseded: 'neutral',
-};
 
 // Nenhum diálogo · registro (talvez já vinculado a um atendimento) · edição.
 type Editing = null | { appointmentId: string | null } | VaccineWithStatus;
@@ -240,7 +232,7 @@ function VaccineRow({ vaccine, appointmentDate, onOpen }: VaccineRowProps) {
         {vaccine.next_dose_date ? formatDate(vaccine.next_dose_date) : '—'}
       </span>
       <span className={styles.status}>
-        <Badge tone={STATUS_TONES[vaccine.status]}>{describeVaccineStatus(vaccine)}</Badge>
+        <Badge tone={VACCINE_STATUS_TONES[vaccine.status]}>{describeVaccineStatus(vaccine)}</Badge>
       </span>
       <Pencil className={styles.editIcon} size={18} strokeWidth={1.75} aria-hidden="true" />
     </button>
