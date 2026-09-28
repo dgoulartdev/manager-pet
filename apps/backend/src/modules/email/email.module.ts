@@ -14,7 +14,7 @@ const DEFAULT_FROM = 'MeuPaciente <onboarding@resend.dev>';
       inject: [ConfigService],
       // Com a chave do Resend, envia de verdade; sem ela, só registra no log.
       useFactory: (config: ConfigService) => {
-        const apiKey = config.get<string>('RESEND_EMAIL');
+        const apiKey = config.get<string>('RESEND_API_KEY');
         if (apiKey) {
           return new ResendEmailSender(apiKey, config.get<string>('EMAIL_FROM') || DEFAULT_FROM);
         }

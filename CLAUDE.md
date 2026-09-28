@@ -78,7 +78,7 @@ Seed: `teste@meupaciente.com` / `teste123`.
 - `@meupaciente/shared` é CommonJS: o `vite.config.ts` o pré-processa (`optimizeDeps`), senão importar
   enums (ex.: `Sex`) quebra no navegador. Só tipos funcionariam sem isso.
 - `apps/backend/tsconfig.json` precisa de `"types": ["node", "jest"]` (sem `node`, o seed quebra).
-- E-mail (recuperação de senha): `modules/email` com `EmailSender`. Com `RESEND_EMAIL` (chave do
+- E-mail (recuperação de senha): `modules/email` com `EmailSender`. Com `RESEND_API_KEY` (chave do
   Resend) no `.env`, envia de verdade; sem ela, o e-mail sai no log do backend. `APP_URL` monta o
   link e `EMAIL_FROM` é o remetente. O e2e troca o provedor por um que só captura (nunca envia).
 - Prisma fixado em 6.x (a 7 muda a sintaxe do datasource aprovada na arquitetura).
