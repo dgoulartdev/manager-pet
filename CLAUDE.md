@@ -65,9 +65,9 @@ Seed: `teste@meupaciente.com` / `teste123`.
   (`updateUser` após salvar o perfil; `changePassword` entra de novo com a senha nova, porque a
   API revoga todas as sessões na troca).
   Utilitários em `lib/` (datas, formatação, vacinas, pesagens, validação).
-- Rotas em português (`/pacientes`, `/pacientes/:id?aba=historico`, `/pacientes/:id/editar`,
-  `/pacientes/:id/atendimentos/novo`, `/tutores`, `/locais`, `/perfil`). Cadastro e edição usam a
-  mesma página (`PatientFormPage`, `AppointmentFormPage`).
+- Rotas em português (`/inicio`, `/pacientes`, `/pacientes/:id?aba=historico`, `/pacientes/:id/editar`,
+  `/pacientes/:id/atendimentos/novo`, `/tutores`, `/locais`, `/perfil`). Depois de entrar o app abre
+  em `/inicio`. Cadastro e edição usam a mesma página (`PatientFormPage`, `AppointmentFormPage`).
 - Decisão de produto: o tutor de um paciente **não muda** depois do cadastro (a API não aceita
   `tutor_id` no PATCH e deve continuar assim).
 

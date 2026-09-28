@@ -97,6 +97,7 @@
 - [x] Telas: login/registro
 - [ ] Telas: esqueci minha senha / redefinir senha
 - [x] Estrutura do app (barra lateral, trilho no tablet, abas no mobile)
+- [x] Tela: início (total de pacientes e novos no mês, vacinas para acompanhar, últimos atendimentos; primeiros passos sem pacientes)
 - [x] Tela: lista de pacientes + busca (API passou a incluir o resumo do tutor)
 - [x] Tela: cadastro de paciente (espécie Cão/Gato/Outra, foto, criação de tutor sem sair do formulário)
 - [x] Edição de paciente (a partir do prontuário; o tutor não muda depois do cadastro)
