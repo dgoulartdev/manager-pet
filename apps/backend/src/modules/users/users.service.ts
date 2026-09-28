@@ -12,6 +12,13 @@ import { toUserDto } from '../../common/mappers/user.mapper';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 
+function currentPasswordError(message: string): UnprocessableEntityException {
+  return new UnprocessableEntityException({
+    detail: message,
+    errors: [{ field: 'current_password', message }],
+  });
+}
+
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -25,6 +32,20 @@ export class UsersService {
   }
 
   async updateProfile(userId: string, dto: UpdateUserDto): Promise<UserDto> {
+    const current = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!current) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    // Trocar o e-mail muda o acesso à conta (e o destino da recuperação de
+    // senha): com o aparelho desbloqueado, não basta a sessão aberta.
+    if (dto.email !== undefined && dto.email !== current.email) {
+      await this.assertPassword(current.password, dto.current_password, {
+        missing: 'Informe sua senha atual para trocar o e-mail.',
+        wrong: 'Senha atual incorreta.',
+      });
+    }
+
     try {
       const user = await this.prisma.user.update({
         where: { id: userId },
@@ -50,15 +71,10 @@ export class UsersService {
       throw new NotFoundException('Usuário não encontrado.');
     }
 
-    const valid = await compare(dto.current_password, user.password);
-    // 422 no campo, não 401: a sessão é válida, o valor informado é que está
-    // errado (um 401 faria o cliente renovar o token e repetir a requisição).
-    if (!valid) {
-      throw new UnprocessableEntityException({
-        detail: 'Senha atual incorreta.',
-        errors: [{ field: 'current_password', message: 'Senha atual incorreta.' }],
-      });
-    }
+    await this.assertPassword(user.password, dto.current_password, {
+      missing: 'Informe sua senha atual.',
+      wrong: 'Senha atual incorreta.',
+    });
 
     const passwordHash = await hash(dto.new_password, 10);
 
@@ -73,5 +89,19 @@ export class UsersService {
         data: { revoked: true },
       }),
     ]);
+  }
+
+  /**
+   * Confere a senha atual. 422 no campo, não 401: a sessão é válida, o valor
+   * informado é que está errado (um 401 faria o cliente renovar o token e
+   * repetir a requisição).
+   */
+  private async assertPassword(
+    passwordHash: string,
+    informed: string | undefined,
+    messages: { missing: string; wrong: string },
+  ): Promise<void> {
+    if (!informed) throw currentPasswordError(messages.missing);
+    if (!(await compare(informed, passwordHash))) throw currentPasswordError(messages.wrong);
   }
 }

@@ -239,6 +239,11 @@ paths:
       tags: [Users]
       summary: Atualizar perfil do veterinário autenticado
       operationId: updateMe
+      description: |
+        Trocar o e-mail exige `current_password` (é o e-mail que dá acesso à
+        conta e recebe a recuperação de senha). Sem ela ou com a senha errada,
+        responde 422 com erro no campo `current_password`. Mudar só o nome, ou
+        mandar o mesmo e-mail, não pede senha. Limite de 10 requisições por minuto.
       requestBody:
         required: true
         content:
@@ -258,6 +263,8 @@ paths:
           $ref: "#/components/responses/Conflict"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /users/me/password:
     patch:
@@ -1236,6 +1243,9 @@ components:
         email:
           type: string
           format: email
+        current_password:
+          type: string
+          description: Obrigatória quando `email` muda.
 
     ChangePasswordRequest:
       type: object

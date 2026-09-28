@@ -15,6 +15,9 @@ export class UsersController {
     return this.usersService.getProfile(user.id);
   }
 
+  // Com a senha exigida na troca de e-mail, também não pode virar teste de senhas.
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Patch('me')
   updateMe(@CurrentUser() user: AuthenticatedUser, @Body() dto: UpdateUserDto) {
     return this.usersService.updateProfile(user.id, dto);
