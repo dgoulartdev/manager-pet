@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './auth/AuthContext';
 import { AppShell } from './components/AppShell/AppShell';
 import { AppointmentFormPage } from './pages/AppointmentForm/AppointmentFormPage';
 import { ToastProvider } from './components/Toast/Toast';
+import { HomePage } from './pages/Home/HomePage';
 import { LocationsPage } from './pages/Locations/LocationsPage';
 import { LoginPage } from './pages/Login/LoginPage';
 import { PatientFormPage } from './pages/PatientForm/PatientFormPage';
@@ -54,6 +55,7 @@ export function App() {
                 </RequireAuth>
               }
             >
+              <Route path="/inicio" element={<HomePage />} />
               <Route path="/pacientes" element={<PatientsPage />} />
               <Route path="/pacientes/novo" element={<PatientFormPage />} />
               <Route path="/pacientes/:patientId" element={<PatientRecordPage />} />
@@ -71,7 +73,7 @@ export function App() {
               <Route path="/perfil" element={<ProfilePage />} />
             </Route>
 
-            <Route path="*" element={<Navigate to="/pacientes" replace />} />
+            <Route path="*" element={<Navigate to="/inicio" replace />} />
           </Routes>
         </BrowserRouter>
       </ToastProvider>
@@ -98,7 +100,7 @@ function PublicOnly({ children }: { children: ReactNode }) {
 
   if (state.status === 'loading') return <SessionLoading />;
   if (state.status === 'authenticated') {
-    const from = (location.state as { from?: string } | null)?.from ?? '/pacientes';
+    const from = (location.state as { from?: string } | null)?.from ?? '/inicio';
     return <Navigate to={from} replace />;
   }
   return children;

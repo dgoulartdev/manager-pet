@@ -43,7 +43,8 @@ function describeLoginError(error: unknown): { message?: FormMessage; fields?: F
   if (error instanceof ApiError && error.status === 422) {
     const fields: FieldErrors = {};
     for (const fieldError of error.fieldErrors) {
-      if (fieldError.field === 'email') fields.email = 'Informe um e-mail válido, com domínio completo.';
+      if (fieldError.field === 'email')
+        fields.email = 'Informe um e-mail válido, com domínio completo.';
       if (fieldError.field === 'password') fields.password = 'Informe sua senha.';
     }
     return { fields };
@@ -56,7 +57,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as LoginLocationState | null;
-  const redirectTo = locationState?.from ?? '/pacientes';
+  const redirectTo = locationState?.from ?? '/inicio';
 
   const [email, setEmail] = useState(locationState?.email ?? '');
   const [password, setPassword] = useState('');
@@ -148,7 +149,10 @@ export function LoginPage() {
               setFormMessage(null);
               // Com erro visível, revalida a cada tecla para o erro sumir ao corrigir.
               if (fieldErrors.email) {
-                setFieldErrors((current) => ({ ...current, email: validateEmail(event.target.value) }));
+                setFieldErrors((current) => ({
+                  ...current,
+                  email: validateEmail(event.target.value),
+                }));
               }
             }}
             onBlur={() => {

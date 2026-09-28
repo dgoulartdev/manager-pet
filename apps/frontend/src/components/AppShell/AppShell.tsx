@@ -1,4 +1,12 @@
-import { CircleUserRound, LogOut, MapPin, PawPrint, UsersRound, type LucideIcon } from 'lucide-react';
+import {
+  CircleUserRound,
+  House,
+  LogOut,
+  MapPin,
+  PawPrint,
+  UsersRound,
+  type LucideIcon,
+} from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { Avatar } from '../Avatar/Avatar';
@@ -13,6 +21,7 @@ interface NavItem {
 
 // Seções do MVP. Agenda, financeiro etc. estão fora do escopo (architecture.md).
 const SECTIONS: NavItem[] = [
+  { to: '/inicio', label: 'Início', icon: House },
   { to: '/pacientes', label: 'Pacientes', icon: PawPrint },
   { to: '/tutores', label: 'Tutores', icon: UsersRound },
   { to: '/locais', label: 'Locais', icon: MapPin },
@@ -35,7 +44,7 @@ export function AppShell() {
       </a>
 
       <aside className={styles.sidebar}>
-        <Link to="/pacientes" className={styles.brand} aria-label="MeuPaciente — início">
+        <Link to="/inicio" className={styles.brand} aria-label="MeuPaciente — início">
           <span className={styles.brandFull}>
             <BrandMark size="md" />
           </span>
@@ -62,7 +71,13 @@ export function AppShell() {
                 <span className={styles.accountEmail}>{user.email}</span>
               </span>
             </Link>
-            <button type="button" className={styles.logout} aria-label="Sair" title="Sair" onClick={logout}>
+            <button
+              type="button"
+              className={styles.logout}
+              aria-label="Sair"
+              title="Sair"
+              onClick={logout}
+            >
               <LogOut size={18} strokeWidth={1.75} aria-hidden="true" />
             </button>
           </div>

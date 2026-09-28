@@ -100,7 +100,7 @@ export function RegisterPage() {
         { name: values.name.trim(), email: values.email.trim(), password: values.password },
         prefersRememberedSession(),
       );
-      navigate('/pacientes', { replace: true });
+      navigate('/inicio', { replace: true });
     } catch (error) {
       setSubmitting(false);
       if (error instanceof ApiError && error.status === 409) {
@@ -207,7 +207,13 @@ export function RegisterPage() {
           <p className={styles.legal}>
             Ao criar a conta, você concorda com os Termos de uso e a Política de privacidade.
           </p>
-          <Button type="submit" size="lg" fullWidth loading={submitting} loadingLabel="Criando conta…">
+          <Button
+            type="submit"
+            size="lg"
+            fullWidth
+            loading={submitting}
+            loadingLabel="Criando conta…"
+          >
             Criar conta
           </Button>
           <p className={form.footnote}>

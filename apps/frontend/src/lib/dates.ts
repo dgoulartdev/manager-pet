@@ -15,10 +15,32 @@ export function todayDateOnly(): Date {
 
 /** Hoje em YYYY-MM-DD, no fuso do aparelho. */
 export function todayIso(): string {
+  return isoDateInDays(0);
+}
+
+/** Daqui a `days` dias em YYYY-MM-DD, no fuso do aparelho. */
+export function isoDateInDays(days: number): string {
   const today = todayDateOnly();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${today.getFullYear()}-${month}-${day}`;
+  const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + days);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+/** Meia-noite do dia 1º do mês corrente, no fuso do aparelho. */
+export function startOfMonth(today = new Date()): Date {
+  return new Date(today.getFullYear(), today.getMonth(), 1);
+}
+
+/** "Segunda-feira, 28 de setembro" */
+export function formatWeekdayDate(date = new Date()): string {
+  const text = date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** "setembro" */
+export function formatMonthName(date = new Date()): string {
+  return date.toLocaleDateString('pt-BR', { month: 'long' });
 }
 
 /** "12/07/2026" */
