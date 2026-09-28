@@ -1,5 +1,5 @@
 import type { PaginatedResponse } from './pagination';
-import type { PatientDto } from './patients';
+import type { PatientDto, PatientSummaryDto } from './patients';
 
 export interface VaccineDto {
   id: string;
@@ -18,6 +18,11 @@ export interface VaccineDto {
 // Detalhe inclui paciente aninhado (GET /vaccines/:id).
 export interface VaccineDetailDto extends VaccineDto {
   patient: PatientDto;
+}
+
+// Item de GET /vaccines: vacina + resumo do paciente.
+export interface VaccineListItemDto extends VaccineDto {
+  patient: PatientSummaryDto;
 }
 
 export interface CreateVaccineRequest {
@@ -41,4 +46,4 @@ export interface UpdateVaccineRequest {
   notes?: string | null;
 }
 
-export type VaccineListResponse = PaginatedResponse<VaccineDto>;
+export type VaccineListResponse = PaginatedResponse<VaccineListItemDto>;

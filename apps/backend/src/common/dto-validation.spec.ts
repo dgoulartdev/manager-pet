@@ -7,8 +7,10 @@ import { CreatePatientDto } from '../modules/patients/dto/create-patient.dto';
 import { UpdatePatientDto } from '../modules/patients/dto/update-patient.dto';
 import { UpdateAppointmentDto } from '../modules/appointments/dto/update-appointment.dto';
 import { ListAppointmentsQueryDto } from '../modules/appointments/dto/list-appointments-query.dto';
+import { ListPatientsQueryDto } from '../modules/patients/dto/list-patients-query.dto';
 import { CreateVaccineDto } from '../modules/vaccines/dto/create-vaccine.dto';
 import { UpdateVaccineDto } from '../modules/vaccines/dto/update-vaccine.dto';
+import { ListVaccinesQueryDto } from '../modules/vaccines/dto/list-vaccines-query.dto';
 
 // Valida um objeto como o ValidationPipe global faria e devolve os campos com erro.
 async function invalidFields(
@@ -86,11 +88,50 @@ describe('Validação de DTOs', () => {
       [UpdateVaccineDto, 'next_dose_date'],
       [ListAppointmentsQueryDto, 'date_from'],
       [ListAppointmentsQueryDto, 'date_to'],
+      [ListVaccinesQueryDto, 'next_dose_to'],
     ] as const)('%p.%s rejeita data com hora', async (dtoClass, field) => {
       const fields = await invalidFields(dtoClass, {
         [field]: '2024-06-15T10:00:00Z',
       });
       expect(fields).toEqual([field]);
+    });
+  });
+
+  describe('pacientes cadastrados a partir de (created_from)', () => {
+    it.each([
+      ['UTC', '2026-09-01T03:00:00.000Z'],
+      ['com fuso', '2026-09-01T00:00:00-03:00'],
+    ])('aceita data e hora %s', async (_caso, value) => {
+      expect(
+        await invalidFields(ListPatientsQueryDto, { created_from: value }),
+      ).toEqual([]);
+    });
+
+    it.each([
+      ['só a data', '2026-09-01'],
+      ['hora sem fuso', '2026-09-01T00:00:00'],
+      ['data impossível', '2026-02-30T00:00:00Z'],
+    ])('rejeita %s', async (_caso, value) => {
+      expect(
+        await invalidFields(ListPatientsQueryDto, { created_from: value }),
+      ).toEqual(['created_from']);
+    });
+  });
+
+  describe('latest_only na query string', () => {
+    it.each([
+      ['true', true],
+      ['false', false],
+    ])('"%s" vira booleano', async (value, expected) => {
+      const query = plainToInstance(ListVaccinesQueryDto, { latest_only: value });
+      expect(query.latest_only).toBe(expected);
+      expect(await validate(query)).toEqual([]);
+    });
+
+    it('rejeita outro texto', async () => {
+      expect(
+        await invalidFields(ListVaccinesQueryDto, { latest_only: 'sim' }),
+      ).toEqual(['latest_only']);
     });
   });
 

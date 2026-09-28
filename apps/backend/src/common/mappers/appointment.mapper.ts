@@ -1,7 +1,11 @@
 import { Appointment, Location, Patient } from '@prisma/client';
-import type { AppointmentDetailDto, AppointmentDto } from '@meupaciente/shared';
+import type {
+  AppointmentDetailDto,
+  AppointmentDto,
+  AppointmentListItemDto,
+} from '@meupaciente/shared';
 import { LocationType } from '@meupaciente/shared';
-import { toPatientDto } from './patient.mapper';
+import { PatientSummary, toPatientDto, toPatientSummaryDto } from './patient.mapper';
 import { toLocationDto } from './location.mapper';
 
 export function toAppointmentDto(appointment: Appointment): AppointmentDto {
@@ -22,6 +26,15 @@ export function toAppointmentDto(appointment: Appointment): AppointmentDto {
     notes: appointment.notes,
     created_at: appointment.created_at.toISOString(),
     updated_at: appointment.updated_at.toISOString(),
+  };
+}
+
+export function toAppointmentListItemDto(
+  appointment: Appointment & { patient: PatientSummary },
+): AppointmentListItemDto {
+  return {
+    ...toAppointmentDto(appointment),
+    patient: toPatientSummaryDto(appointment.patient),
   };
 }
 

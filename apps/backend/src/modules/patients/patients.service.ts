@@ -64,11 +64,12 @@ export class PatientsService {
     userId: string,
     query: ListPatientsQueryDto,
   ): Promise<PaginatedResponse<PatientListItemDto>> {
-    const { page, per_page, q, tutor_id } = query;
+    const { page, per_page, q, tutor_id, created_from } = query;
 
     const where: Prisma.PatientWhereInput = {
       user_id: userId,
       ...(tutor_id ? { tutor_id } : {}),
+      ...(created_from ? { created_at: { gte: new Date(created_from) } } : {}),
       ...(q
         ? {
             OR: [

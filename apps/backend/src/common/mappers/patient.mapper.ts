@@ -1,8 +1,9 @@
-import { Patient, Tutor } from '@prisma/client';
+import { Patient, Prisma, Tutor } from '@prisma/client';
 import type {
   PatientDetailDto,
   PatientDto,
   PatientListItemDto,
+  PatientSummaryDto,
 } from '@meupaciente/shared';
 import { Sex } from '@meupaciente/shared';
 import { toTutorDto } from './tutor.mapper';
@@ -45,5 +46,32 @@ export function toPatientDetailDto(
   return {
     ...toPatientDto(patient),
     tutor: toTutorDto(patient.tutor),
+  };
+}
+
+// Campos do paciente que as listagens de atendimentos e vacinas incluem.
+export const PATIENT_SUMMARY_SELECT = {
+  id: true,
+  name: true,
+  species: true,
+  photo_url: true,
+  tutor: { select: { id: true, name: true, phone: true } },
+} satisfies Prisma.PatientSelect;
+
+export type PatientSummary = Prisma.PatientGetPayload<{
+  select: typeof PATIENT_SUMMARY_SELECT;
+}>;
+
+export function toPatientSummaryDto(patient: PatientSummary): PatientSummaryDto {
+  return {
+    id: patient.id,
+    name: patient.name,
+    species: patient.species,
+    photo_url: patient.photo_url,
+    tutor: {
+      id: patient.tutor.id,
+      name: patient.tutor.name,
+      phone: patient.tutor.phone,
+    },
   };
 }

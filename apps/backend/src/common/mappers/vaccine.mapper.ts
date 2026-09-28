@@ -1,6 +1,10 @@
 import { Patient, Vaccine } from '@prisma/client';
-import type { VaccineDetailDto, VaccineDto } from '@meupaciente/shared';
-import { toPatientDto } from './patient.mapper';
+import type {
+  VaccineDetailDto,
+  VaccineDto,
+  VaccineListItemDto,
+} from '@meupaciente/shared';
+import { PatientSummary, toPatientDto, toPatientSummaryDto } from './patient.mapper';
 
 export function toVaccineDto(vaccine: Vaccine): VaccineDto {
   return {
@@ -17,6 +21,15 @@ export function toVaccineDto(vaccine: Vaccine): VaccineDto {
     notes: vaccine.notes,
     created_at: vaccine.created_at.toISOString(),
     updated_at: vaccine.updated_at.toISOString(),
+  };
+}
+
+export function toVaccineListItemDto(
+  vaccine: Vaccine & { patient: PatientSummary },
+): VaccineListItemDto {
+  return {
+    ...toVaccineDto(vaccine),
+    patient: toPatientSummaryDto(vaccine.patient),
   };
 }
 

@@ -8,6 +8,7 @@ import { LocationType } from '@meupaciente/shared';
 import type {
   AppointmentDetailDto,
   AppointmentDto,
+  AppointmentListItemDto,
   PaginatedResponse,
 } from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -15,7 +16,9 @@ import { paginate } from '../../common/pagination';
 import {
   toAppointmentDetailDto,
   toAppointmentDto,
+  toAppointmentListItemDto,
 } from '../../common/mappers/appointment.mapper';
+import { PATIENT_SUMMARY_SELECT } from '../../common/mappers/patient.mapper';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { ListAppointmentsQueryDto } from './dto/list-appointments-query.dto';
@@ -58,7 +61,7 @@ export class AppointmentsService {
   async findAll(
     userId: string,
     query: ListAppointmentsQueryDto,
-  ): Promise<PaginatedResponse<AppointmentDto>> {
+  ): Promise<PaginatedResponse<AppointmentListItemDto>> {
     const { page, per_page, patient_id, location_id, date_from, date_to } =
       query;
 
@@ -79,14 +82,18 @@ export class AppointmentsService {
     const [appointments, total] = await this.prisma.$transaction([
       this.prisma.appointment.findMany({
         where,
-        orderBy: { date: 'desc' },
+        // Resumo do paciente: listas que misturam pacientes (ex.: início) não
+        // precisam de uma requisição por linha.
+        include: { patient: { select: PATIENT_SUMMARY_SELECT } },
+        // No mesmo dia, o registrado por último vem primeiro.
+        orderBy: [{ date: 'desc' }, { created_at: 'desc' }],
         skip: (page - 1) * per_page,
         take: per_page,
       }),
       this.prisma.appointment.count({ where }),
     ]);
 
-    return paginate(appointments.map(toAppointmentDto), total, page, per_page);
+    return paginate(appointments.map(toAppointmentListItemDto), total, page, per_page);
   }
 
   async findOne(userId: string, id: string): Promise<AppointmentDetailDto> {

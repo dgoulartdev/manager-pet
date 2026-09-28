@@ -33,6 +33,16 @@ export interface PatientListItemDto extends PatientDto {
   tutor: TutorSummaryDto;
 }
 
+// Resumo do paciente nas listagens de atendimentos e vacinas: identifica o
+// paciente (e quem contatar) numa lista que mistura pacientes.
+export interface PatientSummaryDto {
+  id: string;
+  name: string;
+  species: string | null;
+  photo_url: string | null;
+  tutor: TutorSummaryDto;
+}
+
 export interface CreatePatientRequest {
   tutor_id: string;
   name: string;

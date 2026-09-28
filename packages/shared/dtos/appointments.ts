@@ -1,6 +1,6 @@
 import type { LocationType } from '../enums';
 import type { PaginatedResponse } from './pagination';
-import type { PatientDto } from './patients';
+import type { PatientDto, PatientSummaryDto } from './patients';
 import type { LocationDto } from './locations';
 
 export interface AppointmentDto {
@@ -26,6 +26,11 @@ export interface AppointmentDto {
 export interface AppointmentDetailDto extends AppointmentDto {
   patient: PatientDto;
   location: LocationDto | null;
+}
+
+// Item de GET /appointments: atendimento + resumo do paciente.
+export interface AppointmentListItemDto extends AppointmentDto {
+  patient: PatientSummaryDto;
 }
 
 export interface CreateAppointmentRequest {
@@ -59,4 +64,4 @@ export interface UpdateAppointmentRequest {
   notes?: string | null;
 }
 
-export type AppointmentListResponse = PaginatedResponse<AppointmentDto>;
+export type AppointmentListResponse = PaginatedResponse<AppointmentListItemDto>;

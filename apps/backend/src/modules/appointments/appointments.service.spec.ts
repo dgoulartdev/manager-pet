@@ -28,6 +28,14 @@ function buildAppointment(overrides: Partial<Appointment> = {}): Appointment {
   } as Appointment;
 }
 
+const patientSummary = {
+  id: 'patient-1',
+  name: 'Miso',
+  species: 'Gato',
+  photo_url: null,
+  tutor: { id: 'tutor-1', name: 'Rafael Bueno', phone: '11999999999' },
+};
+
 describe('AppointmentsService', () => {
   let service: AppointmentsService;
   let prisma: {
@@ -192,7 +200,9 @@ describe('AppointmentsService', () => {
 
   describe('findAll', () => {
     it('filtra por usuário, paciente, local e intervalo de datas', async () => {
-      prisma.appointment.findMany.mockResolvedValue([buildAppointment()]);
+      prisma.appointment.findMany.mockResolvedValue([
+        { ...buildAppointment(), patient: patientSummary },
+      ]);
       prisma.appointment.count.mockResolvedValue(1);
 
       const result = await service.findAll('user-1', {
@@ -216,6 +226,22 @@ describe('AppointmentsService', () => {
       );
       expect(result.pagination.total).toBe(1);
       expect(result.data).toHaveLength(1);
+    });
+
+    it('inclui o resumo do paciente e desempata o mesmo dia pelo registro mais recente', async () => {
+      prisma.appointment.findMany.mockResolvedValue([
+        { ...buildAppointment(), patient: patientSummary },
+      ]);
+      prisma.appointment.count.mockResolvedValue(1);
+
+      const result = await service.findAll('user-1', { page: 1, per_page: 5 });
+
+      expect(prisma.appointment.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: [{ date: 'desc' }, { created_at: 'desc' }],
+        }),
+      );
+      expect(result.data[0].patient).toEqual(patientSummary);
     });
   });
 

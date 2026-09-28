@@ -22,6 +22,14 @@ function buildVaccine(overrides: Partial<Vaccine> = {}): Vaccine {
   } as Vaccine;
 }
 
+const patientSummary = {
+  id: 'patient-1',
+  name: 'Miso',
+  species: 'Gato',
+  photo_url: null,
+  tutor: { id: 'tutor-1', name: 'Rafael Bueno', phone: '11999999999' },
+};
+
 describe('VaccinesService', () => {
   let service: VaccinesService;
   let prisma: {
@@ -29,6 +37,7 @@ describe('VaccinesService', () => {
     patient: Record<string, jest.Mock>;
     appointment: Record<string, jest.Mock>;
     $transaction: jest.Mock;
+    $queryRaw: jest.Mock;
   };
 
   beforeEach(() => {
@@ -44,6 +53,7 @@ describe('VaccinesService', () => {
       patient: { findFirst: jest.fn() },
       appointment: { findFirst: jest.fn() },
       $transaction: jest.fn((ops: Promise<unknown>[]) => Promise.all(ops)),
+      $queryRaw: jest.fn(),
     };
 
     service = new VaccinesService(prisma as unknown as PrismaService);
@@ -128,8 +138,10 @@ describe('VaccinesService', () => {
   });
 
   describe('findAll', () => {
-    it('filtra por usuário e paciente', async () => {
-      prisma.vaccine.findMany.mockResolvedValue([buildVaccine()]);
+    it('filtra por usuário e paciente, com o resumo do paciente', async () => {
+      prisma.vaccine.findMany.mockResolvedValue([
+        { ...buildVaccine(), patient: patientSummary },
+      ]);
       prisma.vaccine.count.mockResolvedValue(1);
 
       const result = await service.findAll('user-1', {
@@ -141,10 +153,36 @@ describe('VaccinesService', () => {
       expect(prisma.vaccine.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { user_id: 'user-1', patient_id: 'patient-1' },
+          orderBy: [{ application_date: 'desc' }, { created_at: 'desc' }],
         }),
       );
+      expect(prisma.$queryRaw).not.toHaveBeenCalled();
       expect(result.pagination.total).toBe(1);
-      expect(result.data).toHaveLength(1);
+      expect(result.data[0].patient).toEqual(patientSummary);
+    });
+
+    it('lista reforços pendentes: só a dose mais recente, até a data, mais urgente primeiro', async () => {
+      prisma.$queryRaw.mockResolvedValue([{ id: 'vaccine-2' }, { id: 'vaccine-3' }]);
+      prisma.vaccine.findMany.mockResolvedValue([]);
+      prisma.vaccine.count.mockResolvedValue(0);
+
+      await service.findAll('user-1', {
+        page: 1,
+        per_page: 5,
+        latest_only: true,
+        next_dose_to: '2026-10-28',
+      });
+
+      expect(prisma.vaccine.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            user_id: 'user-1',
+            id: { in: ['vaccine-2', 'vaccine-3'] },
+            next_dose_date: { lte: new Date('2026-10-28') },
+          },
+          orderBy: [{ next_dose_date: 'asc' }, { application_date: 'desc' }],
+        }),
+      );
     });
   });
 

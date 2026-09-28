@@ -430,6 +430,16 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: created_from
+          in: query
+          description: |
+            Só pacientes cadastrados a partir deste instante (inclusive). Exige
+            data e hora com fuso, porque o início do dia ou do mês depende do
+            fuso do aparelho. Data sem hora ou hora sem fuso é rejeitada (422).
+          schema:
+            type: string
+            format: date-time
+            example: "2026-09-01T00:00:00-03:00"
       responses:
         "200":
           description: Lista paginada de pacientes
@@ -750,6 +760,8 @@ paths:
       description: |
         Endpoint principal para histórico e busca de atendimentos.
         Use `patient_id` para a timeline de um paciente específico.
+        Ordem: data mais recente primeiro; no mesmo dia, o registrado por
+        último primeiro. Cada item traz o resumo do paciente (e do tutor).
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
@@ -897,6 +909,14 @@ paths:
       description: |
         Endpoint principal para o histórico vacinal. Use `patient_id` para
         listar as vacinas de um paciente específico.
+
+        Reforços pendentes de todos os pacientes:
+        `?latest_only=true&next_dose_to=<hoje + 30 dias>` — as doses em atraso
+        entram, porque a próxima dose já passou.
+
+        Ordem: aplicação mais recente primeiro. Com `next_dose_to`, a próxima
+        dose mais antiga (a mais atrasada ou a que vence antes) primeiro.
+        Cada item traz o resumo do paciente (e do tutor).
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
@@ -906,6 +926,25 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: latest_only
+          in: query
+          description: |
+            Só a aplicação mais recente de cada vacina de cada paciente — as
+            anteriores já foram reforçadas. A vacina é identificada pelo nome,
+            sem diferenciar maiúsculas nem espaços nas pontas; no mesmo dia,
+            vale a registrada por último.
+          schema:
+            type: boolean
+            default: false
+        - name: next_dose_to
+          in: query
+          description: |
+            Só vacinas com próxima dose prevista até esta data (inclusive),
+            as já vencidas incluídas. Vacinas sem próxima dose ficam de fora.
+          schema:
+            type: string
+            format: date
+            example: "2026-10-28"
       responses:
         "200":
           description: Lista paginada de vacinas
@@ -1423,7 +1462,7 @@ components:
 
     TutorSummary:
       type: object
-      description: Resumo do tutor usado na listagem de pacientes
+      description: Resumo do tutor nas listagens (pacientes, atendimentos e vacinas)
       required: [id, name]
       properties:
         id:
@@ -1455,6 +1494,28 @@ components:
             $ref: "#/components/schemas/PatientListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
+
+    PatientSummary:
+      type: object
+      description: |
+        Resumo do paciente nas listagens de atendimentos e vacinas, que
+        misturam pacientes: quem é e qual tutor contatar.
+      required: [id, name, species, photo_url, tutor]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Mimi"
+        species:
+          type: [string, "null"]
+          example: "Gato"
+        photo_url:
+          type: [string, "null"]
+          format: uri
+        tutor:
+          $ref: "#/components/schemas/TutorSummary"
 
     # -- Location ------------------------------------------------------------
 
@@ -1684,6 +1745,15 @@ components:
         notes:
           type: [string, "null"]
 
+    AppointmentListItem:
+      allOf:
+        - $ref: "#/components/schemas/Appointment"
+        - type: object
+          required: [patient]
+          properties:
+            patient:
+              $ref: "#/components/schemas/PatientSummary"
+
     AppointmentListResponse:
       type: object
       required: [data, pagination]
@@ -1691,7 +1761,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Appointment"
+            $ref: "#/components/schemas/AppointmentListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 
@@ -1805,6 +1875,15 @@ components:
         notes:
           type: [string, "null"]
 
+    VaccineListItem:
+      allOf:
+        - $ref: "#/components/schemas/Vaccine"
+        - type: object
+          required: [patient]
+          properties:
+            patient:
+              $ref: "#/components/schemas/PatientSummary"
+
     VaccineListResponse:
       type: object
       required: [data, pagination]
@@ -1812,7 +1891,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Vaccine"
+            $ref: "#/components/schemas/VaccineListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 

@@ -134,6 +134,17 @@ describe('Fluxo principal (e2e)', () => {
     });
   });
 
+  it('conta pacientes cadastrados a partir de um instante (data e hora com fuso)', async () => {
+    const since = (value: string) =>
+      request(app.getHttpServer())
+        .get(`/v1/patients?per_page=1&created_from=${encodeURIComponent(value)}`)
+        .set('Authorization', `Bearer ${accessToken}`);
+
+    expect((await since('2000-01-01T00:00:00-03:00').expect(200)).body.pagination.total).toBe(1);
+    expect((await since('2999-01-01T00:00:00Z').expect(200)).body.pagination.total).toBe(0);
+    await since('2026-09-01').expect(422);
+  });
+
   it('lista tutores com os pacientes vinculados, buscando pelo nome do paciente', async () => {
     const res = await request(app.getHttpServer())
       .get('/v1/tutors?q=miau')
@@ -210,7 +221,7 @@ describe('Fluxo principal (e2e)', () => {
       .expect(409);
   });
 
-  it('lista atendimentos filtrando por paciente', async () => {
+  it('lista atendimentos filtrando por paciente, com o resumo do paciente', async () => {
     const res = await request(app.getHttpServer())
       .get(`/v1/appointments?patient_id=${patientId}`)
       .set('Authorization', `Bearer ${accessToken}`)
@@ -218,6 +229,54 @@ describe('Fluxo principal (e2e)', () => {
 
     expect(res.body.data).toHaveLength(1);
     expect(res.body.pagination.total).toBe(1);
+    expect(res.body.data[0].patient).toEqual({
+      id: patientId,
+      name: 'Miau',
+      species: 'Gato',
+      photo_url: null,
+      tutor: { id: tutorId, name: 'Maria Tutora', phone: '11999999999' },
+    });
+  });
+
+  it('lista reforços pendentes só com a dose mais recente de cada vacina', async () => {
+    const register = (body: Record<string, unknown>) =>
+      request(app.getHttpServer())
+        .post('/v1/vaccines')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ patient_id: patientId, ...body })
+        .expect(201);
+
+    // 1ª dose com reforço vencido, mas já reforçada: não conta como pendente.
+    await register({ name: 'V4', application_date: '2025-07-01', next_dose_date: '2025-08-01' });
+    // Mesmo nome com outra caixa e espaços: é o reforço, e este vence no prazo.
+    const booster = await register({
+      name: ' v4 ',
+      application_date: '2025-08-01',
+      next_dose_date: '2026-08-01',
+    });
+    // Reforço fora do prazo e vacina sem próxima dose: ficam de fora.
+    await register({ name: 'Antirrábica', application_date: '2026-07-01', next_dose_date: '2027-07-01' });
+    await register({ name: 'Giárdia', application_date: '2026-07-01' });
+
+    const pending = await request(app.getHttpServer())
+      .get('/v1/vaccines?latest_only=true&next_dose_to=2026-10-28')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(pending.body.data.map((vaccine: { id: string }) => vaccine.id)).toEqual([
+      booster.body.id,
+    ]);
+    expect(pending.body.data[0].patient).toMatchObject({
+      id: patientId,
+      name: 'Miau',
+      tutor: { id: tutorId, name: 'Maria Tutora' },
+    });
+
+    const all = await request(app.getHttpServer())
+      .get(`/v1/vaccines?patient_id=${patientId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(all.body.pagination.total).toBe(4);
   });
 
   it('atualiza o atendimento', async () => {
