@@ -531,7 +531,7 @@ Persistir o hash SHA-256 de cada refresh token na tabela `refresh_tokens`. O val
 
 **Consequências negativas:**
 - Uma query extra no banco a cada uso do refresh token (custo desprezível)
-- Necessidade de job de limpeza de tokens expirados (simples de implementar)
+- Necessidade de job de limpeza de tokens expirados — implementado em `TokenCleanupService` (`@nestjs/schedule`): todo dia às 3h (horário de Brasília) apaga refresh tokens vencidos ou revogados e tokens de redefinição vencidos ou usados
 
 **Alternativas rejeitadas:**
 - Refresh token stateless (apenas JWT): logout não invalida o token de verdade
