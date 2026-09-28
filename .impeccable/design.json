@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-28T19:30:57.214966+00:00",
+  "title": "Design System: MeuPaciente",
+  "extensions": {
+    "colorMeta": {
+      "verde-agua-clinico": {
+        "role": "primary",
+        "displayName": "Verde-água Clínico",
+        "canonical": "#137a72",
+        "tonalRamp": [
+          "#14403e",
+          "#134d4a",
+          "#12615c",
+          "#137a72",
+          "#1f988d",
+          "#46b5aa",
+          "#7bd1c7",
+          "#d5f2ee"
+        ]
+      },
+      "terracota-paciente": {
+        "role": "secondary",
+        "displayName": "Terracota Paciente",
+        "canonical": "#e45e39",
+        "tonalRamp": [
+          "#62271c",
+          "#7e2e20",
+          "#a03724",
+          "#c4472a",
+          "#e45e39",
+          "#f27e5c",
+          "#ffc8b4",
+          "#fff4f0"
+        ]
+      },
+      "ardosia": {
+        "role": "neutral",
+        "displayName": "Ardósia",
+        "canonical": "#1b222b",
+        "tonalRamp": [
+          "#1b222b",
+          "#2c3542",
+          "#3f4a5c",
+          "#4e5b71",
+          "#64738c",
+          "#8391ab",
+          "#d3dae5",
+          "#f5f7fa"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Título de página",
+        "purpose": "Saudação e título de cada tela (28px no celular)."
+      },
+      "title": {
+        "displayName": "Título de seção",
+        "purpose": "Cabeçalho de card e painel."
+      },
+      "data": {
+        "displayName": "Dado clínico",
+        "purpose": "Peso, datas, telefone e contagens, sempre tabular."
+      }
+    },
+    "shadows": [
+      {
+        "name": "hover",
+        "value": "0 1px 2px rgba(27,34,43,.06), 0 2px 6px rgba(27,34,43,.06)",
+        "purpose": "Card clicável sob o cursor."
+      },
+      {
+        "name": "flutuante",
+        "value": "0 12px 28px rgba(27,34,43,.1), 0 2px 6px rgba(27,34,43,.06)",
+        "purpose": "FAB e toast."
+      },
+      {
+        "name": "dialogo",
+        "value": "0 24px 56px rgba(27,34,43,.14), 0 4px 12px rgba(27,34,43,.08)",
+        "purpose": "Diálogos e bottom sheets."
+      },
+      {
+        "name": "foco",
+        "value": "0 0 0 3px rgba(31,152,141,.35)",
+        "purpose": "Anel de foco de botões e campos."
+      }
+    ],
+    "motion": [
+      {
+        "name": "rapida",
+        "value": "140ms ease-out",
+        "purpose": "Hover, foco e troca de fundo."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "480px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão primário",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "A única ação primária da tela.",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Novo paciente</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;border:1px solid transparent;border-radius:6px;background:var(--color-action-primary-bg,#137a72);color:var(--color-action-primary-fg,#fff);font:500 15px/1 'IBM Plex Sans',system-ui,sans-serif;letter-spacing:.01em;cursor:pointer;transition:background-color 140ms ease-out,box-shadow 140ms ease-out}.ds-btn-primary:hover{background:var(--color-action-primary-hover,#12615c)}.ds-btn-primary:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(31,152,141,.35)}"
+    },
+    {
+      "name": "Botão secundário",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ações de apoio.",
+      "html": "<button class=\"ds-btn-secondary\">Registrar vacina</button>",
+      "css": ".ds-btn-secondary{height:44px;padding:0 20px;border:1px solid var(--color-border,#d3dae5);border-radius:6px;background:var(--color-surface,#fff);color:var(--color-action-secondary-fg,#3f4a5c);font:500 15px/1 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer;transition:background-color 140ms ease-out}.ds-btn-secondary:hover{background:var(--color-hover,#eef2f7)}.ds-btn-secondary:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(31,152,141,.35)}"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Rótulo sempre visível, 48px, texto de 16px.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Nome do paciente</span><input class=\"ds-input\" placeholder=\"Ex.: Miso\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:6px;font-family:'IBM Plex Sans',system-ui,sans-serif}.ds-field-label{font:600 13px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:.02em;color:var(--color-text-label,#3f4a5c)}.ds-input{height:48px;padding:0 14px;border:1px solid var(--color-border,#d3dae5);border-radius:6px;background:var(--color-surface,#fff);color:var(--color-text-primary,#1b222b);font:400 16px/1.6 'IBM Plex Sans',sans-serif;transition:border-color 140ms ease-out,box-shadow 140ms ease-out}.ds-input:hover{border-color:var(--color-border-strong,#aeb9cb)}.ds-input:focus-visible{outline:none;border-color:var(--color-focus-border,#1f988d);box-shadow:0 0 0 3px rgba(31,152,141,.35)}"
+    },
+    {
+      "name": "Selo de situação",
+      "kind": "chip",
+      "refersTo": "badge-alerta",
+      "description": "Estado sempre escrito, com fundo tonal.",
+      "html": "<span class=\"ds-badge\">Vence em 9 dias</span>",
+      "css": ".ds-badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:3px;background:var(--color-warning-surface,#fff9eb);color:var(--color-warning-fg,#944b07);font:600 12px/1.4 'IBM Plex Sans',sans-serif;letter-spacing:.01em}"
+    },
+    {
+      "name": "Linha de paciente",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Card de lista com avatar terracota e dado em mono.",
+      "html": "<a class=\"ds-row\" href=\"#\"><span class=\"ds-avatar\">MI</span><span class=\"ds-row-text\"><span class=\"ds-row-name\">Miso</span><span class=\"ds-row-meta\">Rafael Bueno · <span class=\"ds-mono\">(11) 99999-8888</span></span></span></a>",
+      "css": ".ds-row{display:flex;align-items:center;gap:12px;padding:16px 20px;border:1px solid var(--color-border,#d3dae5);border-radius:8px;background:var(--color-card,#fff);color:var(--color-text-primary,#1b222b);text-decoration:none;font-family:'IBM Plex Sans',sans-serif;transition:background-color 140ms ease-out,box-shadow 140ms ease-out}.ds-row:hover{background:var(--color-hover,#eef2f7)}.ds-row:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(31,152,141,.35)}.ds-avatar{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:9999px;background:var(--color-avatar-patient-bg,#fff4f0);color:var(--color-avatar-patient-fg,#a03724);font:600 14px/1 'IBM Plex Sans',sans-serif}.ds-row-text{display:flex;flex-direction:column}.ds-row-name{font:600 16px/1.4 'IBM Plex Sans',sans-serif}.ds-row-meta{font:400 14px/1.5 'IBM Plex Sans',sans-serif;color:var(--color-text-muted,#64738c)}.ds-mono{font:500 13px/1.5 'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Item de navegação",
+      "kind": "nav",
+      "refersTo": "nav-item-ativo",
+      "description": "Barra lateral; ativo em névoa verde-água.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item\" aria-current=\"page\" href=\"#\">Início</a><a class=\"ds-nav-item\" href=\"#\">Pacientes</a></nav>",
+      "css": ".ds-nav{display:flex;flex-direction:column;gap:4px;width:208px}.ds-nav-item{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:6px;color:var(--color-text-secondary,#4e5b71);font:500 14px/1.5 'IBM Plex Sans',sans-serif;text-decoration:none;transition:background-color 140ms ease-out}.ds-nav-item:hover{background:var(--color-hover,#eef2f7)}.ds-nav-item:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(31,152,141,.35)}.ds-nav-item[aria-current=page]{background:var(--color-selected-bg,#d5f2ee);color:var(--color-selected-fg,#12615c);font-weight:600}"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Prontuário de Bolso",
+    "overview": "O MeuPaciente é uma ferramenta clínica que cabe no bolso da veterinária e anda com ela entre clínicas, consultórios e casas de tutores. O visual é calmo, preciso e acolhedor: fundo claro levemente azulado, superfícies brancas bem delimitadas, um verde-água que só aparece onde há ação e um terracota quente que só aparece onde está o paciente. O dado clínico é o herói — peso, datas e telefones em fonte mono tabular, com mais contraste que qualquer elemento de interface.\n\nA densidade é de ferramenta de trabalho usada com uma mão, em luz ruim: alvos grandes, rótulos sempre visíveis, uma ação primária por tela, listas agrupadas num só bloco. Seções de documento separadas por divisórias, não caixas. Nada decorativo compete com o registro clínico. O tema escuro é cidadão de primeira classe: só os tokens semânticos mudam, os componentes não sabem em que tema estão.",
+    "keyCharacteristics": [
+      "Mobile-first: tab bar no celular, trilho de 72px no tablet, barra lateral de 240px no desktop.",
+      "Verde-água = ação; terracota = paciente; ardósia = texto e estrutura.",
+      "Dado clínico sempre em IBM Plex Mono tabular.",
+      "Superfícies com borda fina, sem sombra em repouso; cantos secos (6–8px).",
+      "Seções separadas por divisória; caixa só para o que é um objeto (tabela, lista, painel de detalhe).",
+      "Estados sempre com texto ou ícone, nunca só com cor."
+    ],
+    "rules": [
+      {
+        "name": "The Teal Is Action Rule",
+        "body": "Verde-água só em coisas que se clica ou em que se está: botões, links, foco, item ativo. Nunca decorativo.",
+        "section": "colors"
+      },
+      {
+        "name": "The Terracotta Is the Patient Rule",
+        "body": "Terracota só em avatar de paciente, marcador da timeline e gráfico de peso. Se não é o animal, não é terracota.",
+        "section": "colors"
+      },
+      {
+        "name": "The Semantic Only Rule",
+        "body": "Componentes usam só tokens semânticos (`--color-*`), nunca primitivos nem HEX. É o que faz o tema escuro funcionar sem nenhum `if`.",
+        "section": "colors"
+      },
+      {
+        "name": "The Clinical Data Is Mono Rule",
+        "body": "Peso, datas, telefone e números de contagem sempre em IBM Plex Mono tabular. Texto de interface nunca em mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mobile-First Rule",
+        "body": "80% do uso é no celular, com uma mão. Toda tela nasce na largura de 375px e cresce; nunca rolagem horizontal.",
+        "section": "layout"
+      },
+      {
+        "name": "The Border Before Shadow Rule",
+        "body": "Separação é feita por borda de 1px, divisória e fundo. Sombra só em elemento que flutua; nunca em card, botão ou lista em repouso.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Section Not Card Rule",
+        "body": "Grupos de conteúdo de uma mesma tela (dados do paciente, seções de formulário, configurações do perfil) são seções com título e divisória, não caixas. Caixa só para um objeto com borda própria: tabela, lista, faixa de resumo, painel de detalhe. Nunca caixa dentro de caixa.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** manter alvos de toque de pelo menos 44px e campos de 48px (52px no celular) com texto de 16px.",
+      "**Do** usar só tokens semânticos (`--color-*`, `--type-*`, `--space-*`) nos componentes.",
+      "**Do** escrever peso, datas, telefone e contagens em IBM Plex Mono tabular.",
+      "**Do** separar grupos de uma tela com título e divisória; caixa só para lista, tabela ou painel.",
+      "**Do** acompanhar toda cor de estado com texto ou ícone.",
+      "**Do** ter uma única ação primária por tela; no celular ela vira FAB.",
+      "**Do** verificar cada tela no tema claro e no escuro."
+    ],
+    "donts": [
+      "**Don't** usar terracota fora de avatar de paciente, marcador de timeline e gráfico de peso.",
+      "**Don't** usar verde-água como decoração, fundo de seção ou texto que não é ação.",
+      "**Don't** usar primitivos (`--primary-600`) ou HEX soltos em componentes.",
+      "**Don't** criar rolagem horizontal de página no celular; tabela vira lista agrupada.",
+      "**Don't** pôr caixa dentro de caixa, sombra em superfície em repouso, pílulas ou faixa colorida na lateral de cards e itens.",
+      "**Don't** usar ícone repetido em toda linha só como enfeite, nem círculo colorido atrás de ícone.",
+      "**Don't** mostrar números, metas, planos ou promessas que o sistema não sustenta.",
+      "**Don't** usar sombras largas, brilhos ou texto em gradiente."
+    ]
+  }
+}

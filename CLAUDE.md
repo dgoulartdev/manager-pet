@@ -52,13 +52,13 @@ Seed: `teste@meupaciente.com` / `teste123`.
   `lib/theme.ts` e aplicada antes do CSS pelo script do `index.html`).
 - **Regras do DS aplicadas:** alvos ≥ 44px; campos ≥ 48px (52px no mobile); texto de input 16px;
   rótulo sempre visível e opcional marcado com "(opcional)"; uma ação primária por tela; cor nunca é
-  o único sinal (ícone/texto junto); dado clínico (peso, datas, telefone) em JetBrains Mono;
+  o único sinal (ícone/texto junto); dado clínico (peso, datas, telefone) em IBM Plex Mono (a interface é IBM Plex Sans);
   terracota só em avatar de paciente, marcador de timeline e gráfico de peso; teal só em ações.
 - **Peças prontas** (`src/components`): AppShell, AuthLayout, Alert, Avatar, Badge, BrandMark,
   Button/ButtonLink (primary, secondary, ghost, destructive), Checkbox, DeleteDialog (confirmação ou,
   com vínculos/409, explicação do bloqueio), Dialog (sobre `<dialog>`, `size` sm/md, vira bottom sheet
   no mobile, foco no elemento com `data-autofocus`), EmptyState, ListPage (estilos de tela de lista:
-  tabela ≥ 768px e cards abaixo; Pagination; ListSkeleton), LocationDialog e TutorDialog (cadastro e
+  tabela ≥ 768px e lista agrupada abaixo; Pagination; ListSkeleton), LocationDialog e TutorDialog (cadastro e
   edição, usados nas telas e nos atalhos dos formulários), PasswordStrength, PhotoPicker, SearchField,
   Segmented, Select, Tabs, Textarea (auto-grow), TextField, Toast, TutorPicker.
 - **Dados:** `lib/api.ts` (`apiRequest`, renovação do token com uma única chamada em andamento —
