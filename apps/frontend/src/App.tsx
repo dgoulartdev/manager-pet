@@ -9,11 +9,12 @@ import { LocationsPage } from './pages/Locations/LocationsPage';
 import { LoginPage } from './pages/Login/LoginPage';
 import { PatientFormPage } from './pages/PatientForm/PatientFormPage';
 import { PatientRecordPage } from './pages/PatientRecord/PatientRecordPage';
+import { ForgotPasswordPage } from './pages/PasswordRecovery/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/PasswordRecovery/ResetPasswordPage';
 import { PatientsPage } from './pages/Patients/PatientsPage';
 import { ProfilePage } from './pages/Profile/ProfilePage';
 import { RegisterPage } from './pages/Register/RegisterPage';
 import { TutorsPage } from './pages/Tutors/TutorsPage';
-import { UnderConstructionPage } from './pages/UnderConstruction/UnderConstructionPage';
 import styles from './App.module.css';
 
 export function App() {
@@ -42,10 +43,12 @@ export function App() {
               path="/esqueci-senha"
               element={
                 <PublicOnly>
-                  <UnderConstructionPage title="Recuperar acesso" />
+                  <ForgotPasswordPage />
                 </PublicOnly>
               }
             />
+            {/* Sem PublicOnly: o link do e-mail precisa abrir mesmo com sessão neste aparelho. */}
+            <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
 
             {/* Telas internas: todas dentro da estrutura com navegação. */}
             <Route
