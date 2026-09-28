@@ -33,6 +33,7 @@ describe('AuthService', () => {
   };
   let jwtService: Record<string, jest.Mock>;
   let configService: Record<string, jest.Mock>;
+  let emailSender: { send: jest.Mock };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -66,10 +67,13 @@ describe('AuthService', () => {
       get: jest.fn((_key: string, def?: string) => def),
     };
 
+    emailSender = { send: jest.fn().mockResolvedValue(undefined) };
+
     service = new AuthService(
       prisma as unknown as PrismaService,
       jwtService as unknown as JwtService,
       configService as unknown as ConfigService,
+      emailSender,
     );
   });
 
@@ -226,12 +230,24 @@ describe('AuthService', () => {
   });
 
   describe('forgotPassword', () => {
-    it('cria token de reset quando o e-mail existe', async () => {
+    it('cria token de reset e envia o link por e-mail quando o e-mail existe', async () => {
       prisma.user.findUnique.mockResolvedValue(buildUser());
 
       await service.forgotPassword('ana@example.com');
 
       expect(prisma.passwordResetToken.create).toHaveBeenCalled();
+      const message = emailSender.send.mock.calls[0][0];
+      expect(message.to).toBe('ana@example.com');
+      expect(message.text).toMatch(
+        /http:\/\/localhost:5173\/redefinir-senha\?token=[0-9a-f]{64}/,
+      );
+    });
+
+    it('não falha a requisição quando o provedor de e-mail falha', async () => {
+      prisma.user.findUnique.mockResolvedValue(buildUser());
+      emailSender.send.mockRejectedValue(new Error('Resend fora do ar'));
+
+      await expect(service.forgotPassword('ana@example.com')).resolves.toBeUndefined();
     });
 
     it('não cria token nem erra quando o e-mail não existe (evita enumeração)', async () => {
@@ -241,6 +257,7 @@ describe('AuthService', () => {
         service.forgotPassword('fantasma@example.com'),
       ).resolves.toBeUndefined();
       expect(prisma.passwordResetToken.create).not.toHaveBeenCalled();
+      expect(emailSender.send).not.toHaveBeenCalled();
     });
   });
 
