@@ -5,6 +5,8 @@ import { LocationType } from '@meupaciente/shared';
 import { AppModule } from '../src/app.module';
 import { ProblemDetailsFilter } from '../src/common/filters/problem-details.filter';
 import { validationExceptionFactory } from '../src/common/validation-exception-factory';
+import { PrismaService } from '../src/prisma/prisma.service';
+import { TokenCleanupService } from '../src/modules/token-cleanup/token-cleanup.service';
 
 // Fluxo principal completo: register -> login -> CRUD (tutor/local/paciente/
 // atendimento) -> logout. Roda contra o schema Postgres isolado
@@ -435,5 +437,34 @@ describe('Fluxo principal (e2e)', () => {
       .post('/v1/auth/login')
       .send({ email, password })
       .expect(401);
+  });
+  it('limpa tokens vencidos, revogados e usados sem derrubar a sessão ativa', async () => {
+    const prisma = app.get(PrismaService);
+    const login = await request(app.getHttpServer())
+      .post('/v1/auth/login')
+      .send({ email, password: newPassword })
+      .expect(200);
+    const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+    await prisma.passwordResetToken.create({
+      data: { user_id: user.id, token_hash: `vencido-${Date.now()}`, expires_at: new Date(Date.now() - 1000) },
+    });
+    // Depois da troca de senha e do logout, este usuário já tem sessões revogadas.
+    expect(await prisma.refreshToken.count({ where: { user_id: user.id, revoked: true } })).toBeGreaterThan(0);
+
+    await app.get(TokenCleanupService).purge();
+
+    const staleSessions = await prisma.refreshToken.count({
+      where: { user_id: user.id, OR: [{ revoked: true }, { expires_at: { lt: new Date() } }] },
+    });
+    const staleResets = await prisma.passwordResetToken.count({
+      where: { user_id: user.id, OR: [{ used: true }, { expires_at: { lt: new Date() } }] },
+    });
+    expect(staleSessions).toBe(0);
+    expect(staleResets).toBe(0);
+
+    await request(app.getHttpServer())
+      .post('/v1/auth/refresh')
+      .send({ refresh_token: login.body.refresh_token })
+      .expect(200);
   });
 });
