@@ -6,16 +6,11 @@
   text-align: center;
 }
 
+/* Ícone discreto que diz do que é a lista; sem círculo colorido (terracota é só do paciente). */
 .icon {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  margin-bottom: var(--space-5);
-  border-radius: var(--radius-full);
-  background: var(--color-avatar-patient-bg);
-  color: var(--color-avatar-patient-fg);
+  margin-bottom: var(--space-4);
+  color: var(--color-text-muted);
 }
 
 .title {

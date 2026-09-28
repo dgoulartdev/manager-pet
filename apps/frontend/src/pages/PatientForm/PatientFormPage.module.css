@@ -28,7 +28,6 @@
 
 .title {
   font: var(--type-h1);
-  font-size: 28px;
   letter-spacing: var(--tracking-h1);
 }
 
@@ -55,7 +54,7 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-8);
   grid-area: main;
   min-width: 0;
 }
@@ -67,12 +66,9 @@
   grid-area: side;
 }
 
+/* Seções do formulário: o título com filete separa; nada de caixa em volta dos campos. */
 .card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-card);
-  box-shadow: var(--shadow-xs);
+  min-width: 0;
 }
 
 /* Título de seção com filete: separa Identificação e Tutor sem pesar. */
@@ -148,38 +144,6 @@
   }
 }
 
-.nextSteps {
-  display: none;
-}
-
-.nextTitle {
-  margin-bottom: var(--space-3);
-  font: var(--type-h6);
-}
-
-.nextSteps ul {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.nextSteps li {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-  font: var(--type-small);
-  color: var(--color-text-secondary);
-}
-
-.nextSteps svg {
-  flex: none;
-  margin-top: 1px;
-  color: var(--color-success-border);
-}
-
 /* Barra de ações fixa no rodapé. No mobile fica acima das abas de navegação. */
 .actions {
   position: sticky;
@@ -207,14 +171,6 @@
 @media (min-width: 768px) {
   .page {
     padding: var(--space-8) var(--space-8) 0;
-  }
-
-  .title {
-    font-size: 36px;
-  }
-
-  .card {
-    padding: var(--space-5);
   }
 
   .grid {
@@ -249,12 +205,13 @@
       'message message'
       'main side'
       'actions actions';
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: var(--space-6);
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: var(--space-6) var(--space-10);
     align-items: start;
   }
 
-  .nextSteps {
-    display: block;
+  .side {
+    padding-left: var(--space-8);
+    border-left: 1px solid var(--color-divider);
   }
 }

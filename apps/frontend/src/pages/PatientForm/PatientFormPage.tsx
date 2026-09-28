@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ChevronRight, CircleCheck, SearchX } from 'lucide-react';
+import { ChevronRight, SearchX } from 'lucide-react';
 import { Sex, type PatientDetailDto, type PatientDto, type TutorDto } from '@meupaciente/shared';
 import { ApiError, apiRequest } from '../../lib/api';
 import { describeCommonError, type FormMessage } from '../../lib/errors';
@@ -442,21 +442,6 @@ export function PatientFormPage() {
               onChange={(photo) => update('photo', photo)}
             />
           </div>
-          {!editing && (
-            <div className={`${styles.card} ${styles.nextSteps}`}>
-              <p className={styles.nextTitle}>Depois de salvar</p>
-              <ul>
-                <li>
-                  <CircleCheck size={18} strokeWidth={1.75} aria-hidden="true" />O prontuário do
-                  paciente abre em seguida
-                </li>
-                <li>
-                  <CircleCheck size={18} strokeWidth={1.75} aria-hidden="true" />
-                  Peso e vacinas você registra a partir dele
-                </li>
-              </ul>
-            </div>
-          )}
         </aside>
 
         <div className={styles.actions}>

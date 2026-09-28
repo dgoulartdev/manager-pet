@@ -19,7 +19,7 @@
 
 .headline {
   font: var(--type-display);
-  font-size: 36px;
+  font-size: 28px;
   letter-spacing: var(--tracking-display);
   color: var(--color-brand-panel-fg);
   text-wrap: balance;
@@ -31,28 +31,21 @@
   text-wrap: pretty;
 }
 
+/* O que o app faz, em linhas separadas por filete (sem checks de landing page). */
 .highlights {
   display: flex;
   flex-direction: column;
-  gap: 14px;
   margin: var(--space-2) 0 0;
   padding: 0;
   list-style: none;
 }
 
 .highlights li {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-brand-panel-muted) 35%, transparent);
   font: var(--type-body);
   font-weight: 500;
   color: var(--color-brand-panel-emphasis);
-}
-
-.highlights svg {
-  flex: none;
-  margin-top: 2px;
-  color: var(--color-brand-panel-muted);
 }
 
 .panelFooter {
@@ -89,7 +82,7 @@
 
 @media (min-width: 1280px) {
   .headline {
-    font-size: 48px;
+    font-size: 40px;
   }
 
   .main {

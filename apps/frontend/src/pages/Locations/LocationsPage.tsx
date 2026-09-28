@@ -245,9 +245,6 @@ function LocationRow({ location, onOpen }: { location: LocationListItemDto; onOp
         onClick={onOpen}
       >
         <span className={styles.locationCell}>
-          <span className={styles.locationIcon} aria-hidden="true">
-            <MapPin size={20} strokeWidth={1.75} />
-          </span>
           <span className={list.stack}>
             <span className={list.name}>
               <span className="visually-hidden">Editar </span>

@@ -59,7 +59,6 @@
 
 .name {
   font: var(--type-h1);
-  font-size: 28px;
   letter-spacing: var(--tracking-h1);
   overflow-wrap: anywhere;
 }
@@ -152,12 +151,13 @@
 
 .skeletonCards {
   display: grid;
-  gap: var(--space-4);
+  gap: 1px;
+  overflow: clip;
+  border-radius: var(--radius-lg);
 }
 
 .skeletonCards span {
-  height: 96px;
-  border-radius: var(--radius-lg);
+  height: 56px;
 }
 
 @keyframes pulse {
@@ -175,10 +175,6 @@
     grid-template-areas: 'avatar identity action';
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: var(--space-5);
-  }
-
-  .name {
-    font-size: 36px;
   }
 
   .primaryAction {

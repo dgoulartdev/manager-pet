@@ -11,7 +11,6 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-card);
-  box-shadow: var(--shadow-xs);
 }
 
 .stat {
@@ -169,20 +168,13 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-card);
-  box-shadow: var(--shadow-xs);
   text-align: center;
 }
 
 .firstStepsIcon {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  margin-bottom: var(--space-5);
-  border-radius: var(--radius-full);
-  background: var(--color-avatar-patient-bg);
-  color: var(--color-avatar-patient-fg);
+  margin-bottom: var(--space-4);
+  color: var(--color-text-muted);
 }
 
 .firstStepsTitle {

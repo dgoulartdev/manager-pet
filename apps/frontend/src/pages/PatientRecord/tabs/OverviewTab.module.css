@@ -1,20 +1,23 @@
+/*
+ * Aba Dados: seções de documento separadas por divisórias, não caixas.
+ * Mobile: uma coluna. ≥ 1024px: identificação à esquerda, tutor e foto à direita.
+ */
 .layout {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-6);
 }
 
 .side {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-6);
 }
 
-.card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-card);
-  box-shadow: var(--shadow-xs);
+.side > * + *,
+.layout > .side,
+.danger {
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-divider);
 }
 
 .cardTitle {
@@ -138,9 +141,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
 }
 
 .dangerTitle {
@@ -174,10 +174,6 @@
 }
 
 @media (min-width: 768px) {
-  .card {
-    padding: var(--space-5);
-  }
-
   .fields {
     gap: var(--space-5) var(--space-6);
   }
@@ -185,8 +181,17 @@
 
 @media (min-width: 1024px) {
   .layout {
-    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: var(--space-8) var(--space-10);
     align-items: start;
+  }
+
+  /* Lado a lado, a coluna do tutor se separa pela esquerda, não por cima. */
+  .layout > .side {
+    padding-top: 0;
+    padding-left: var(--space-8);
+    border-top: 0;
+    border-left: 1px solid var(--color-divider);
   }
 
   .danger {

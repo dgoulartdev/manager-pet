@@ -1,18 +1,23 @@
+/* Mesma silhueta da lista: um bloco com divisórias (no desktop, dentro do card). */
 .skeleton {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  overflow: clip;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
 }
 
 .row {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  height: 88px;
+  height: 72px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-card);
+}
+
+.row + .row {
+  border-top: 1px solid var(--color-divider);
 }
 
 .avatar,
@@ -53,17 +58,13 @@
 
 @media (min-width: 768px) {
   .skeleton {
-    gap: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
   }
 
   .row {
-    height: 68px;
+    height: 64px;
     padding: 0 var(--space-5);
-    border: 0;
-    border-radius: 0;
-  }
-
-  .row + .row {
-    border-top: 1px solid var(--color-divider);
   }
 }

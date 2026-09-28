@@ -30,7 +30,6 @@
 
 .title {
   font: var(--type-h1);
-  font-size: 28px;
   letter-spacing: var(--tracking-h1);
 }
 
@@ -39,10 +38,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-subtle-surface);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-divider);
 }
 
 .patientText {
@@ -66,16 +63,13 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-8);
   margin-top: var(--space-2);
 }
 
+/* Seções do formulário: o título com filete separa; nada de caixa em volta dos campos. */
 .card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-card);
-  box-shadow: var(--shadow-xs);
+  min-width: 0;
 }
 
 .sectionTitle {
@@ -235,14 +229,6 @@
   .page {
     max-width: calc(var(--container-form) + 2 * var(--space-8));
     padding: var(--space-8) var(--space-8) 0;
-  }
-
-  .title {
-    font-size: 36px;
-  }
-
-  .card {
-    padding: var(--space-5);
   }
 
   .grid {

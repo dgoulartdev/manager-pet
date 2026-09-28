@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { Check } from 'lucide-react';
 import { BrandMark } from '../BrandMark/BrandMark';
 import styles from './AuthLayout.module.css';
 
@@ -24,10 +23,7 @@ export function AuthLayout({ headline, description, highlights, children }: Auth
           <p className={styles.description}>{description}</p>
           <ul className={styles.highlights}>
             {highlights.map((highlight) => (
-              <li key={highlight}>
-                <Check size={20} strokeWidth={2} aria-hidden="true" />
-                {highlight}
-              </li>
+              <li key={highlight}>{highlight}</li>
             ))}
           </ul>
         </div>
