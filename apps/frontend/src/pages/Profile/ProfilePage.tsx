@@ -4,11 +4,13 @@ import type { UpdateUserRequest, UserDto } from '@meupaciente/shared';
 import { useAuth } from '../../auth/AuthContext';
 import { ApiError, apiRequest } from '../../lib/api';
 import { describeCommonError, type FormMessage } from '../../lib/errors';
+import { useThemePreference, type ThemePreference } from '../../lib/theme';
 import { useDocumentTitle } from '../../lib/useDocumentTitle';
 import { validateEmail, validatePersonName } from '../../lib/validation';
 import { Alert } from '../../components/Alert/Alert';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Button } from '../../components/Button/Button';
+import { Segmented } from '../../components/Segmented/Segmented';
 import { TextField } from '../../components/TextField/TextField';
 import { useToast } from '../../components/Toast/Toast';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
@@ -75,6 +77,8 @@ export function ProfilePage() {
           </Button>
         </div>
       </section>
+
+      <AppearanceCard />
 
       <ChangePasswordDialog
         open={changingPassword}
@@ -192,6 +196,37 @@ function AccountForm({ user }: { user: UserDto }) {
           </Button>
         </div>
       </form>
+    </section>
+  );
+}
+
+const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
+  { value: 'system', label: 'Sistema' },
+  { value: 'light', label: 'Claro' },
+  { value: 'dark', label: 'Escuro' },
+];
+
+/** Tema da interface: acompanha o sistema ou fica fixo neste aparelho. */
+function AppearanceCard() {
+  const [preference, setPreference] = useThemePreference();
+
+  return (
+    <section className={styles.card} aria-labelledby="perfil-aparencia">
+      <div className={styles.cardHeading}>
+        <h2 id="perfil-aparencia" className={styles.cardTitle}>
+          Aparência
+        </h2>
+        <p className={styles.cardText}>
+          "Sistema" acompanha o modo claro ou escuro do aparelho. A escolha vale só neste aparelho.
+        </p>
+      </div>
+      <Segmented
+        legend="Tema"
+        name="tema"
+        options={THEME_OPTIONS}
+        value={preference}
+        onChange={setPreference}
+      />
     </section>
   );
 }
