@@ -10,7 +10,7 @@
 
 ## 1. Banco de dados
 - [x] Instalar Prisma no `apps/backend`
-- [x] Criar `schema.prisma` (a partir da arquitetura v1.3.0)
+- [x] Criar `schema.prisma` (criado na arquitetura v1.3.0; hoje em v1.5.0)
 - [x] Rodar primeira migration
 - [x] Popular seed básico (usuário de teste, opcional)
 
@@ -74,24 +74,38 @@
 - [x] `ValidationPipe` global
 - [x] Exception filter no formato RFC 7807 (catch-all + mapeamento Prisma)
 - [x] Checagem de ownership (`user_id`) em todas as queries
+- [x] Rejeitar `null` em campos obrigatórios no PATCH (`@IsOptionalNotNull`)
+- [x] Aceitar apenas datas `YYYY-MM-DD` (`@IsDateOnly`)
+- [x] Mapear violação de FK (Prisma P2003) para 409
+
+## 8.1 Pendências do backend
+- [ ] Integrar provedor de e-mail no `forgot-password` (hoje o token só é logado fora de produção)
+- [ ] Rotina de limpeza de refresh/reset tokens expirados (ADR-006)
 
 ## 9. Testes
-- [x] Testes unitários dos services críticos (auth, appointments)
+- [x] Testes unitários dos services críticos (auth, appointments, vaccines)
+- [x] Testes unitários de validação de DTOs e do filtro RFC 7807
 - [x] Testes e2e dos fluxos principais (register→login→CRUD→logout)
+- [ ] Testes unitários dos services de users, tutors, locations e patients
+- [ ] Testes e2e de vacinas, foto do paciente, `/users/me` e forgot/reset de senha
 
 ## 10. Frontend (PWA)
-- [ ] Setup do projeto React + PWA
+- [ ] Setup do projeto React + PWA (Vite + `vite-plugin-pwa` já configurados; falta rotas e ícones do manifest)
 - [ ] Tipos/DTOs importados de `packages/shared`
+- [ ] Cliente HTTP com refresh automático do access token e tratamento de erros RFC 7807
 - [ ] Telas: login/registro
+- [ ] Telas: esqueci minha senha / redefinir senha
 - [ ] Tela: lista de pacientes + busca
-- [ ] Tela: cadastro/edição de paciente
+- [ ] Tela: cadastro/edição de paciente (com upload de foto)
 - [ ] Tela: timeline de atendimentos do paciente
 - [ ] Tela: novo atendimento
+- [ ] Tela: vacinas do paciente (lista + cadastro, vínculo opcional a atendimento)
 - [ ] Tela: tutores e locais (CRUD simples)
-- [ ] Tela: perfil do usuário
+- [ ] Tela: perfil do usuário (dados + troca de senha)
 
 ## 11. Pré-lançamento
-- [ ] Preencher placeholders dos documentos legais (e-mail, cidade, data, hosting)
-- [ ] Definir provedor de hosting (backend + banco + storage de fotos)
+- [ ] Redigir documentos legais (termos de uso e política de privacidade/LGPD) — ainda não existem no repositório
+- [ ] Definir provedor de hosting (backend + banco + storage de fotos persistente — ADR-007)
+- [ ] Definir provedor de e-mail transacional
 - [ ] Deploy de staging
 - [ ] Teste real com sua namorada (usuária piloto)

@@ -1,5 +1,4 @@
 import {
-  IsDateString,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -10,12 +9,13 @@ import {
   Min,
 } from 'class-validator';
 import { LocationType, type CreateAppointmentRequest } from '@meupaciente/shared';
+import { IsDateOnly } from '../../../common/decorators/is-date-only.decorator';
 
 export class CreateAppointmentDto implements CreateAppointmentRequest {
   @IsUUID()
   patient_id!: string;
 
-  @IsDateString()
+  @IsDateOnly()
   date!: string;
 
   @IsEnum(LocationType)

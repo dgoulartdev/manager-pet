@@ -1,5 +1,5 @@
 // schema.prisma
-// MeuPaciente — v1.4.0
+// MeuPaciente — v1.5.0
 
 generator client {
   provider = "prisma-client-js"

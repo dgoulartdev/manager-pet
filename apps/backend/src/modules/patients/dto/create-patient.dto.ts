@@ -1,5 +1,4 @@
 import {
-  IsDateString,
   IsEnum,
   IsOptional,
   IsString,
@@ -8,6 +7,8 @@ import {
   MinLength,
 } from 'class-validator';
 import { Sex, type CreatePatientRequest } from '@meupaciente/shared';
+import { IsOptionalNotNull } from '../../../common/decorators/is-optional-not-null.decorator';
+import { IsDateOnly } from '../../../common/decorators/is-date-only.decorator';
 
 export class CreatePatientDto implements CreatePatientRequest {
   @IsUUID()
@@ -23,7 +24,7 @@ export class CreatePatientDto implements CreatePatientRequest {
   @MaxLength(60)
   species?: string | null;
 
-  @IsOptional()
+  @IsOptionalNotNull()
   @IsEnum(Sex)
   sex?: Sex;
 
@@ -38,6 +39,6 @@ export class CreatePatientDto implements CreatePatientRequest {
   color?: string | null;
 
   @IsOptional()
-  @IsDateString()
+  @IsDateOnly()
   birth_date?: string | null;
 }

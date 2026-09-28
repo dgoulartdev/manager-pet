@@ -1,8 +1,8 @@
 # Arquitetura — MeuPaciente
 
-**Versão:** 1.5.0
-**Data:** 2026-08-16
-**Status:** Aprovado — pronto para implementação
+**Versão:** 1.5.1
+**Data:** 2026-09-23
+**Status:** Aprovado — backend implementado, frontend em andamento
 
 ---
 
@@ -46,7 +46,7 @@ Financeiro, estoque, agenda, gestão de clínica, funcionários, portal do tutor
 | ORM | Prisma | Type-safety, migrations, DX superior para TypeScript |
 | Frontend | React + TypeScript (PWA) | Familiaridade do time, PWA para uso mobile em clínicas |
 | Monorepo | Turborepo | Compartilhamento de DTOs e enums entre backend e frontend |
-| API | REST + OpenAPI 3.1 | Contratos versionados, geração de tipos automática |
+| API | REST + OpenAPI 3.1 | Contratos versionados; tipos compartilhados em `packages/shared` (escritos à mão, espelhando a spec) |
 
 ---
 
@@ -96,6 +96,8 @@ meupaciente/
 ├── apps/
 │   ├── backend/
 │   │   └── src/
+│   │       ├── common/        # decorators, filtro RFC 7807, mappers, paginação
+│   │       ├── config/        # validação de env no boot
 │   │       ├── modules/
 │   │       │   ├── auth/
 │   │       │   ├── users/
@@ -383,6 +385,9 @@ O `Patient` já é uma entidade genérica — não existe uma tabela ou tipo "Fe
 - **Paginação:** offset-based com `page`, `per_page`, `total`, `total_pages`
 - **Rotas planas com query params:** ex. `/appointments?patient_id=X` em vez de `/patients/:id/appointments`
 - **Convenção de nomes:** `snake_case` nos JSON, alinhado com Prisma
+- **Datas:** campos de data (sem hora) trafegam como `YYYY-MM-DD`; data com hora é rejeitada (422)
+- **PATCH parcial:** campo ausente não é alterado; `null` limpa campos anuláveis e é rejeitado (422) em campos obrigatórios
+- **Recurso de outro usuário:** responde 404, nunca 403 — não revela que o recurso existe
 - **Spec completa:** `docs/openapi.yaml` (OpenAPI 3.1, 36 endpoints, 7 módulos)
 
 ---
@@ -517,7 +522,7 @@ Criar a tabela `Document` no schema Prisma desde o início, sem nenhum endpoint 
 Logout sem persistência de refresh token é ineficaz — o token continua válido até expirar mesmo após o usuário sair. Em caso de dispositivo roubado ou comprometido, não há mecanismo de revogação.
 
 **Decisão:**
-Persistir o hash SHA-256 de cada refresh token na tabela `refresh_tokens`. O valor bruto nunca é armazenado. No logout, o token é marcado como `revoked = true`. No uso do refresh, verifica-se existência, validade e `revoked = false` antes de emitir novo access token.
+Persistir o hash SHA-256 de cada refresh token na tabela `refresh_tokens`. O valor bruto nunca é armazenado. No uso do refresh, verifica-se existência, validade e `revoked = false`; o token usado é revogado e um novo par é emitido (rotação). No logout, **todos** os refresh tokens ativos do usuário são marcados como `revoked = true` — a rota não recebe corpo, então não há como indicar uma sessão específica. Troca e redefinição de senha também revogam todas as sessões.
 
 **Consequências positivas:**
 - Logout real: token invalidado imediatamente no banco
@@ -668,3 +673,5 @@ Estes princípios governam decisões cotidianas e devem ser consultados antes de
 | Storage para fotos sem definição | Baixa | Baixo | Resolvido: interface `PatientPhotoStorage` com disco local no MVP; swap para R2/S3 no pós-MVP (ADR-007) |
 | Migration traumática pós-MVP | Baixa | Alto | Tabelas reservadas (Document, RefreshToken) e `user_id` em todas as entidades desde o início |
 | Logout ineficaz / token roubado | Baixa | Alto | Refresh tokens persistidos com hash; revogação imediata no logout (ADR-006) |
+| Recuperação de senha inoperante em produção | Alta | Alto | Hoje o token só é logado fora de produção; integrar provedor de e-mail antes do lançamento |
+| Fotos perdidas no redeploy | Média | Médio | Disco local é efêmero em PaaS (ADR-007); escolher host com volume persistente ou migrar para R2/S3 |

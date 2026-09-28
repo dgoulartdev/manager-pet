@@ -2,14 +2,17 @@ openapi: "3.1.0"
 
 info:
   title: MeuPaciente API
-  version: "1.0.0"
+  version: "1.0.1"
   description: |
     API do sistema de prontuário veterinário para profissionais autônomos,
     com suporte inicial a pacientes cães e gatos.
 
     ## Autenticação
-    Todos os endpoints (exceto `/v1/auth/*`) exigem um JWT Bearer token
-    obtido via `POST /v1/auth/login`.
+    Todos os endpoints exigem um JWT Bearer token obtido via
+    `POST /v1/auth/login`, exceto `register`, `login`, `refresh`,
+    `forgot-password` e `reset-password` em `/v1/auth/*`.
+    Todos os endpoints de `/v1/auth/*` (inclusive `logout`) têm rate limit
+    por IP e respondem 429 quando o limite é excedido.
 
     ## Isolamento de dados
     Todos os recursos são isolados por `user_id` derivado do JWT.
@@ -19,8 +22,13 @@ info:
     Endpoints de coleção usam paginação offset-based com `page` e `per_page`.
     Valores padrão: `page=1`, `per_page=20`. Máximo: `per_page=100`.
 
+    ## Datas
+    Campos `format: date` aceitam apenas `YYYY-MM-DD` (sem hora).
+
     ## Erros
     Todos os erros seguem RFC 7807 (`application/problem+json`).
+    Um ID de rota que não é UUID válido retorna 400; um UUID válido que não
+    existe (ou pertence a outro usuário) retorna 404.
 
 servers:
   - url: https://api.meupaciente.com.br/v1
@@ -79,6 +87,8 @@ paths:
           $ref: "#/components/responses/Conflict"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /auth/login:
     post:
@@ -106,6 +116,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /auth/refresh:
     post:
@@ -128,6 +140,8 @@ paths:
                 $ref: "#/components/schemas/AuthResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /auth/forgot-password:
     post:
@@ -154,6 +168,8 @@ paths:
                   message:
                     type: string
                     example: "Se o e-mail estiver cadastrado, você receberá as instruções em breve."
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /auth/reset-password:
     post:
@@ -182,17 +198,25 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /auth/logout:
     post:
       tags: [Auth]
-      summary: Invalidar refresh token atual
+      summary: Encerrar todas as sessões do usuário
       operationId: logoutUser
+      description: |
+        Revoga todos os refresh tokens ativos do usuário autenticado — a rota
+        não recebe corpo, então não há como indicar uma sessão específica.
+        Access tokens já emitidos seguem válidos até expirar (15min).
       responses:
         "204":
           description: Logout realizado com sucesso
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   # ── USERS ─────────────────────────────────────────────────────────────────
 
@@ -303,8 +327,6 @@ paths:
                 $ref: "#/components/schemas/Tutor"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "409":
-          $ref: "#/components/responses/Conflict"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
 
@@ -323,6 +345,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tutor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -345,6 +369,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tutor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -362,6 +388,8 @@ paths:
       responses:
         "204":
           description: Tutor removido
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -461,6 +489,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PatientDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -483,6 +513,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Patient"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -495,10 +527,13 @@ paths:
       summary: Remover paciente
       operationId: deletePatient
       description: |
-        Remove o paciente e todos os seus atendimentos (cascade).
+        Remove o paciente, todos os seus atendimentos e todas as suas vacinas
+        (cascade). A foto, se houver, também é apagada.
       responses:
         "204":
           description: Paciente removido
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -536,12 +571,25 @@ paths:
                     type: string
                     format: uri
                     example: "https://cdn.meupaciente.com.br/patients/uuid/photo.jpg"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
         "422":
-          $ref: "#/components/responses/UnprocessableEntity"
+          description: Arquivo ausente ou em formato diferente de JPG/PNG
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                type: "https://meupaciente.com.br/errors/validation-error"
+                title: "Validation Error"
+                status: 422
+                detail: "Formato inválido. Envie uma imagem JPG ou PNG."
 
     delete:
       tags: [Patients]
@@ -550,6 +598,8 @@ paths:
       responses:
         "204":
           description: Foto removida
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -616,6 +666,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Location"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -638,6 +690,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Location"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -655,6 +709,8 @@ paths:
       responses:
         "204":
           description: Local removido
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -762,6 +818,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AppointmentDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -784,6 +842,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Appointment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -798,6 +858,8 @@ paths:
       responses:
         "204":
           description: Atendimento removido
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -880,6 +942,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VaccineDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -902,6 +966,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Vaccine"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -916,6 +982,8 @@ paths:
       responses:
         "204":
           description: Vacina removida
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -934,9 +1002,6 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-  security:
-    - BearerAuth: []
 
   # ── PARAMETERS ────────────────────────────────────────────────────────────
 
@@ -1135,13 +1200,11 @@ components:
           type: string
           example: "Maria Souza"
         phone:
-          type: string
-          nullable: true
+          type: [string, "null"]
           example: "11999998888"
         email:
-          type: string
+          type: [string, "null"]
           format: email
-          nullable: true
           example: "maria@email.com"
         created_at:
           type: string
@@ -1161,12 +1224,10 @@ components:
           minLength: 2
           maxLength: 120
         phone:
-          type: string
-          nullable: true
+          type: [string, "null"]
         email:
-          type: string
+          type: [string, "null"]
           format: email
-          nullable: true
 
     UpdateTutorRequest:
       type: object
@@ -1176,12 +1237,10 @@ components:
           minLength: 2
           maxLength: 120
         phone:
-          type: string
-          nullable: true
+          type: [string, "null"]
         email:
-          type: string
+          type: [string, "null"]
           format: email
-          nullable: true
 
     TutorListResponse:
       type: object
@@ -1217,8 +1276,7 @@ components:
           type: string
           example: "Mimi"
         species:
-          type: string
-          nullable: true
+          type: [string, "null"]
           description: |
             Espécie do paciente. Campo texto livre — os valores iniciais
             suportados são "Cão" e "Gato", mas a API aceita qualquer valor.
@@ -1226,22 +1284,18 @@ components:
         sex:
           $ref: "#/components/schemas/Sex"
         breed:
-          type: string
-          nullable: true
+          type: [string, "null"]
           example: "Persa"
         color:
-          type: string
-          nullable: true
+          type: [string, "null"]
           example: "Branca"
         birth_date:
-          type: string
+          type: [string, "null"]
           format: date
-          nullable: true
           example: "2020-03-15"
         photo_url:
-          type: string
+          type: [string, "null"]
           format: uri
-          nullable: true
           readOnly: true
         created_at:
           type: string
@@ -1272,8 +1326,7 @@ components:
           minLength: 1
           maxLength: 120
         species:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 60
           description: |
             Espécie do paciente. Campo texto livre — os valores iniciais
@@ -1282,17 +1335,14 @@ components:
         sex:
           $ref: "#/components/schemas/Sex"
         breed:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 60
         color:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 60
         birth_date:
-          type: string
+          type: [string, "null"]
           format: date
-          nullable: true
 
     UpdatePatientRequest:
       type: object
@@ -1302,8 +1352,7 @@ components:
           minLength: 1
           maxLength: 120
         species:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 60
           description: |
             Espécie do paciente. Campo texto livre — os valores iniciais
@@ -1311,17 +1360,14 @@ components:
         sex:
           $ref: "#/components/schemas/Sex"
         breed:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 60
         color:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 60
         birth_date:
-          type: string
+          type: [string, "null"]
           format: date
-          nullable: true
 
     PatientListResponse:
       type: object
@@ -1348,12 +1394,10 @@ components:
           type: string
           example: "Clínica Vida Animal"
         address:
-          type: string
-          nullable: true
+          type: [string, "null"]
           example: "Rua das Flores, 123 – Goiânia, GO"
         phone:
-          type: string
-          nullable: true
+          type: [string, "null"]
           example: "6233334444"
         created_at:
           type: string
@@ -1373,12 +1417,10 @@ components:
           minLength: 2
           maxLength: 120
         address:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 255
         phone:
-          type: string
-          nullable: true
+          type: [string, "null"]
 
     UpdateLocationRequest:
       type: object
@@ -1388,12 +1430,10 @@ components:
           minLength: 2
           maxLength: 120
         address:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 255
         phone:
-          type: string
-          nullable: true
+          type: [string, "null"]
 
     LocationListResponse:
       type: object
@@ -1434,42 +1474,32 @@ components:
         location_type:
           $ref: "#/components/schemas/LocationType"
         location_id:
-          type: string
+          type: [string, "null"]
           format: uuid
-          nullable: true
           description: Preenchido quando location_type = REGISTERED
         ad_hoc_location_name:
-          type: string
-          nullable: true
+          type: [string, "null"]
           description: Preenchido quando location_type = AD_HOC
         home_address:
-          type: string
-          nullable: true
+          type: [string, "null"]
           description: Preenchido quando location_type = HOME_VISIT (opcional)
         weight_kg:
-          type: number
+          type: [number, "null"]
           format: float
-          nullable: true
           example: 4.2
         chief_complaint:
-          type: string
-          nullable: true
+          type: [string, "null"]
           example: "Vômito há 2 dias"
         history:
-          type: string
-          nullable: true
+          type: [string, "null"]
         diagnosis:
-          type: string
-          nullable: true
+          type: [string, "null"]
         treatment:
-          type: string
-          nullable: true
+          type: [string, "null"]
         prescription:
-          type: string
-          nullable: true
+          type: [string, "null"]
         notes:
-          type: string
-          nullable: true
+          type: [string, "null"]
         created_at:
           type: string
           format: date-time
@@ -1487,8 +1517,9 @@ components:
             patient:
               $ref: "#/components/schemas/Patient"
             location:
-              $ref: "#/components/schemas/Location"
-              nullable: true
+              oneOf:
+                - $ref: "#/components/schemas/Location"
+                - type: "null"
 
     CreateAppointmentRequest:
       type: object
@@ -1503,43 +1534,33 @@ components:
         location_type:
           $ref: "#/components/schemas/LocationType"
         location_id:
-          type: string
+          type: [string, "null"]
           format: uuid
-          nullable: true
           description: Obrigatório se location_type = REGISTERED
         ad_hoc_location_name:
-          type: string
-          nullable: true
+          type: [string, "null"]
           description: Obrigatório se location_type = AD_HOC
         home_address:
-          type: string
-          nullable: true
+          type: [string, "null"]
           description: Opcional se location_type = HOME_VISIT
         weight_kg:
-          type: number
+          type: [number, "null"]
           format: float
-          nullable: true
           minimum: 0.1
           maximum: 100
         chief_complaint:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 500
         history:
-          type: string
-          nullable: true
+          type: [string, "null"]
         diagnosis:
-          type: string
-          nullable: true
+          type: [string, "null"]
         treatment:
-          type: string
-          nullable: true
+          type: [string, "null"]
         prescription:
-          type: string
-          nullable: true
+          type: [string, "null"]
         notes:
-          type: string
-          nullable: true
+          type: [string, "null"]
 
     UpdateAppointmentRequest:
       type: object
@@ -1550,40 +1571,30 @@ components:
         location_type:
           $ref: "#/components/schemas/LocationType"
         location_id:
-          type: string
+          type: [string, "null"]
           format: uuid
-          nullable: true
         ad_hoc_location_name:
-          type: string
-          nullable: true
+          type: [string, "null"]
         home_address:
-          type: string
-          nullable: true
+          type: [string, "null"]
         weight_kg:
-          type: number
+          type: [number, "null"]
           format: float
-          nullable: true
           minimum: 0.1
           maximum: 100
         chief_complaint:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 500
         history:
-          type: string
-          nullable: true
+          type: [string, "null"]
         diagnosis:
-          type: string
-          nullable: true
+          type: [string, "null"]
         treatment:
-          type: string
-          nullable: true
+          type: [string, "null"]
         prescription:
-          type: string
-          nullable: true
+          type: [string, "null"]
         notes:
-          type: string
-          nullable: true
+          type: [string, "null"]
 
     AppointmentListResponse:
       type: object
@@ -1610,34 +1621,29 @@ components:
           type: string
           format: uuid
         appointment_id:
-          type: string
+          type: [string, "null"]
           format: uuid
-          nullable: true
           description: Atendimento em que a vacina foi aplicada, se houver
         name:
           type: string
           example: "V10"
         manufacturer:
-          type: string
-          nullable: true
+          type: [string, "null"]
           example: "Zoetis"
         batch:
-          type: string
-          nullable: true
+          type: [string, "null"]
           example: "L12345"
         application_date:
           type: string
           format: date
           example: "2024-06-15"
         next_dose_date:
-          type: string
+          type: [string, "null"]
           format: date
-          nullable: true
           description: Previsão da próxima dose/reforço
           example: "2025-06-15"
         notes:
-          type: string
-          nullable: true
+          type: [string, "null"]
         created_at:
           type: string
           format: date-time
@@ -1663,63 +1669,53 @@ components:
           type: string
           format: uuid
         appointment_id:
-          type: string
+          type: [string, "null"]
           format: uuid
-          nullable: true
           description: Deve pertencer ao mesmo paciente informado
         name:
           type: string
           minLength: 1
           maxLength: 120
         manufacturer:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 120
         batch:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 60
         application_date:
           type: string
           format: date
         next_dose_date:
-          type: string
+          type: [string, "null"]
           format: date
-          nullable: true
         notes:
-          type: string
-          nullable: true
+          type: [string, "null"]
 
     UpdateVaccineRequest:
       type: object
       properties:
         appointment_id:
-          type: string
+          type: [string, "null"]
           format: uuid
-          nullable: true
           description: Deve pertencer ao mesmo paciente da vacina
         name:
           type: string
           minLength: 1
           maxLength: 120
         manufacturer:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 120
         batch:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 60
         application_date:
           type: string
           format: date
         next_dose_date:
-          type: string
+          type: [string, "null"]
           format: date
-          nullable: true
         notes:
-          type: string
-          nullable: true
+          type: [string, "null"]
 
     VaccineListResponse:
       type: object
@@ -1789,6 +1785,18 @@ components:
   # ── RESPONSES ─────────────────────────────────────────────────────────────
 
   responses:
+    BadRequest:
+      description: "Parâmetro de rota inválido (ex.: ID que não é UUID)"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://meupaciente.com.br/errors/bad-request"
+            title: "Bad Request"
+            status: 400
+            detail: "Validation failed (uuid is expected)"
+
     Unauthorized:
       description: Token ausente, inválido ou expirado
       content:
@@ -1800,18 +1808,6 @@ components:
             title: "Unauthorized"
             status: 401
             detail: "Token de acesso inválido ou expirado."
-
-    Forbidden:
-      description: Autenticado, mas sem permissão para este recurso
-      content:
-        application/problem+json:
-          schema:
-            $ref: "#/components/schemas/Problem"
-          example:
-            type: "https://meupaciente.com.br/errors/forbidden"
-            title: "Forbidden"
-            status: 403
-            detail: "Você não tem permissão para acessar este recurso."
 
     NotFound:
       description: Recurso não encontrado
@@ -1836,6 +1832,30 @@ components:
             title: "Conflict"
             status: 409
             detail: "Já existe um cadastro com este e-mail."
+
+    PayloadTooLarge:
+      description: Arquivo enviado excede o tamanho máximo
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://meupaciente.com.br/errors/payload-too-large"
+            title: "Payload Too Large"
+            status: 413
+            detail: "Imagem excede o tamanho máximo de 5MB."
+
+    TooManyRequests:
+      description: Limite de requisições excedido (rate limit)
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://meupaciente.com.br/errors/too-many-requests"
+            title: "Too Many Requests"
+            status: 429
+            detail: "ThrottlerException: Too Many Requests"
 
     UnprocessableEntity:
       description: Erro de validação dos dados enviados
