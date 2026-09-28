@@ -13,10 +13,10 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../../common/types/authenticated-user';
-import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 import { LocationsService } from './locations.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
+import { ListLocationsQueryDto } from './dto/list-locations-query.dto';
 
 @Controller('locations')
 export class LocationsController {
@@ -25,7 +25,7 @@ export class LocationsController {
   @Get()
   list(
     @CurrentUser() user: AuthenticatedUser,
-    @Query() query: PaginationQueryDto,
+    @Query() query: ListLocationsQueryDto,
   ) {
     return this.locationsService.findAll(user.id, query);
   }

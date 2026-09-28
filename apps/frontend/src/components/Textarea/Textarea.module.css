@@ -1,0 +1,15 @@
+/* Sobrescreve a altura fixa do input: a altura vem do conteúdo (ver componente). */
+.textarea {
+  height: auto;
+  min-height: 0;
+  padding: var(--space-3) 14px;
+  resize: none;
+  line-height: 1.6;
+}
+
+@media (max-width: 767px) {
+  .textarea {
+    height: auto;
+    padding: var(--space-3) var(--space-4);
+  }
+}

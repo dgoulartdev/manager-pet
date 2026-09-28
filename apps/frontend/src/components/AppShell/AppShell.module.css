@@ -1,0 +1,281 @@
+/* Altura da barra de abas do mobile; o conteúdo e o FAB se afastam dela. */
+.shell {
+  --tab-bar-height: 64px;
+
+  min-height: 100dvh;
+  background: var(--color-background);
+}
+
+.skipLink {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 100;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-200%);
+}
+
+.skipLink:focus-visible {
+  transform: none;
+}
+
+/* ── barra lateral (≥ 768px) ───────────────────────────────────────── */
+.sidebar {
+  display: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font: var(--type-small);
+  font-weight: 500;
+  transition: background-color var(--transition-fast);
+}
+
+.navLink:hover {
+  background: var(--color-hover);
+  text-decoration: none;
+}
+
+.navLink[aria-current='page'] {
+  background: var(--color-selected-bg);
+  color: var(--color-selected-fg);
+  font-weight: 600;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+}
+
+.accountLink {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-md);
+  color: inherit;
+  font-weight: 400;
+}
+
+.accountLink:hover {
+  background: var(--color-hover);
+  text-decoration: none;
+}
+
+.accountText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.accountName,
+.accountEmail {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.accountName {
+  font: var(--type-small);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.accountEmail {
+  font: var(--type-caption);
+  color: var(--color-text-muted);
+}
+
+.logout {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.logout:hover {
+  background: var(--color-hover);
+  color: var(--color-text-secondary);
+}
+
+/* ── conteúdo ──────────────────────────────────────────────────────── */
+.content {
+  min-width: 0;
+  padding-bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom, 0px));
+}
+
+.content:focus {
+  outline: none;
+}
+
+/* ── abas no rodapé (< 768px) ──────────────────────────────────────── */
+.tabBar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: var(--space-1) var(--space-2) env(safe-area-inset-bottom, 0px);
+  border-top: 1px solid var(--color-divider);
+  background: var(--color-surface);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: 56px;
+  color: var(--color-text-muted);
+  font: var(--type-caption);
+  font-weight: 500;
+}
+
+.tab:hover {
+  text-decoration: none;
+}
+
+.tab[aria-current='page'] {
+  color: var(--color-selected-fg);
+  font-weight: 600;
+}
+
+.railOnly,
+.brandCompact {
+  display: none;
+}
+
+/* ── trilho (768–1023px) ───────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    height: 100dvh;
+    padding: var(--space-5) var(--space-2);
+    border-right: 1px solid var(--color-divider);
+    background: var(--color-surface);
+  }
+
+  .brand {
+    justify-content: center;
+  }
+
+  .brandFull,
+  .account {
+    display: none;
+  }
+
+  .brandCompact,
+  .railOnly {
+    display: contents;
+  }
+
+  .navLink {
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-1);
+    min-height: 60px;
+    padding: 0;
+    font: var(--type-caption);
+    font-weight: 500;
+  }
+
+  .content {
+    padding-bottom: 0;
+  }
+
+  .tabBar {
+    display: none;
+  }
+}
+
+/* ── barra lateral completa (≥ 1024px) ─────────────────────────────── */
+@media (min-width: 1024px) {
+  .shell {
+    grid-template-columns: var(--sidebar-width) 1fr;
+  }
+
+  .sidebar {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .brand {
+    justify-content: flex-start;
+  }
+
+  .brandFull {
+    display: contents;
+  }
+
+  .brandCompact,
+  .railOnly {
+    display: none;
+  }
+
+  .account {
+    display: flex;
+  }
+
+  .navLink {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    font: var(--type-small);
+    font-weight: 500;
+  }
+}

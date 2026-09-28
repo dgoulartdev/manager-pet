@@ -1,0 +1,305 @@
+/*
+ * Início: cartão de pacientes e dois painéis (vacinas e atendimentos). Página,
+ * cabeçalho e linhas de lista vêm de ListPage.module.css; aqui só o arranjo.
+ */
+
+/* ── cartão de pacientes ───────────────────────────────────────────── */
+.patientsCard {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.statLabel {
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-muted);
+}
+
+/* DS: o número é o herói, em JetBrains Mono tabular. */
+.statNumber {
+  font: 600 32px/1.15 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.statMeta {
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+/* Mesma altura do número + linha de baixo: nada pula quando o dado chega. */
+.statLoading {
+  display: block;
+  width: 96px;
+  height: 58px;
+  border-radius: var(--radius-sm);
+  background: var(--color-divider);
+}
+
+/* Empilhado: numa linha só, o aviso alargaria a coluna e espremeria a busca. */
+.statError {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.search {
+  min-width: 0;
+}
+
+.seeAll {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--space-1);
+  min-height: 44px;
+  font: var(--type-small);
+  font-weight: 600;
+  color: var(--color-text-link);
+  white-space: nowrap;
+}
+
+/* ── painéis ───────────────────────────────────────────────────────── */
+.panels {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.panel {
+  /* Colunas das linhas: avatar, texto e o selo/data na borda direita. */
+  --columns: 40px minmax(0, 1fr) auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.panelHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.panelTitle {
+  font: var(--type-h4);
+  letter-spacing: var(--tracking-h4);
+  color: var(--color-text-primary);
+}
+
+.panelHint {
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.row {
+  grid-template-columns: var(--columns);
+  align-items: start;
+}
+
+.detail {
+  overflow: hidden;
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.status {
+  justify-self: end;
+  padding-top: 2px;
+}
+
+.when {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding-top: 2px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.ago {
+  font: var(--type-caption);
+  color: var(--color-text-muted);
+}
+
+/* No mobile cada linha é um card; o aviso de painel vazio também. */
+.panelEmpty {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.panelEmptyIcon {
+  display: flex;
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+/* ── primeiros passos (sem pacientes) ──────────────────────────────── */
+.firstSteps {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-10) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+  text-align: center;
+}
+
+.firstStepsIcon {
+  display: flex;
+  margin-bottom: var(--space-4);
+  color: var(--color-text-muted);
+}
+
+.firstStepsTitle {
+  font: var(--type-h3);
+  letter-spacing: var(--tracking-h3);
+  color: var(--color-text-primary);
+}
+
+.firstStepsText {
+  max-width: 52ch;
+  margin: var(--space-2) 0 var(--space-6);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.steps {
+  width: 100%;
+  max-width: 400px;
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-divider);
+  text-align: left;
+}
+
+.stepsTitle {
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-muted);
+}
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-primary);
+}
+
+.step svg {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+/* Feito: ícone de check verde e texto esmaecido — a cor não é o único sinal. */
+.step[data-done] {
+  color: var(--color-text-secondary);
+}
+
+.step[data-done] svg {
+  color: var(--color-success-fg);
+}
+
+/* Telas estreitas: o selo da vacina desce para baixo do texto. */
+@media (max-width: 479px) {
+  .vaccineRow {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .vaccineRow .status {
+    grid-column: 2;
+    justify-self: start;
+    padding-top: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Tablet: número e link em cima, busca inteira embaixo (no meio ela ficaria estreita). */
+  .patientsCard {
+    grid-template-areas:
+      'stat link'
+      'search search';
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-4) var(--space-8);
+    padding: var(--space-5);
+  }
+
+  .stat {
+    grid-area: stat;
+  }
+
+  .search {
+    grid-area: search;
+  }
+
+  .seeAll {
+    grid-area: link;
+  }
+
+  /* Dentro do card da lista (ListPage), o aviso vazio perde a própria moldura. */
+  .panelEmpty {
+    padding: var(--space-5);
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .firstSteps {
+    padding: var(--space-12) var(--space-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .patientsCard {
+    grid-template-areas: 'stat search link';
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .search {
+    justify-self: end;
+    width: 100%;
+    max-width: 440px;
+  }
+
+  .panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+    align-items: start;
+  }
+}

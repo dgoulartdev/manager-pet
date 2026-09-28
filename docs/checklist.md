@@ -28,17 +28,17 @@
 ## 3. Módulo Users
 - [x] `GET /users/me`
 - [x] `PATCH /users/me`
-- [x] `PATCH /users/me/password`
+- [x] `PATCH /users/me/password` (senha atual errada = 422 no campo; 5 tentativas/min)
 
 ## 4. Módulo Tutors
-- [x] `GET /tutors` (paginado + busca)
+- [x] `GET /tutors` (paginado + busca, com os pacientes de cada tutor)
 - [x] `POST /tutors`
 - [x] `GET /tutors/:id`
 - [x] `PATCH /tutors/:id`
 - [x] `DELETE /tutors/:id` (bloquear se tiver pacientes)
 
 ## 5. Módulo Locations
-- [x] `GET /locations`
+- [x] `GET /locations` (paginado + busca, com a contagem de atendimentos)
 - [x] `POST /locations`
 - [x] `GET /locations/:id`
 - [x] `PATCH /locations/:id`
@@ -87,21 +87,27 @@
 - [x] Testes unitários de validação de DTOs e do filtro RFC 7807
 - [x] Testes e2e dos fluxos principais (register→login→CRUD→logout)
 - [ ] Testes unitários dos services de users, tutors, locations e patients
-- [ ] Testes e2e de vacinas, foto do paciente, `/users/me` e forgot/reset de senha
+- [x] Testes e2e de `/users/me` e da troca de senha
+- [ ] Testes e2e de vacinas, foto do paciente e forgot/reset de senha
 
 ## 10. Frontend (PWA)
-- [ ] Setup do projeto React + PWA (Vite + `vite-plugin-pwa` já configurados; falta rotas e ícones do manifest)
-- [ ] Tipos/DTOs importados de `packages/shared`
-- [ ] Cliente HTTP com refresh automático do access token e tratamento de erros RFC 7807
-- [ ] Telas: login/registro
+- [x] Setup do projeto React + PWA (rotas, tokens do DS, fontes offline, ícone do manifest)
+- [x] Tipos/DTOs importados de `packages/shared`
+- [x] Cliente HTTP com refresh automático do access token e tratamento de erros RFC 7807
+- [x] Telas: login/registro
 - [ ] Telas: esqueci minha senha / redefinir senha
-- [ ] Tela: lista de pacientes + busca
-- [ ] Tela: cadastro/edição de paciente (com upload de foto)
-- [ ] Tela: timeline de atendimentos do paciente
-- [ ] Tela: novo atendimento
-- [ ] Tela: vacinas do paciente (lista + cadastro, vínculo opcional a atendimento)
-- [ ] Tela: tutores e locais (CRUD simples)
-- [ ] Tela: perfil do usuário (dados + troca de senha)
+- [x] Estrutura do app (barra lateral, trilho no tablet, abas no mobile)
+- [x] Tela: início (total de pacientes e novos no mês, vacinas para acompanhar, últimos atendimentos; primeiros passos sem pacientes)
+- [x] Tela: lista de pacientes + busca (API passou a incluir o resumo do tutor)
+- [x] Tela: cadastro de paciente (espécie Cão/Gato/Outra, foto, criação de tutor sem sair do formulário)
+- [x] Edição de paciente (a partir do prontuário; o tutor não muda depois do cadastro)
+- [x] Tela: prontuário do paciente (dados, timeline de atendimentos, pesagens, foto, exclusão)
+- [x] Tela: novo atendimento (local cadastrado/avulso/domicílio, peso, avaliação e conduta)
+- [x] Editar e excluir atendimento (a partir do histórico)
+- [x] Tela: vacinas do paciente (carteira com situação + registro)
+- [x] Vacinas: editar/excluir e vínculo a um atendimento (visível na carteira e no histórico)
+- [x] Tela: tutores e locais (lista com busca, cadastro, edição e exclusão respeitando os vínculos)
+- [x] Tela: perfil do usuário (dados + troca de senha, mantendo a sessão deste aparelho)
 
 ## 11. Pré-lançamento
 - [ ] Redigir documentos legais (termos de uso e política de privacidade/LGPD) — ainda não existem no repositório

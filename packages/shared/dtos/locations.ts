@@ -21,4 +21,9 @@ export interface UpdateLocationRequest {
   phone?: string | null;
 }
 
-export type LocationListResponse = PaginatedResponse<LocationDto>;
+// Item de GET /locations: local + quantos atendimentos o usam (local em uso não pode ser excluído).
+export interface LocationListItemDto extends LocationDto {
+  appointments_count: number;
+}
+
+export type LocationListResponse = PaginatedResponse<LocationListItemDto>;

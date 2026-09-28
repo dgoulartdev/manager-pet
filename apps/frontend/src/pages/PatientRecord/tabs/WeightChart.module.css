@@ -1,0 +1,95 @@
+.chart {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-md);
+}
+
+.chart:focus-visible {
+  outline-offset: 4px;
+}
+
+.svg {
+  display: block;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+/* Grade e eixos: linha fina sólida, um tom acima do fundo (nunca tracejada). */
+.grid {
+  stroke: var(--color-chart-grid);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.yTick,
+.xTick,
+.unit {
+  fill: var(--color-text-muted);
+  font: 500 12px var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.yTick,
+.unit {
+  text-anchor: end;
+}
+
+.area {
+  fill: var(--color-chart-area);
+  stroke: none;
+}
+
+.line {
+  fill: none;
+  stroke: var(--color-chart-line);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* Anel de 2px na cor do fundo: o ponto continua legível sobre a linha. */
+.dot {
+  fill: var(--color-chart-line);
+  stroke: var(--color-card);
+  stroke-width: 2;
+  transition: r var(--transition-fast);
+}
+
+.crosshair {
+  stroke: var(--color-text-muted);
+  stroke-width: 1;
+  opacity: 0.5;
+  shape-rendering: crispEdges;
+}
+
+/* Texto nunca na cor da série: rótulos usam tokens de texto. */
+.endLabel {
+  fill: var(--color-text-primary);
+  font: 600 13px var(--font-mono);
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+}
+
+.tooltipValue {
+  font: 600 15px/1.3 var(--font-mono);
+  color: var(--color-text-primary);
+}
+
+.tooltipMeta {
+  font: var(--type-caption);
+  color: var(--color-text-secondary);
+}

@@ -2,8 +2,36 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#12615c" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1418" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <title>MeuPaciente</title>
+    <script>
+      // Tema escolhido no Perfil (src/lib/theme.ts) ou, sem escolha, o do sistema.
+      // Roda antes do CSS para não piscar o tema errado.
+      (function () {
+        var media = window.matchMedia('(prefers-color-scheme: dark)');
+        var colors = { light: '#12615c', dark: '#0e1418' };
+        function apply() {
+          var saved = null;
+          try {
+            saved = localStorage.getItem('meupaciente.theme');
+          } catch (error) {}
+          var chosen = saved === 'light' || saved === 'dark';
+          var theme = chosen ? saved : media.matches ? 'dark' : 'light';
+          document.documentElement.dataset.theme = theme;
+          if (chosen) {
+            document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) {
+              meta.content = colors[theme];
+            });
+          }
+        }
+        apply();
+        // Sistema mudou: com "Sistema" escolhido o tema acompanha; com escolha fixa, nada muda.
+        media.addEventListener('change', apply);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

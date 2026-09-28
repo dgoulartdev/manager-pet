@@ -1,0 +1,73 @@
+/* Estrutura da lista em ListPage.module.css; aqui só as células de paciente. */
+.patients {
+  --columns: minmax(0, 2fr) minmax(0, 1.5fr) 128px 20px;
+}
+
+.patientCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.tutorCell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.tutorName {
+  overflow: hidden;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.phone {
+  color: var(--color-text-muted);
+}
+
+.ageCell {
+  font: var(--type-small);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* Card do mobile: paciente e seta em cima, tutor e idade embaixo. */
+@media (max-width: 767px) {
+  .row {
+    grid-template-areas:
+      'patient chevron'
+      'tutor age';
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .patientCell {
+    grid-area: patient;
+  }
+
+  .tutorCell {
+    flex-direction: row;
+    flex-wrap: wrap;
+    grid-area: tutor;
+    gap: 0 var(--space-2);
+    /* Alinha com o nome do paciente: avatar (40) + espaço (12). */
+    padding-left: 52px;
+  }
+
+  /* No card o telefone fica de fora (a busca por ele continua valendo). */
+  .phone {
+    display: none;
+  }
+
+  .ageCell {
+    grid-area: age;
+  }
+
+  .chevron {
+    grid-area: chevron;
+  }
+}

@@ -1,0 +1,6 @@
+.legal {
+  font: var(--type-caption);
+  text-align: center;
+  color: var(--color-text-muted);
+  text-wrap: balance;
+}

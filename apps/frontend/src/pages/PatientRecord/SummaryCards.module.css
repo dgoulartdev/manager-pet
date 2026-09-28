@@ -1,0 +1,155 @@
+/*
+ * Resumo do prontuário: uma faixa só, dividida em três respostas (não três
+ * cartões soltos). Mobile: uma linha por resposta, rótulo à esquerda e valor à
+ * direita. A partir de 768px: três colunas separadas por divisórias.
+ */
+.cards {
+  display: grid;
+  overflow: clip;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+}
+
+.card {
+  display: grid;
+  grid-template-areas:
+    'label value'
+    'label meta';
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px var(--space-4);
+  align-items: baseline;
+  min-width: 0;
+  min-height: 56px;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.card + .card {
+  border-top: 1px solid var(--color-divider);
+}
+
+.card:hover {
+  background: var(--color-hover);
+}
+
+.card:focus-visible {
+  outline-offset: -3px;
+}
+
+.label {
+  grid-area: label;
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-muted);
+}
+
+/* DS: o dado clínico é o herói — mais contraste que qualquer chrome. */
+.value,
+.empty,
+.loading {
+  grid-area: value;
+  justify-self: end;
+}
+
+.value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  max-width: 100%;
+  overflow: hidden;
+  font: var(--type-h5);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.number {
+  font: 600 18px/1.2 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.change {
+  font: 400 13px/1.4 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+}
+
+.meta {
+  grid-area: meta;
+  justify-self: end;
+  max-width: 100%;
+  overflow: hidden;
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.meta[data-status='overdue'] {
+  color: var(--color-error-fg);
+  font-weight: 500;
+}
+
+.meta[data-status='due-soon'] {
+  color: var(--color-warning-fg);
+  font-weight: 500;
+}
+
+.empty {
+  font: var(--type-h6);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.loading {
+  width: 96px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  background: var(--color-divider);
+}
+
+@media (min-width: 768px) {
+  .cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .card {
+    grid-template-areas:
+      'label'
+      'value'
+      'meta';
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+    align-content: start;
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .card + .card {
+    border-top: 0;
+    border-left: 1px solid var(--color-divider);
+  }
+
+  .value,
+  .empty,
+  .loading,
+  .meta {
+    justify-self: start;
+  }
+
+  .value {
+    font: var(--type-h4);
+  }
+
+  .number {
+    font-size: 20px;
+  }
+
+  .loading {
+    height: 26px;
+  }
+}

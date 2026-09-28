@@ -1,0 +1,137 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: var(--container-form);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-24);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font: var(--type-h1);
+  letter-spacing: var(--tracking-h1);
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+}
+
+/* ── seções de configuração: divisória entre elas, sem caixas ──────── */
+.card {
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-divider);
+}
+
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.identityText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.identityName {
+  overflow: hidden;
+  font: var(--type-h5);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.identityEmail {
+  overflow: hidden;
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.identitySince {
+  margin-top: var(--space-1);
+  font: var(--type-caption);
+  letter-spacing: var(--tracking-caption);
+  color: var(--color-text-muted);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.cardHeading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.cardTitle {
+  font: var(--type-h4);
+  letter-spacing: var(--tracking-h4);
+}
+
+.cardText {
+  max-width: 52ch;
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.passwordRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Mobile: botões na largura toda, fáceis de alcançar com o polegar. */
+@media (max-width: 767px) {
+  .logout,
+  .passwordButton,
+  .actions button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: var(--space-10) var(--space-8) var(--space-16);
+  }
+
+  .passwordRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .passwordButton {
+    flex: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--space-12) var(--space-10) var(--space-16);
+  }
+}

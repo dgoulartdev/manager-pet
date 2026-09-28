@@ -1,0 +1,61 @@
+/* DS: sublinhado de 2px no item ativo, altura 44, gap 24, rolagem horizontal no mobile. */
+.tablist {
+  display: flex;
+  gap: var(--space-6);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-divider);
+  scrollbar-width: none;
+}
+
+.tablist::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: var(--type-small);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--color-text-primary);
+}
+
+.tab[aria-selected='true'] {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--color-action-primary-bg);
+}
+
+.tab:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Contagem da aba: número discreto ao lado do rótulo, sem pílula. */
+.count {
+  color: var(--color-text-muted);
+  font: 400 13px/1 var(--font-mono);
+}
+
+.tab[aria-selected='true'] .count {
+  color: var(--color-text-secondary);
+}

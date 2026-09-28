@@ -1,0 +1,88 @@
+/* Estrutura da lista em ListPage.module.css; aqui só as células de local. */
+.locations {
+  --columns: minmax(0, 2fr) 168px 112px 20px;
+}
+
+.locationCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.phoneCell {
+  display: flex;
+  min-width: 0;
+  color: var(--color-text-secondary);
+}
+
+/* DS: números em mono tabular, alinhados à direita. */
+.countHeader,
+.countCell {
+  text-align: right;
+}
+
+.countCell {
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.countUnit {
+  font: var(--type-small);
+}
+
+/* Na tabela, telefone e atendimentos ocupam as próprias colunas. */
+.details {
+  display: contents;
+}
+
+/* Card do mobile: local e lápis em cima; telefone e atendimentos numa linha só. */
+@media (max-width: 767px) {
+  .row {
+    grid-template-areas:
+      'location edit'
+      'details details';
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .locationCell {
+    grid-area: location;
+  }
+
+  .details {
+    display: flex;
+    grid-area: details;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-4);
+  }
+
+  .phoneCell[data-missing] {
+    display: none;
+  }
+
+  .countCell {
+    margin-left: auto;
+  }
+
+  .editIcon {
+    grid-area: edit;
+  }
+}
+
+/* Na tabela o cabeçalho "Atendimentos" dá o nome: a unidade fica só para leitor de tela. */
+@media (min-width: 768px) {
+  .countUnit {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* O vermelho fica para o botão da confirmação; aqui só o texto sinaliza. */
+.deleteButton {
+  color: var(--color-error-fg);
+}

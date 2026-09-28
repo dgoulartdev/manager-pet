@@ -1,0 +1,350 @@
+.layout {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* Mobile: um passo por vez — lista, ou o atendimento aberto. */
+.detail {
+  display: none;
+}
+
+.layout[data-detail-open] .timeline {
+  display: none;
+}
+
+.layout[data-detail-open] .detail {
+  display: block;
+}
+
+/* ── linha do tempo ────────────────────────────────────────────────── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.month {
+  margin-bottom: var(--space-2);
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-muted);
+}
+
+/* Linha do tempo: um fio vertical com o marcador terracota de cada atendimento (DS). */
+.items {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-8);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-weight: 400;
+  transition: background-color var(--transition-fast);
+}
+
+/* Fio: cada item desenha o seu trecho; o primeiro começa e o último termina no marcador. */
+.item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 7px;
+  width: 1px;
+  background: var(--color-border);
+}
+
+.items > li:first-child > .item::after {
+  top: 22px;
+}
+
+.items > li:last-child > .item::after {
+  bottom: calc(100% - 22px);
+}
+
+.items > li:only-child > .item::after {
+  display: none;
+}
+
+/* O anel da cor do fundo interrompe o fio em volta do marcador. */
+.item::before {
+  z-index: 1;
+  content: '';
+  position: absolute;
+  top: 17px;
+  left: 2px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--color-background);
+  border-radius: var(--radius-full);
+  background: var(--color-timeline-marker);
+}
+
+.item:hover {
+  background: var(--color-hover);
+  text-decoration: none;
+}
+
+.item:hover::before {
+  border-color: var(--color-hover);
+}
+
+.item:focus-visible {
+  outline-offset: -3px;
+}
+
+.date {
+  flex: none;
+  padding-top: 2px;
+  font: 500 13px/1.4 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+}
+
+.itemText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.itemTitle {
+  overflow: hidden;
+  font: var(--type-small);
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.itemMeta {
+  overflow: hidden;
+  font: var(--type-caption);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ── evolução do atendimento ───────────────────────────────────────── */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  margin-bottom: var(--space-2);
+  font: var(--type-button);
+}
+
+.detailHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.detailTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.detailActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+@media (max-width: 767px) {
+  .dialogActions {
+    flex-direction: column-reverse;
+  }
+
+  .dialogActions button {
+    width: 100%;
+  }
+}
+
+.detailTitle {
+  font: var(--type-h4);
+  letter-spacing: var(--tracking-h4);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-8);
+  margin: 0;
+}
+
+.facts dt {
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-muted);
+}
+
+.facts dd {
+  display: flex;
+  flex-direction: column;
+  margin: 2px 0 0;
+  font: var(--type-body);
+}
+
+.facts .data {
+  font: var(--type-data);
+  font-variant-numeric: tabular-nums;
+}
+
+.address {
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+/* ── vacinas aplicadas no atendimento ──────────────────────────────── */
+.vaccines .sectionLabel {
+  margin-bottom: var(--space-2);
+}
+
+.vaccineList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vaccineChip,
+.registerVaccine {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  font: var(--type-small);
+  font-weight: 500;
+  transition: background-color var(--transition-fast);
+}
+
+.vaccineChip {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.vaccineChip svg {
+  color: var(--color-text-muted);
+}
+
+.vaccineBatch {
+  font: 500 12px/1.5 var(--font-mono);
+  color: var(--color-text-muted);
+}
+
+/* Ação secundária do atendimento: texto de ação, sem moldura. */
+.registerVaccine {
+  color: var(--color-text-link);
+}
+
+.vaccineChip:hover,
+.registerVaccine:hover {
+  background: var(--color-hover);
+  text-decoration: none;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--container-prose);
+  padding-top: var(--space-5);
+}
+
+.sectionLabel {
+  margin-bottom: var(--space-1);
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-muted);
+}
+
+/* DS: texto clínico longo em body-large, medida controlada. */
+.sectionText {
+  font: var(--type-body-large);
+  white-space: pre-wrap;
+}
+
+/* Prescrição em destaque: é o que mais se consulta e se imprime. Fundo, não moldura. */
+.prescription {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-subtle-surface);
+}
+
+.prescription .sectionText {
+  font: var(--type-data);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.noNotes {
+  padding-top: var(--space-5);
+  color: var(--color-text-secondary);
+}
+
+/* ── master–detail (≥ 1024px) ──────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .layout .timeline,
+  .layout[data-detail-open] .timeline {
+    display: flex;
+    position: sticky;
+    top: var(--space-4);
+    max-height: calc(100dvh - var(--space-8));
+    overflow-y: auto;
+    padding-right: var(--space-2);
+  }
+
+  .detail,
+  .layout[data-detail-open] .detail {
+    display: block;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-card);
+  }
+
+  .back {
+    display: none;
+  }
+
+  .item[aria-current='true'] {
+    background: var(--color-selected-bg);
+  }
+
+  .item[aria-current='true']::before {
+    border-color: var(--color-selected-bg);
+  }
+
+  .item[aria-current='true'] .itemTitle {
+    color: var(--color-selected-fg);
+  }
+}

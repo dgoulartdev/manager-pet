@@ -1,0 +1,70 @@
+/* Mesma silhueta da lista: um bloco com divisórias (no desktop, dentro do card). */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 72px;
+  padding: 0 var(--space-4);
+}
+
+.row + .row {
+  border-top: 1px solid var(--color-divider);
+}
+
+.avatar,
+.lines span {
+  background: var(--color-divider);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: var(--radius-full);
+}
+
+.lines {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.lines span {
+  height: 12px;
+  width: 45%;
+  border-radius: var(--radius-full);
+}
+
+.lines span + span {
+  width: 70%;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (min-width: 768px) {
+  .skeleton {
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .row {
+    height: 64px;
+    padding: 0 var(--space-5);
+  }
+}

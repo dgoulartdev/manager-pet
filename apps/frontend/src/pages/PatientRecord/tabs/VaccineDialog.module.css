@@ -1,0 +1,49 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.row {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+/* Ação secundária (ex.: excluir) fica longe do botão de salvar. */
+.extraAction {
+  display: flex;
+  margin-right: auto;
+}
+
+/* Link pequeno ao lado do rótulo: área de toque de 44px sem mexer no layout. */
+.inlineLink {
+  padding: 14px 0;
+  margin: -14px 0;
+  font: var(--type-small);
+  font-weight: 600;
+}
+
+@media (min-width: 480px) {
+  .row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 767px) {
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .actions button,
+  .extraAction {
+    width: 100%;
+  }
+}

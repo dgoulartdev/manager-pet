@@ -1,0 +1,84 @@
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-label);
+}
+
+/* Conteúdo extra abaixo das opções (ex.: campo de "Outra"). */
+.track + * {
+  margin-top: var(--space-3);
+}
+
+.optional {
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--color-text-muted);
+}
+
+.track {
+  display: grid;
+  gap: 3px;
+  height: 48px;
+  padding: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-subtle-surface);
+}
+
+.option {
+  position: relative;
+  display: flex;
+  cursor: pointer;
+}
+
+/* Rádio invisível mas focável; o segmento desenhado mostra o estado dele. */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.segment {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font: var(--type-small);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition:
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.option:hover .segment {
+  color: var(--color-text-primary);
+}
+
+.input:checked + .segment {
+  background: var(--color-card);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.input:focus-visible + .segment {
+  box-shadow: var(--shadow-focus);
+}
+
+@media (max-width: 767px) {
+  .track {
+    height: 52px;
+  }
+}

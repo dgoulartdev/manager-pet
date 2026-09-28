@@ -264,6 +264,11 @@ paths:
       tags: [Users]
       summary: Alterar senha do veterinário autenticado
       operationId: changePassword
+      description: |
+        Revoga todas as sessões (refresh tokens) do usuário, inclusive a atual:
+        o cliente precisa entrar de novo com a nova senha. Senha atual incorreta
+        responde 422 com erro no campo `current_password`. Limite de 5
+        tentativas por minuto.
       requestBody:
         required: true
         content:
@@ -277,6 +282,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   # ── TUTORS ────────────────────────────────────────────────────────────────
 
@@ -285,12 +292,16 @@ paths:
       tags: [Tutors]
       summary: Listar tutores
       operationId: listTutors
+      description: |
+        Cada item traz o total de pacientes vinculados e os primeiros nomes
+        (até 3, em ordem alfabética) — o suficiente para reconhecer o tutor pelo
+        animal e saber se ele pode ser removido.
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
         - name: q
           in: query
-          description: Busca por nome, e-mail ou telefone
+          description: Busca por nome, e-mail, telefone ou nome de um paciente do tutor
           schema:
             type: string
             example: "Maria"
@@ -419,6 +430,16 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: created_from
+          in: query
+          description: |
+            Só pacientes cadastrados a partir deste instante (inclusive). Exige
+            data e hora com fuso, porque o início do dia ou do mês depende do
+            fuso do aparelho. Data sem hora ou hora sem fuso é rejeitada (422).
+          schema:
+            type: string
+            format: date-time
+            example: "2026-09-01T00:00:00-03:00"
       responses:
         "200":
           description: Lista paginada de pacientes
@@ -612,9 +633,18 @@ paths:
       tags: [Locations]
       summary: Listar locais de atendimento cadastrados
       operationId: listLocations
+      description: |
+        Cada item traz quantos atendimentos usam o local — local em uso não
+        pode ser removido.
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - name: q
+          in: query
+          description: Busca por nome, endereço ou telefone
+          schema:
+            type: string
+            example: "Vida Animal"
       responses:
         "200":
           description: Lista paginada de locais
@@ -624,6 +654,8 @@ paths:
                 $ref: "#/components/schemas/LocationListResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
 
     post:
       tags: [Locations]
@@ -728,6 +760,8 @@ paths:
       description: |
         Endpoint principal para histórico e busca de atendimentos.
         Use `patient_id` para a timeline de um paciente específico.
+        Ordem: data mais recente primeiro; no mesmo dia, o registrado por
+        último primeiro. Cada item traz o resumo do paciente (e do tutor).
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
@@ -875,6 +909,14 @@ paths:
       description: |
         Endpoint principal para o histórico vacinal. Use `patient_id` para
         listar as vacinas de um paciente específico.
+
+        Reforços pendentes de todos os pacientes:
+        `?latest_only=true&next_dose_to=<hoje + 30 dias>` — as doses em atraso
+        entram, porque a próxima dose já passou.
+
+        Ordem: aplicação mais recente primeiro. Com `next_dose_to`, a próxima
+        dose mais antiga (a mais atrasada ou a que vence antes) primeiro.
+        Cada item traz o resumo do paciente (e do tutor).
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
@@ -884,6 +926,25 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: latest_only
+          in: query
+          description: |
+            Só a aplicação mais recente de cada vacina de cada paciente — as
+            anteriores já foram reforçadas. A vacina é identificada pelo nome,
+            sem diferenciar maiúsculas nem espaços nas pontas; no mesmo dia,
+            vale a registrada por último.
+          schema:
+            type: boolean
+            default: false
+        - name: next_dose_to
+          in: query
+          description: |
+            Só vacinas com próxima dose prevista até esta data (inclusive),
+            as já vencidas incluídas. Vacinas sem próxima dose ficam de fora.
+          schema:
+            type: string
+            format: date
+            example: "2026-10-28"
       responses:
         "200":
           description: Lista paginada de vacinas
@@ -1242,6 +1303,36 @@ components:
           type: [string, "null"]
           format: email
 
+    TutorPatientSummary:
+      type: object
+      description: Paciente resumido na listagem de tutores
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Mimi"
+
+    TutorListItem:
+      allOf:
+        - $ref: "#/components/schemas/Tutor"
+        - type: object
+          required: [patients_count, patients]
+          properties:
+            patients_count:
+              type: integer
+              minimum: 0
+              description: Total de pacientes vinculados ao tutor
+              example: 2
+            patients:
+              type: array
+              maxItems: 3
+              description: Primeiros pacientes do tutor, em ordem alfabética
+              items:
+                $ref: "#/components/schemas/TutorPatientSummary"
+
     TutorListResponse:
       type: object
       required: [data, pagination]
@@ -1249,7 +1340,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Tutor"
+            $ref: "#/components/schemas/TutorListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 
@@ -1369,6 +1460,30 @@ components:
           type: [string, "null"]
           format: date
 
+    TutorSummary:
+      type: object
+      description: Resumo do tutor nas listagens (pacientes, atendimentos e vacinas)
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Maria Souza"
+        phone:
+          type: [string, "null"]
+          example: "11999998888"
+
+    PatientListItem:
+      allOf:
+        - $ref: "#/components/schemas/Patient"
+        - type: object
+          required: [tutor]
+          properties:
+            tutor:
+              $ref: "#/components/schemas/TutorSummary"
+
     PatientListResponse:
       type: object
       required: [data, pagination]
@@ -1376,9 +1491,31 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Patient"
+            $ref: "#/components/schemas/PatientListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
+
+    PatientSummary:
+      type: object
+      description: |
+        Resumo do paciente nas listagens de atendimentos e vacinas, que
+        misturam pacientes: quem é e qual tutor contatar.
+      required: [id, name, species, photo_url, tutor]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Mimi"
+        species:
+          type: [string, "null"]
+          example: "Gato"
+        photo_url:
+          type: [string, "null"]
+          format: uri
+        tutor:
+          $ref: "#/components/schemas/TutorSummary"
 
     # -- Location ------------------------------------------------------------
 
@@ -1435,6 +1572,18 @@ components:
         phone:
           type: [string, "null"]
 
+    LocationListItem:
+      allOf:
+        - $ref: "#/components/schemas/Location"
+        - type: object
+          required: [appointments_count]
+          properties:
+            appointments_count:
+              type: integer
+              minimum: 0
+              description: Quantos atendimentos usam o local
+              example: 12
+
     LocationListResponse:
       type: object
       required: [data, pagination]
@@ -1442,7 +1591,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Location"
+            $ref: "#/components/schemas/LocationListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 
@@ -1596,6 +1745,15 @@ components:
         notes:
           type: [string, "null"]
 
+    AppointmentListItem:
+      allOf:
+        - $ref: "#/components/schemas/Appointment"
+        - type: object
+          required: [patient]
+          properties:
+            patient:
+              $ref: "#/components/schemas/PatientSummary"
+
     AppointmentListResponse:
       type: object
       required: [data, pagination]
@@ -1603,7 +1761,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Appointment"
+            $ref: "#/components/schemas/AppointmentListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 
@@ -1717,6 +1875,15 @@ components:
         notes:
           type: [string, "null"]
 
+    VaccineListItem:
+      allOf:
+        - $ref: "#/components/schemas/Vaccine"
+        - type: object
+          required: [patient]
+          properties:
+            patient:
+              $ref: "#/components/schemas/PatientSummary"
+
     VaccineListResponse:
       type: object
       required: [data, pagination]
@@ -1724,7 +1891,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Vaccine"
+            $ref: "#/components/schemas/VaccineListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 

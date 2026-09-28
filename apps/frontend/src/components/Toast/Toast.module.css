@@ -1,0 +1,89 @@
+/* No mobile fica acima das abas do rodapé; no desktop, no canto inferior direito. */
+.region {
+  position: fixed;
+  right: var(--space-4);
+  bottom: calc(64px + var(--space-4) + env(safe-area-inset-bottom, 0px));
+  left: var(--space-4);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  animation: enter 180ms ease-out;
+}
+
+.icon {
+  flex: none;
+  margin-top: 1px;
+}
+
+.success .icon {
+  color: var(--color-success-border);
+}
+
+.warning .icon {
+  color: var(--color-warning-border);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font: var(--type-h6);
+  color: var(--color-text-primary);
+}
+
+.description {
+  margin-top: 2px;
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.close {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -12px -12px -12px 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--color-hover);
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (min-width: 768px) {
+  .region {
+    bottom: var(--space-6);
+    left: auto;
+    width: 380px;
+  }
+}

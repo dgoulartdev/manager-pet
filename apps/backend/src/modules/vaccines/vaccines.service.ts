@@ -4,10 +4,20 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Appointment, Patient, Prisma, Vaccine } from '@prisma/client';
-import type { PaginatedResponse, VaccineDetailDto, VaccineDto } from '@meupaciente/shared';
+import type {
+  PaginatedResponse,
+  VaccineDetailDto,
+  VaccineDto,
+  VaccineListItemDto,
+} from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { paginate } from '../../common/pagination';
-import { toVaccineDetailDto, toVaccineDto } from '../../common/mappers/vaccine.mapper';
+import {
+  toVaccineDetailDto,
+  toVaccineDto,
+  toVaccineListItemDto,
+} from '../../common/mappers/vaccine.mapper';
+import { PATIENT_SUMMARY_SELECT } from '../../common/mappers/patient.mapper';
 import { CreateVaccineDto } from './dto/create-vaccine.dto';
 import { UpdateVaccineDto } from './dto/update-vaccine.dto';
 import { ListVaccinesQueryDto } from './dto/list-vaccines-query.dto';
@@ -41,25 +51,32 @@ export class VaccinesService {
   async findAll(
     userId: string,
     query: ListVaccinesQueryDto,
-  ): Promise<PaginatedResponse<VaccineDto>> {
-    const { page, per_page, patient_id } = query;
+  ): Promise<PaginatedResponse<VaccineListItemDto>> {
+    const { page, per_page, patient_id, latest_only, next_dose_to } = query;
 
     const where: Prisma.VaccineWhereInput = {
       user_id: userId,
       ...(patient_id ? { patient_id } : {}),
+      ...(latest_only ? { id: { in: await this.findLatestDoseIds(userId) } } : {}),
+      ...(next_dose_to ? { next_dose_date: { lte: new Date(next_dose_to) } } : {}),
     };
 
     const [vaccines, total] = await this.prisma.$transaction([
       this.prisma.vaccine.findMany({
         where,
-        orderBy: { application_date: 'desc' },
+        // Resumo do paciente: a lista de reforços pendentes mistura pacientes.
+        include: { patient: { select: PATIENT_SUMMARY_SELECT } },
+        // Buscando reforços pendentes, o mais urgente (ou mais atrasado) vem primeiro.
+        orderBy: next_dose_to
+          ? [{ next_dose_date: 'asc' }, { application_date: 'desc' }]
+          : [{ application_date: 'desc' }, { created_at: 'desc' }],
         skip: (page - 1) * per_page,
         take: per_page,
       }),
       this.prisma.vaccine.count({ where }),
     ]);
 
-    return paginate(vaccines.map(toVaccineDto), total, page, per_page);
+    return paginate(vaccines.map(toVaccineListItemDto), total, page, per_page);
   }
 
   async findOne(userId: string, id: string): Promise<VaccineDetailDto> {
@@ -96,6 +113,22 @@ export class VaccinesService {
   async remove(userId: string, id: string): Promise<void> {
     await this.getOwned(userId, id);
     await this.prisma.vaccine.delete({ where: { id } });
+  }
+
+  /**
+   * A dose mais recente de cada vacina de cada paciente. O nome identifica a
+   * vacina sem diferenciar maiúsculas nem espaços nas pontas — a mesma regra da
+   * carteira no frontend (lib/vaccines.ts). No mesmo dia, vale a registrada por
+   * último. SQL puro porque o Prisma não agrupa por expressão (lower/trim).
+   */
+  private async findLatestDoseIds(userId: string): Promise<string[]> {
+    const rows = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT DISTINCT ON (patient_id, lower(trim(name))) id
+      FROM vaccines
+      WHERE user_id = ${userId}
+      ORDER BY patient_id, lower(trim(name)), application_date DESC, created_at DESC
+    `;
+    return rows.map((row) => row.id);
   }
 
   private async getOwned(userId: string, id: string): Promise<Vaccine> {

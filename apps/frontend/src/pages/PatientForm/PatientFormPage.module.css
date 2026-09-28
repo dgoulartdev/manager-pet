@@ -1,0 +1,217 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) 0;
+  scroll-margin-top: var(--space-4);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.breadcrumb svg {
+  color: var(--color-text-muted);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font: var(--type-h1);
+  letter-spacing: var(--tracking-h1);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+}
+
+/* Mobile: foto primeiro (ajuda a identificar), depois os dados, ações fixas no rodapé. */
+.form {
+  display: grid;
+  grid-template-areas:
+    'message'
+    'side'
+    'main'
+    'actions';
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.message {
+  grid-area: message;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  grid-area: main;
+  min-width: 0;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  grid-area: side;
+}
+
+/* Seções do formulário: o título com filete separa; nada de caixa em volta dos campos. */
+.card {
+  min-width: 0;
+}
+
+/* Título de seção com filete: separa Identificação e Tutor sem pesar. */
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  font: var(--type-h6);
+  color: var(--color-text-primary);
+}
+
+.sectionTitle::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* ── edição: tutor fixo ────────────────────────────────────────────── */
+.fixedTutor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tutorRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.tutorText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tutorName {
+  overflow: hidden;
+  font: var(--type-h6);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tutorPhone {
+  font: 500 13px/1.5 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+}
+
+.tutorNote {
+  font: var(--type-small);
+  color: var(--color-text-secondary);
+}
+
+.loading {
+  height: 480px;
+  margin-top: var(--space-12);
+  border-radius: var(--radius-lg);
+  background: var(--color-subtle-surface);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Barra de ações fixa no rodapé. No mobile fica acima das abas de navegação. */
+.actions {
+  position: sticky;
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  z-index: 5;
+  display: flex;
+  grid-area: actions;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin: 0 calc(-1 * var(--space-4));
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-divider);
+  background: var(--color-background);
+}
+
+.actions > button[type='submit'] {
+  flex: 1;
+}
+
+.cancel,
+.saveAnother {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: var(--space-8) var(--space-8) 0;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-5);
+    align-items: start;
+  }
+
+  .actions {
+    bottom: 0;
+    margin: 0 calc(-1 * var(--space-8));
+    padding: var(--space-4) var(--space-8);
+  }
+
+  .actions > button[type='submit'] {
+    flex: none;
+  }
+
+  .cancel,
+  .saveAnother {
+    display: inline-flex;
+  }
+
+  .cancel {
+    margin-right: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .form {
+    grid-template-areas:
+      'message message'
+      'main side'
+      'actions actions';
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: var(--space-6) var(--space-10);
+    align-items: start;
+  }
+
+  .side {
+    padding-left: var(--space-8);
+    border-left: 1px solid var(--color-divider);
+  }
+}

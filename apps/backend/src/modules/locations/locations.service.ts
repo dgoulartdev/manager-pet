@@ -4,13 +4,20 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Location, Prisma } from '@prisma/client';
-import type { LocationDto, PaginatedResponse } from '@meupaciente/shared';
+import type {
+  LocationDto,
+  LocationListItemDto,
+  PaginatedResponse,
+} from '@meupaciente/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { paginate } from '../../common/pagination';
-import { toLocationDto } from '../../common/mappers/location.mapper';
-import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import {
+  toLocationDto,
+  toLocationListItemDto,
+} from '../../common/mappers/location.mapper';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
+import { ListLocationsQueryDto } from './dto/list-locations-query.dto';
 
 @Injectable()
 export class LocationsService {
@@ -30,11 +37,22 @@ export class LocationsService {
 
   async findAll(
     userId: string,
-    query: PaginationQueryDto,
-  ): Promise<PaginatedResponse<LocationDto>> {
-    const { page, per_page } = query;
+    query: ListLocationsQueryDto,
+  ): Promise<PaginatedResponse<LocationListItemDto>> {
+    const { page, per_page, q } = query;
 
-    const where: Prisma.LocationWhereInput = { user_id: userId };
+    const where: Prisma.LocationWhereInput = {
+      user_id: userId,
+      ...(q
+        ? {
+            OR: [
+              { name: { contains: q, mode: 'insensitive' } },
+              { address: { contains: q, mode: 'insensitive' } },
+              { phone: { contains: q } },
+            ],
+          }
+        : {}),
+    };
 
     const [locations, total] = await this.prisma.$transaction([
       this.prisma.location.findMany({
@@ -42,11 +60,18 @@ export class LocationsService {
         orderBy: { created_at: 'desc' },
         skip: (page - 1) * per_page,
         take: per_page,
+        // Local em uso não pode ser excluído: a lista já sabe quais estão.
+        include: { _count: { select: { appointments: true } } },
       }),
       this.prisma.location.count({ where }),
     ]);
 
-    return paginate(locations.map(toLocationDto), total, page, per_page);
+    return paginate(
+      locations.map(toLocationListItemDto),
+      total,
+      page,
+      per_page,
+    );
   }
 
   async findOne(userId: string, id: string): Promise<LocationDto> {
