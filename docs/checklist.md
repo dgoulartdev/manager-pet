@@ -27,7 +27,7 @@
 
 ## 3. Módulo Users
 - [x] `GET /users/me`
-- [x] `PATCH /users/me`
+- [x] `PATCH /users/me` (trocar o e-mail exige a senha atual; 10 requisições/min)
 - [x] `PATCH /users/me/password` (senha atual errada = 422 no campo; 5 tentativas/min)
 
 ## 4. Módulo Tutors
