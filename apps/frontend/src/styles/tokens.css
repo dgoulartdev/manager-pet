@@ -88,33 +88,37 @@
   --info-900: #1e3a8a;
 
   /* ── primitivos · tipografia ──────────────────────────────────────── */
-  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /*
+   * IBM Plex: sans sóbria de ferramenta profissional e a mono da mesma família
+   * para o dado clínico. Escala contida (passo ~1.15): tela de trabalho, não vitrine.
+   */
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  --type-display: 800 48px/1.05 var(--font-sans);
-  --type-h1: 700 36px/1.15 var(--font-sans);
-  --type-h2: 700 30px/1.2 var(--font-sans);
-  --type-h3: 600 24px/1.25 var(--font-sans);
-  --type-h4: 600 20px/1.3 var(--font-sans);
-  --type-h5: 600 18px/1.35 var(--font-sans);
+  --type-display: 700 40px/1.1 var(--font-sans);
+  --type-h1: 600 28px/1.2 var(--font-sans);
+  --type-h2: 600 24px/1.25 var(--font-sans);
+  --type-h3: 600 20px/1.3 var(--font-sans);
+  --type-h4: 600 18px/1.35 var(--font-sans);
+  --type-h5: 600 16px/1.4 var(--font-sans);
   --type-h6: 600 16px/1.4 var(--font-sans);
-  --type-subtitle: 500 18px/1.5 var(--font-sans);
-  --type-body-large: 400 18px/1.6 var(--font-sans);
-  --type-body: 400 16px/1.6 var(--font-sans);
-  --type-small: 400 14px/1.5 var(--font-sans);
-  --type-caption: 500 12px/1.4 var(--font-sans);
-  --type-label: 600 13px/1.2 var(--font-sans);
-  --type-button: 600 15px/1 var(--font-sans);
-  --type-data: 500 15px/1.5 var(--font-mono);
+  --type-subtitle: 500 17px/1.5 var(--font-sans);
+  --type-body-large: 400 18px/1.55 var(--font-sans);
+  --type-body: 400 16px/1.55 var(--font-sans);
+  --type-small: 400 14px/1.45 var(--font-sans);
+  --type-caption: 500 12px/1.35 var(--font-sans);
+  --type-label: 500 13px/1.25 var(--font-sans);
+  --type-button: 500 15px/1 var(--font-sans);
+  --type-data: 400 15px/1.5 var(--font-mono);
 
-  --tracking-display: -0.025em;
-  --tracking-h1: -0.018em;
-  --tracking-h2: -0.015em;
-  --tracking-h3: -0.01em;
-  --tracking-h4: -0.005em;
+  --tracking-display: -0.02em;
+  --tracking-h1: -0.012em;
+  --tracking-h2: -0.01em;
+  --tracking-h3: -0.005em;
+  --tracking-h4: 0;
   --tracking-caption: 0.01em;
-  --tracking-label: 0.02em;
-  --tracking-button: 0.01em;
+  --tracking-label: 0.01em;
+  --tracking-button: 0;
 
   /* ── primitivos · espaçamento, raio, sombra ───────────────────────── */
   --space-0: 0;
@@ -131,15 +135,15 @@
   --space-20: 80px;
   --space-24: 96px;
 
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-2xl: 28px;
+  /* Cantos secos: controles 6px, contêineres 8px. Arredondado total só em avatar e FAB. */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
   --radius-full: 9999px;
 
-  --shadow-xs: 0 1px 2px rgba(27, 34, 43, 0.06);
   --shadow-sm: 0 1px 2px rgba(27, 34, 43, 0.06), 0 2px 6px rgba(27, 34, 43, 0.06);
   --shadow-md: 0 4px 12px rgba(27, 34, 43, 0.08), 0 1px 3px rgba(27, 34, 43, 0.06);
   --shadow-lg: 0 12px 28px rgba(27, 34, 43, 0.1), 0 2px 6px rgba(27, 34, 43, 0.06);
@@ -179,6 +183,7 @@
   --color-action-secondary-fg: var(--secondary-700);
   --color-destructive-bg: var(--error-600);
   --color-destructive-hover: var(--error-700);
+  --color-destructive-fg: #ffffff;
 
   --color-focus-ring: rgba(31, 152, 141, 0.35);
   --color-focus-border: var(--primary-500);
@@ -232,6 +237,13 @@
   --color-brand-panel-muted: var(--primary-300);
   --color-brand-mark-bg: var(--primary-400);
   --color-brand-mark-fg: #0e1418;
+}
+
+/* Título de página menor no celular: a tela é estreita e o dado vem logo abaixo. */
+@media (max-width: 767px) {
+  :root {
+    --type-h1: 600 24px/1.2 var(--font-sans);
+  }
 }
 
 /* ── semânticos · tema escuro (só estes mudam) ──────────────────────── */

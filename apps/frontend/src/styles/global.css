@@ -39,6 +39,21 @@ textarea {
   color: inherit;
 }
 
+/* Superfícies do navegador também seguem o tema: seleção, cursor e números. */
+::selection {
+  background: var(--color-selected-bg);
+  color: var(--color-text-primary);
+}
+
+input,
+textarea {
+  caret-color: var(--color-focus-border);
+}
+
+body {
+  font-variant-numeric: tabular-nums;
+}
+
 a {
   color: var(--color-text-link);
   font-weight: 600;

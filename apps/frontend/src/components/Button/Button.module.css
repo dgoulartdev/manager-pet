@@ -46,7 +46,6 @@
 .primary {
   background: var(--color-action-primary-bg);
   color: var(--color-action-primary-fg);
-  box-shadow: var(--shadow-xs);
 }
 
 .primary:hover {
@@ -70,7 +69,7 @@
 
 .destructive {
   background: var(--color-destructive-bg);
-  color: #ffffff;
+  color: var(--color-destructive-fg);
 }
 
 .destructive:hover {
