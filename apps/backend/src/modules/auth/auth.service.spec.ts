@@ -1,4 +1,4 @@
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from '@prisma/client';
@@ -114,6 +114,39 @@ describe('AuthService', () => {
           password: 'senha123',
         }),
       ).rejects.toBeInstanceOf(ConflictException);
+    });
+
+    describe('com SIGNUP_ALLOWED_EMAILS definida', () => {
+      beforeEach(() => {
+        // Espaços e maiúsculas na variável não podem barrar um e-mail da lista.
+        configService.get.mockImplementation((key: string, def?: string) =>
+          key === 'SIGNUP_ALLOWED_EMAILS' ? ' Ana@Example.com , outra@example.com ' : def,
+        );
+      });
+
+      it('cria a conta de um e-mail da lista', async () => {
+        mockedHash.mockResolvedValue('hashed-password');
+        prisma.user.create.mockResolvedValue(buildUser());
+
+        const result = await service.register({
+          name: 'Ana',
+          email: 'ana@example.com',
+          password: 'senha123',
+        });
+
+        expect(result.user.email).toBe('ana@example.com');
+      });
+
+      it('lança ForbiddenException para e-mail fora da lista, sem criar o usuário', async () => {
+        await expect(
+          service.register({
+            name: 'Intruso',
+            email: 'intruso@example.com',
+            password: 'senha123',
+          }),
+        ).rejects.toBeInstanceOf(ForbiddenException);
+        expect(prisma.user.create).not.toHaveBeenCalled();
+      });
     });
   });
 

@@ -42,7 +42,8 @@ export function RegisterPage() {
   const [values, setValues] = useState({ name: '', email: '', password: '' });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formMessage, setFormMessage] = useState<FormMessage | null>(null);
-  const [emailTaken, setEmailTaken] = useState(false);
+  // Recusa da API ligada ao e-mail: já tem conta (409) ou fora da lista de cadastro (403).
+  const [emailIssue, setEmailIssue] = useState<'taken' | 'not-allowed' | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const refs = {
@@ -62,7 +63,7 @@ export function RegisterPage() {
   function updateField(field: keyof FieldErrors, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
     setFormMessage(null);
-    if (field === 'email') setEmailTaken(false);
+    if (field === 'email') setEmailIssue(null);
     // Com erro visível, revalida a cada tecla para o erro sumir ao corrigir.
     if (fieldErrors[field]) {
       setFieldErrors((current) => ({ ...current, [field]: VALIDATORS[field](value) }));
@@ -94,7 +95,7 @@ export function RegisterPage() {
 
     setSubmitting(true);
     setFormMessage(null);
-    setEmailTaken(false);
+    setEmailIssue(null);
     try {
       await register(
         { name: values.name.trim(), email: values.email.trim(), password: values.password },
@@ -104,7 +105,11 @@ export function RegisterPage() {
     } catch (error) {
       setSubmitting(false);
       if (error instanceof ApiError && error.status === 409) {
-        setEmailTaken(true);
+        setEmailIssue('taken');
+        return;
+      }
+      if (error instanceof ApiError && error.status === 403) {
+        setEmailIssue('not-allowed');
         return;
       }
       if (error instanceof ApiError && error.status === 422) {
@@ -143,12 +148,19 @@ export function RegisterPage() {
             <p className={form.subtitle}>São três campos. Ao terminar, você já entra no sistema.</p>
           </header>
 
-          {emailTaken && (
+          {emailIssue === 'taken' && (
             <Alert tone="warning" title="Este e-mail já tem uma conta">
               <Link to="/entrar" state={{ email: values.email.trim() }}>
                 Entrar com este e-mail
               </Link>{' '}
               ou <Link to="/esqueci-senha">recuperar a senha</Link>.
+            </Alert>
+          )}
+
+          {emailIssue === 'not-allowed' && (
+            <Alert tone="warning" title="Este e-mail não está autorizado">
+              O cadastro está aberto só para e-mails autorizados. Se você já tem conta,{' '}
+              <Link to="/entrar">entre por aqui</Link>.
             </Alert>
           )}
 
