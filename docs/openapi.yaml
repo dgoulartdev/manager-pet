@@ -51,6 +51,8 @@ tags:
     description: Atendimentos veterinários
   - name: Vaccines
     description: Vacinas aplicadas aos pacientes
+  - name: Cron
+    description: Tarefas agendadas, chamadas pela plataforma de hospedagem
 
 # ---------------------------------------------------------------------------
 # PATHS
@@ -1077,6 +1079,27 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /cron/token-cleanup:
+    get:
+      tags: [Cron]
+      summary: Apagar tokens vencidos, revogados e usados (tarefa diária)
+      operationId: cleanupTokens
+      description: |
+        Chamada uma vez por dia pelo Vercel Cron (agenda em `apps/backend/vercel.json`),
+        que envia `Authorization: Bearer <CRON_SECRET>`. Sem o segredo certo — ou sem
+        `CRON_SECRET` configurado no servidor — responde 401. Idempotente.
+      security:
+        - CronSecret: []
+      responses:
+        "200":
+          description: Quantos tokens foram apagados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenCleanupResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
 # ---------------------------------------------------------------------------
 # COMPONENTS
 # ---------------------------------------------------------------------------
@@ -1090,6 +1113,10 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    CronSecret:
+      type: http
+      scheme: bearer
+      description: Valor de `CRON_SECRET`, enviado pelo Vercel Cron.
 
   # ── PARAMETERS ────────────────────────────────────────────────────────────
 
@@ -1213,6 +1240,19 @@ components:
         new_password:
           type: string
           minLength: 8
+
+    TokenCleanupResult:
+      type: object
+      required: [refresh_tokens, password_reset_tokens]
+      properties:
+        refresh_tokens:
+          type: integer
+          description: Sessões vencidas ou revogadas apagadas
+          example: 12
+        password_reset_tokens:
+          type: integer
+          description: Links de redefinição vencidos ou usados apagados
+          example: 1
 
     AuthResponse:
       type: object

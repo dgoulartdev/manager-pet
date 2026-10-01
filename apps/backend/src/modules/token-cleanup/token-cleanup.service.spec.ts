@@ -31,10 +31,4 @@ describe('TokenCleanupService', () => {
     });
     expect(result).toEqual({ refreshTokens: 3, passwordResetTokens: 1 });
   });
-
-  it('a execução agendada não lança quando o banco falha', async () => {
-    prisma.$transaction.mockRejectedValue(new Error('banco fora do ar'));
-
-    await expect(service.runScheduled()).resolves.toBeUndefined();
-  });
 });

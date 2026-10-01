@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { buildTestDatabaseUrl } from './test-db';
+import { buildTestDatabaseUrl, E2E_CRON_SECRET } from './test-db';
 
 export default function setup(): void {
   const baseUrl = process.env.DATABASE_URL;
@@ -14,6 +14,8 @@ export default function setup(): void {
   process.env.DATABASE_URL = testUrl;
   // Os testes cadastram e-mails aleatórios: a lista de cadastro do .env não vale aqui.
   delete process.env.SIGNUP_ALLOWED_EMAILS;
+  // Segredo próprio do e2e para a rota do Vercel Cron, independente do .env.
+  process.env.CRON_SECRET = E2E_CRON_SECRET;
 
   execSync('npx prisma migrate deploy --schema src/prisma/schema.prisma', {
     cwd: __dirname + '/..',

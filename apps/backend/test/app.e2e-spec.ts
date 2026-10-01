@@ -6,8 +6,8 @@ import { AppModule } from '../src/app.module';
 import { ProblemDetailsFilter } from '../src/common/filters/problem-details.filter';
 import { validationExceptionFactory } from '../src/common/validation-exception-factory';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { TokenCleanupService } from '../src/modules/token-cleanup/token-cleanup.service';
 import { EMAIL_SENDER, EmailMessage } from '../src/modules/email/email-sender';
+import { E2E_CRON_SECRET } from './test-db';
 
 // Fluxo principal completo: register -> login -> CRUD (tutor/local/paciente/
 // atendimento) -> logout. Roda contra o schema Postgres isolado
@@ -469,6 +469,14 @@ describe('Fluxo principal (e2e)', () => {
       .expect(401);
   });
 
+  it('recusa a limpeza agendada sem o segredo do Vercel Cron (401)', async () => {
+    await request(app.getHttpServer()).get('/v1/cron/token-cleanup').expect(401);
+    await request(app.getHttpServer())
+      .get('/v1/cron/token-cleanup')
+      .set('Authorization', 'Bearer segredo-errado')
+      .expect(401);
+  });
+
   // Roda antes da recuperação de senha: entra com `newPassword`, que o reset troca.
   it('limpa tokens vencidos, revogados e usados sem derrubar a sessão ativa', async () => {
     const prisma = app.get(PrismaService);
@@ -483,7 +491,13 @@ describe('Fluxo principal (e2e)', () => {
     // Depois da troca de senha e do logout, este usuário já tem sessões revogadas.
     expect(await prisma.refreshToken.count({ where: { user_id: user.id, revoked: true } })).toBeGreaterThan(0);
 
-    await app.get(TokenCleanupService).purge();
+    // Do mesmo jeito que o Vercel Cron chama: GET com o CRON_SECRET no Authorization.
+    const cleanup = await request(app.getHttpServer())
+      .get('/v1/cron/token-cleanup')
+      .set('Authorization', `Bearer ${E2E_CRON_SECRET}`)
+      .expect(200);
+    expect(cleanup.body.refresh_tokens).toBeGreaterThan(0);
+    expect(cleanup.body.password_reset_tokens).toBeGreaterThan(0);
 
     const staleSessions = await prisma.refreshToken.count({
       where: { user_id: user.id, OR: [{ revoked: true }, { expires_at: { lt: new Date() } }] },
