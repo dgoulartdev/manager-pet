@@ -65,6 +65,9 @@ paths:
       tags: [Auth]
       summary: Cadastrar novo veterinário
       operationId: registerUser
+      description: |
+        Quando o servidor restringe o cadastro a uma lista de e-mails, um e-mail
+        fora dela recebe 403, antes da checagem de e-mail já cadastrado (409).
       security: []
       requestBody:
         required: true
@@ -83,6 +86,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthResponse"
+        "403":
+          description: Cadastro restrito e o e-mail não está na lista de autorizados
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                type: "https://meupaciente.com.br/errors/forbidden"
+                title: "Forbidden"
+                status: 403
+                detail: "Este e-mail não está autorizado a criar conta."
         "409":
           $ref: "#/components/responses/Conflict"
         "422":

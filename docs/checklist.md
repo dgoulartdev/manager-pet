@@ -15,7 +15,7 @@
 - [x] Popular seed básico (usuário de teste, opcional)
 
 ## 2. Módulo Auth
-- [x] `POST /auth/register`
+- [x] `POST /auth/register` (com `SIGNUP_ALLOWED_EMAILS` definida, só os e-mails da lista; os demais, 403 — ADR-010)
 - [x] `POST /auth/login`
 - [x] `POST /auth/refresh`
 - [x] `POST /auth/logout`
@@ -115,5 +115,6 @@
 - [ ] Redigir documentos legais (termos de uso e política de privacidade/LGPD) — ainda não existem no repositório
 - [ ] Definir provedor de hosting (backend + banco + storage de fotos persistente — ADR-007)
 - [x] Definir provedor de e-mail transacional (Resend)
+- [x] Restringir o cadastro a e-mails autorizados (ADR-010) — no deploy, definir `SIGNUP_ALLOWED_EMAILS` e criar a conta da piloto logo em seguida
 - [ ] Deploy de staging
 - [ ] Teste real com sua namorada (usuária piloto)

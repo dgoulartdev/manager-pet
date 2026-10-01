@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Inject,
   Injectable,
   Logger,
@@ -37,6 +38,11 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
+    // Antes do 409: quem está fora da lista não descobre quais e-mails já têm conta.
+    if (!this.isSignupAllowed(dto.email)) {
+      throw new ForbiddenException('Este e-mail não está autorizado a criar conta.');
+    }
+
     const passwordHash = await hash(dto.password, 10);
 
     let user: User;
@@ -191,5 +197,20 @@ export class AuthService {
 
   private hashToken(token: string): string {
     return createHash('sha256').update(token).digest('hex');
+  }
+
+  /**
+   * Cadastro restrito (ADR-010): com SIGNUP_ALLOWED_EMAILS definida, só os e-mails
+   * da lista criam conta. Sem a variável, o cadastro fica aberto (dev e testes).
+   * O e-mail do DTO já chega aparado e em minúsculas (@NormalizeEmail).
+   */
+  private isSignupAllowed(email: string): boolean {
+    const allowedEmails = this.configService.get<string>('SIGNUP_ALLOWED_EMAILS')?.trim();
+    if (!allowedEmails) return true;
+
+    return allowedEmails
+      .split(',')
+      .map((allowed) => allowed.trim().toLowerCase())
+      .includes(email);
   }
 }

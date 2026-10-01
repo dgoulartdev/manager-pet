@@ -613,6 +613,30 @@ Criar o model `Vaccine` como entidade própria — não como campos dentro de `A
 - Campos de vacina embutidos em `Appointment` (ex.: `vaccine_name`, `vaccine_batch`): rejeitado por não suportar múltiplas vacinas no mesmo atendimento nem vacinas sem atendimento.
 - `appointment_id` obrigatório: rejeitado por impedir o registro de histórico vacinal retroativo/externo.
 
+### ADR-010: Cadastro restrito a uma lista de e-mails
+
+**Status:** Aceito
+
+**Contexto:**
+O primeiro uso real é de uma única veterinária (usuária piloto), com o app publicado na internet. Com `POST /auth/register` aberto, qualquer pessoa que encontre o endereço cria conta e ocupa o banco gratuito. O cadastro aberto continua sendo o destino do produto, então a restrição precisa ser desligável sem mudar código.
+
+**Decisão:**
+A variável `SIGNUP_ALLOWED_EMAILS` (e-mails separados por vírgula, sem diferença de maiúsculas) restringe o cadastro: com ela definida, só e-mails da lista criam conta, e os demais recebem 403 antes da checagem de e-mail já cadastrado (409). Sem a variável, o cadastro é aberto — padrão do desenvolvimento e dos testes e2e, que a removem explicitamente. Login, recuperação de senha e troca de e-mail não consultam a lista. A tela de cadastro explica a recusa e oferece entrar.
+
+**Consequências positivas:**
+- A usuária piloto cria a própria conta pela tela normal; ninguém mais consegue
+- Abrir o cadastro no futuro é remover a variável
+- O 403 vem antes do 409, então quem está fora da lista não descobre quais e-mails têm conta
+
+**Consequências negativas:**
+- O cadastro não confirma a posse do e-mail: a lista vale para o e-mail digitado. Quem souber um e-mail permitido que ainda não tem conta pode cadastrá-lo antes — por isso a conta da piloto deve ser criada logo depois do deploy
+- Esquecer a variável em produção deixa o cadastro aberto (mesma convenção de `CORS_ORIGIN`)
+- Trocar o e-mail no Perfil não atualiza a lista: o e-mail antigo continua liberado para cadastro até ser retirado dela
+
+**Alternativas rejeitadas:**
+- Remover o endpoint e criar as contas por script: exige acesso ao banco de produção a cada conta e código a restaurar quando o cadastro abrir
+- Código de convite: protege contra o cadastro antecipado, mas exige tabela, tela e fluxo novos para uma única usuária
+
 ---
 
 ## 10. Visão de Produto e Princípios de Desenvolvimento
