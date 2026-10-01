@@ -1,6 +1,8 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -15,15 +17,23 @@ import { toUserDto } from '../../common/mappers/user.mapper';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { EMAIL_SENDER, EmailSender } from '../email/email-sender';
+import { passwordResetEmail } from '../email/password-reset-email';
 
-const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000; // 1 hora
+const PASSWORD_RESET_TTL_MINUTES = 60;
+const PASSWORD_RESET_TTL_MS = PASSWORD_RESET_TTL_MINUTES * 60 * 1000;
+// Endereço do app (frontend) que abre o formulário de senha nova.
+const DEFAULT_APP_URL = 'http://localhost:5173';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    @Inject(EMAIL_SENDER) private readonly emailSender: EmailSender,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
@@ -106,10 +116,19 @@ export class AuthService {
       },
     });
 
-    // MVP: sem provedor de e-mail ainda. Log só fora de produção para não vazar token.
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`[auth] Link de recuperação de senha para ${email}: token=${rawToken}`);
-    }
+    const appUrl = (this.configService.get<string>('APP_URL') || DEFAULT_APP_URL).replace(/\/$/, '');
+    const message = passwordResetEmail({
+      to: user.email,
+      name: user.name,
+      link: `${appUrl}/redefinir-senha?token=${rawToken}`,
+      validForMinutes: PASSWORD_RESET_TTL_MINUTES,
+    });
+
+    // Sem await: a resposta leva o mesmo tempo com e sem conta (não revela quem
+    // está cadastrado). Falha do provedor fica no log; a pessoa pode pedir de novo.
+    void this.emailSender.send(message).catch((error: unknown) => {
+      this.logger.error(`Falha ao enviar o e-mail de recuperação de senha: ${String(error)}`);
+    });
   }
 
   async resetPassword(dto: ResetPasswordDto): Promise<void> {

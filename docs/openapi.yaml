@@ -150,7 +150,10 @@ paths:
       operationId: forgotPassword
       security: []
       description: |
-        Sempre retorna 200 para não expor se o e-mail existe na base.
+        Sempre retorna 200 para não expor se o e-mail existe na base (a
+        resposta não espera o envio, então o tempo também não denuncia).
+        Se existir, envia um e-mail com o link
+        `{APP_URL}/redefinir-senha?token=...`, válido por 1 hora e de uso único.
       requestBody:
         required: true
         content:
@@ -177,6 +180,9 @@ paths:
       summary: Redefinir senha com token de recuperação
       operationId: resetPassword
       security: []
+      description: |
+        Troca a senha com o token do link enviado por e-mail e encerra todas as
+        sessões abertas. Token inexistente, já usado ou expirado responde 401.
       requestBody:
         required: true
         content:

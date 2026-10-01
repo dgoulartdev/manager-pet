@@ -67,7 +67,7 @@ Seed: `teste@meupaciente.com` / `teste123`.
   (`updateUser` após salvar o perfil; `changePassword` entra de novo com a senha nova, porque a
   API revoga todas as sessões na troca).
   Utilitários em `lib/` (datas, formatação, vacinas, pesagens, validação).
-- Rotas em português (`/inicio`, `/pacientes`, `/pacientes/:id?aba=historico`, `/pacientes/:id/editar`,
+- Rotas em português (`/inicio`, `/esqueci-senha`, `/redefinir-senha?token=`, `/pacientes`, `/pacientes/:id?aba=historico`, `/pacientes/:id/editar`,
   `/pacientes/:id/atendimentos/novo`, `/tutores`, `/locais`, `/perfil`). Depois de entrar o app abre
   em `/inicio`. Cadastro e edição usam a mesma página (`PatientFormPage`, `AppointmentFormPage`).
 - Decisão de produto: o tutor de um paciente **não muda** depois do cadastro (a API não aceita
@@ -78,6 +78,9 @@ Seed: `teste@meupaciente.com` / `teste123`.
 - `@meupaciente/shared` é CommonJS: o `vite.config.ts` o pré-processa (`optimizeDeps`), senão importar
   enums (ex.: `Sex`) quebra no navegador. Só tipos funcionariam sem isso.
 - `apps/backend/tsconfig.json` precisa de `"types": ["node", "jest"]` (sem `node`, o seed quebra).
+- E-mail (recuperação de senha): `modules/email` com `EmailSender`. Com `RESEND_API_KEY` (chave do
+  Resend) no `.env`, envia de verdade; sem ela, o e-mail sai no log do backend. `APP_URL` monta o
+  link e `EMAIL_FROM` é o remetente. O e2e troca o provedor por um que só captura (nunca envia).
 - Prisma fixado em 6.x (a 7 muda a sintaxe do datasource aprovada na arquitetura).
 - O painel de navegador do app costuma estar oculto: sem screenshots e com `document.hasFocus()` falso
   (eventos de foco não disparam). Para verificação visual, usar Chrome headless via DevTools Protocol

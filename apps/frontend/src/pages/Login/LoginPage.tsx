@@ -171,7 +171,7 @@ export function LoginPage() {
             value={password}
             error={fieldErrors.password}
             labelAction={
-              <Link to="/esqueci-senha" className={form.inlineLink}>
+              <Link to="/esqueci-senha" state={{ email: email.trim() }} className={form.inlineLink}>
                 Esqueci minha senha
               </Link>
             }
