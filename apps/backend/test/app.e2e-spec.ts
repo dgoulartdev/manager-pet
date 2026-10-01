@@ -7,6 +7,7 @@ import { ProblemDetailsFilter } from '../src/common/filters/problem-details.filt
 import { validationExceptionFactory } from '../src/common/validation-exception-factory';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { TokenCleanupService } from '../src/modules/token-cleanup/token-cleanup.service';
+import { EMAIL_SENDER, EmailMessage } from '../src/modules/email/email-sender';
 
 // Fluxo principal completo: register -> login -> CRUD (tutor/local/paciente/
 // atendimento) -> logout. Roda contra o schema Postgres isolado
@@ -25,11 +26,16 @@ describe('Fluxo principal (e2e)', () => {
   let locationId: string;
   let patientId: string;
   let appointmentId: string;
+  // E-mails "enviados" no teste: nada sai pelo provedor real, mesmo com a chave no .env.
+  const sentEmails: EmailMessage[] = [];
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(EMAIL_SENDER)
+      .useValue({ send: async (message: EmailMessage) => void sentEmails.push(message) })
+      .compile();
 
     app = moduleRef.createNestApplication();
     app.setGlobalPrefix('v1');
@@ -438,6 +444,8 @@ describe('Fluxo principal (e2e)', () => {
       .send({ email, password })
       .expect(401);
   });
+
+  // Roda antes da recuperação de senha: entra com `newPassword`, que o reset troca.
   it('limpa tokens vencidos, revogados e usados sem derrubar a sessão ativa', async () => {
     const prisma = app.get(PrismaService);
     const login = await request(app.getHttpServer())
@@ -466,5 +474,41 @@ describe('Fluxo principal (e2e)', () => {
       .post('/v1/auth/refresh')
       .send({ refresh_token: login.body.refresh_token })
       .expect(200);
+  });
+
+  it('pede a recuperação de senha e envia o link só para e-mail cadastrado', async () => {
+    const answer = (value: string) =>
+      request(app.getHttpServer()).post('/v1/auth/forgot-password').send({ email: value }).expect(200);
+
+    const unknown = await answer(`ninguem-${Date.now()}@example.com`);
+    const known = await answer(email);
+
+    // Mesma resposta nos dois casos: não revela quais e-mails têm conta.
+    expect(unknown.body).toEqual(known.body);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(sentEmails).toHaveLength(1);
+    expect(sentEmails[0].to).toBe(email);
+  });
+
+  it('redefine a senha pelo link do e-mail, uma vez só', async () => {
+    const token = sentEmails[0].text.match(/redefinir-senha\?token=([0-9a-f]+)/)?.[1];
+    expect(token).toBeDefined();
+    const resetPassword = 'redefinida789';
+
+    await request(app.getHttpServer())
+      .post('/v1/auth/reset-password')
+      .send({ token, new_password: resetPassword })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .post('/v1/auth/login')
+      .send({ email, password: resetPassword })
+      .expect(200);
+
+    // O link já foi usado.
+    await request(app.getHttpServer())
+      .post('/v1/auth/reset-password')
+      .send({ token, new_password: 'outra12345' })
+      .expect(401);
   });
 });

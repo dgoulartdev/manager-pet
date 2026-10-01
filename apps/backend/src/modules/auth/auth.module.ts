@@ -5,9 +5,11 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
+    EmailModule,
     JwtModule.register({}),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 20 }]),
   ],

@@ -79,7 +79,8 @@
 - [x] Mapear violação de FK (Prisma P2003) para 409
 
 ## 8.1 Pendências do backend
-- [ ] Integrar provedor de e-mail no `forgot-password` (hoje o token só é logado fora de produção)
+- [x] Integrar provedor de e-mail no `forgot-password` (Resend, atrás de `EmailSender`; sem chave, o link vai para o log)
+- [ ] Verificar o domínio próprio no Resend (sem ele, o remetente de teste só entrega para o e-mail da conta)
 - [x] Rotina de limpeza de refresh/reset tokens expirados (ADR-006: diária, às 3h)
 
 ## 9. Testes
@@ -88,14 +89,15 @@
 - [x] Testes e2e dos fluxos principais (register→login→CRUD→logout)
 - [ ] Testes unitários dos services de users, tutors, locations e patients
 - [x] Testes e2e de `/users/me` e da troca de senha
-- [ ] Testes e2e de vacinas, foto do paciente e forgot/reset de senha
+- [x] Testes e2e de forgot/reset de senha e dos filtros de vacinas
+- [ ] Testes e2e do CRUD de vacinas e da foto do paciente
 
 ## 10. Frontend (PWA)
 - [x] Setup do projeto React + PWA (rotas, tokens do DS, fontes offline, ícone do manifest)
 - [x] Tipos/DTOs importados de `packages/shared`
 - [x] Cliente HTTP com refresh automático do access token e tratamento de erros RFC 7807
 - [x] Telas: login/registro
-- [ ] Telas: esqueci minha senha / redefinir senha
+- [x] Telas: esqueci minha senha / redefinir senha
 - [x] Estrutura do app (barra lateral, trilho no tablet, abas no mobile)
 - [x] Tela: início (total de pacientes e novos no mês, vacinas para acompanhar, últimos atendimentos; primeiros passos sem pacientes)
 - [x] Tela: lista de pacientes + busca (API passou a incluir o resumo do tutor)
@@ -112,6 +114,6 @@
 ## 11. Pré-lançamento
 - [ ] Redigir documentos legais (termos de uso e política de privacidade/LGPD) — ainda não existem no repositório
 - [ ] Definir provedor de hosting (backend + banco + storage de fotos persistente — ADR-007)
-- [ ] Definir provedor de e-mail transacional
+- [x] Definir provedor de e-mail transacional (Resend)
 - [ ] Deploy de staging
 - [ ] Teste real com sua namorada (usuária piloto)
