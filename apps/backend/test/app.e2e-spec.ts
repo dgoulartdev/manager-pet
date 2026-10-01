@@ -400,11 +400,35 @@ describe('Fluxo principal (e2e)', () => {
     expect(updated.body).toMatchObject({ email, name: 'Veterinária E2E' });
   });
 
+  it('exige a senha atual para trocar o e-mail (422 no campo); o mesmo e-mail não pede', async () => {
+    const patchMe = (body: Record<string, unknown>) =>
+      request(app.getHttpServer())
+        .patch('/v1/users/me')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(body);
+    const changedEmail = `novo-${Date.now()}@example.com`;
+
+    const missing = await patchMe({ email: changedEmail }).expect(422);
+    expect(missing.body.errors).toEqual([expect.objectContaining({ field: 'current_password' })]);
+
+    const wrong = await patchMe({ email: changedEmail, current_password: 'errada123' }).expect(422);
+    expect(wrong.body.errors).toEqual([expect.objectContaining({ field: 'current_password' })]);
+
+    // Mesmo e-mail (só normalizado) não é troca: não pede senha.
+    await patchMe({ email: email.toUpperCase() }).expect(200);
+
+    const changed = await patchMe({ email: changedEmail, current_password: password }).expect(200);
+    expect(changed.body.email).toBe(changedEmail);
+
+    // Volta ao e-mail original para os próximos testes.
+    await patchMe({ email, current_password: password }).expect(200);
+  });
+
   it('rejeita no perfil o e-mail de outra conta (409)', async () => {
     await request(app.getHttpServer())
       .patch('/v1/users/me')
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({ email: otherEmail })
+      .send({ email: otherEmail, current_password: password })
       .expect(409);
   });
 

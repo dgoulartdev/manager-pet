@@ -11,6 +11,7 @@ import { Alert } from '../../components/Alert/Alert';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Button } from '../../components/Button/Button';
 import { Segmented } from '../../components/Segmented/Segmented';
+import { PasswordField } from '../../components/TextField/PasswordField';
 import { TextField } from '../../components/TextField/TextField';
 import { useToast } from '../../components/Toast/Toast';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
@@ -92,6 +93,7 @@ export function ProfilePage() {
 interface FieldErrors {
   name?: string;
   email?: string;
+  currentPassword?: string;
 }
 
 // Nome e e-mail: só o que mudou vai para a API (PATCH parcial).
@@ -99,6 +101,8 @@ function AccountForm({ user }: { user: UserDto }) {
   const { updateUser } = useAuth();
   const showToast = useToast();
   const [values, setValues] = useState({ name: user.name, email: user.email });
+  // Só aparece (e só vai para a API) quando o e-mail muda: é ele que dá acesso à conta.
+  const [currentPassword, setCurrentPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formMessage, setFormMessage] = useState<FormMessage | null>(null);
   const [saving, setSaving] = useState(false);
@@ -112,6 +116,7 @@ function AccountForm({ user }: { user: UserDto }) {
   if (values.name.trim() !== user.name) changes.name = values.name.trim();
   if (values.email.trim().toLowerCase() !== user.email) changes.email = values.email.trim();
   const dirty = Object.keys(changes).length > 0;
+  const changingEmail = changes.email !== undefined;
 
   function validate(next: typeof values): FieldErrors {
     return { name: validatePersonName(next.name), email: validateEmail(next.email) };
@@ -127,14 +132,24 @@ function AccountForm({ user }: { user: UserDto }) {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving || !dirty) return;
-    const found = validate(values);
+    const found: FieldErrors = {
+      ...validate(values),
+      currentPassword:
+        changingEmail && !currentPassword
+          ? 'Informe sua senha atual para trocar o e-mail.'
+          : undefined,
+    };
     setErrors(found);
-    if (found.name || found.email) return;
+    if (found.name || found.email || found.currentPassword) return;
 
     setSaving(true);
     setFormMessage(null);
     try {
-      const saved = await apiRequest<UserDto>('/users/me', { method: 'PATCH', body: changes });
+      const body: UpdateUserRequest = changingEmail
+        ? { ...changes, current_password: currentPassword }
+        : changes;
+      const saved = await apiRequest<UserDto>('/users/me', { method: 'PATCH', body });
+      setCurrentPassword('');
       updateUser(saved);
       showToast({
         tone: 'success',
@@ -145,7 +160,11 @@ function AccountForm({ user }: { user: UserDto }) {
       if (error instanceof ApiError && error.status === 409) {
         setErrors({ email: 'Este e-mail já é usado em outra conta.' });
       } else if (error instanceof ApiError && error.status === 422) {
-        setErrors(validate(values));
+        const passwordError = error.fieldErrors.find((item) => item.field === 'current_password');
+        setErrors({
+          ...validate(values),
+          currentPassword: passwordError ? passwordError.message : undefined,
+        });
       } else {
         setFormMessage(describeCommonError(error));
       }
@@ -190,6 +209,22 @@ function AccountForm({ user }: { user: UserDto }) {
           hint="É com ele que você entra no MeuPaciente."
           onChange={(event) => update('email', event.target.value)}
         />
+        {changingEmail && (
+          <PasswordField
+            label="Senha atual"
+            name="current-password"
+            autoComplete="current-password"
+            value={currentPassword}
+            error={errors.currentPassword}
+            hint="Para trocar o e-mail de acesso, confirme com a sua senha."
+            onChange={(event) => {
+              setCurrentPassword(event.target.value);
+              setFormMessage(null);
+              if (errors.currentPassword)
+                setErrors((current) => ({ ...current, currentPassword: undefined }));
+            }}
+          />
+        )}
         <div className={styles.actions}>
           <Button type="submit" disabled={!dirty} loading={saving} loadingLabel="Salvando…">
             Salvar alterações

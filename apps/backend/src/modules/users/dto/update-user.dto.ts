@@ -14,4 +14,9 @@ export class UpdateUserDto implements UpdateUserRequest {
   @NormalizeEmail()
   @IsEmail()
   email?: string;
+
+  // Só é exigida (no service) quando o e-mail muda de fato.
+  @IsOptionalNotNull()
+  @IsString()
+  current_password?: string;
 }
