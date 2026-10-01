@@ -531,7 +531,7 @@ Persistir o hash SHA-256 de cada refresh token na tabela `refresh_tokens`. O val
 
 **Consequências negativas:**
 - Uma query extra no banco a cada uso do refresh token (custo desprezível)
-- Necessidade de job de limpeza de tokens expirados — implementado em `TokenCleanupService` (`@nestjs/schedule`): todo dia às 3h (horário de Brasília) apaga refresh tokens vencidos ou revogados e tokens de redefinição vencidos ou usados
+- Necessidade de job de limpeza de tokens expirados — implementado em `TokenCleanupService`: apaga refresh tokens vencidos ou revogados e tokens de redefinição vencidos ou usados. Quem dispara é o Vercel Cron, todo dia às 6h UTC (3h de Brasília; no plano gratuito, em algum momento dessa hora), com `GET /v1/cron/token-cleanup` protegido por `CRON_SECRET` (agenda em `apps/backend/vercel.json`). Um agendador dentro do processo (`@nestjs/schedule`, a primeira versão) não serve na Vercel: a função só fica viva durante as requisições
 
 **Alternativas rejeitadas:**
 - Refresh token stateless (apenas JWT): logout não invalida o token de verdade

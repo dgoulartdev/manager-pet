@@ -81,7 +81,7 @@
 ## 8.1 Pendências do backend
 - [x] Integrar provedor de e-mail no `forgot-password` (SMTP ou Resend, atrás de `EmailSender`; sem nenhum, o link vai para o log — ADR-011)
 - [ ] Criar a conta Gmail do app (verificação em duas etapas + senha de app) e configurar `SMTP_*` na hospedagem
-- [x] Rotina de limpeza de refresh/reset tokens expirados (ADR-006: diária, às 3h)
+- [x] Rotina de limpeza de refresh/reset tokens expirados (ADR-006: Vercel Cron diário às 3h de Brasília, `GET /cron/token-cleanup` com `CRON_SECRET`)
 
 ## 9. Testes
 - [x] Testes unitários dos services críticos (auth, appointments, vaccines)
