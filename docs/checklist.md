@@ -81,7 +81,7 @@
 ## 8.1 Pendências do backend
 - [x] Integrar provedor de e-mail no `forgot-password` (Resend, atrás de `EmailSender`; sem chave, o link vai para o log)
 - [ ] Verificar o domínio próprio no Resend (sem ele, o remetente de teste só entrega para o e-mail da conta)
-- [ ] Rotina de limpeza de refresh/reset tokens expirados (ADR-006)
+- [x] Rotina de limpeza de refresh/reset tokens expirados (ADR-006: diária, às 3h)
 
 ## 9. Testes
 - [x] Testes unitários dos services críticos (auth, appointments, vaccines)
