@@ -79,8 +79,8 @@
 - [x] Mapear violação de FK (Prisma P2003) para 409
 
 ## 8.1 Pendências do backend
-- [x] Integrar provedor de e-mail no `forgot-password` (Resend, atrás de `EmailSender`; sem chave, o link vai para o log)
-- [ ] Verificar o domínio próprio no Resend (sem ele, o remetente de teste só entrega para o e-mail da conta)
+- [x] Integrar provedor de e-mail no `forgot-password` (SMTP ou Resend, atrás de `EmailSender`; sem nenhum, o link vai para o log — ADR-011)
+- [ ] Criar a conta Gmail do app (verificação em duas etapas + senha de app) e configurar `SMTP_*` na hospedagem
 - [x] Rotina de limpeza de refresh/reset tokens expirados (ADR-006: diária, às 3h)
 
 ## 9. Testes
@@ -114,6 +114,6 @@
 ## 11. Pré-lançamento
 - [ ] Redigir documentos legais (termos de uso e política de privacidade/LGPD) — ainda não existem no repositório
 - [ ] Definir provedor de hosting (backend + banco + storage de fotos persistente — ADR-007)
-- [x] Definir provedor de e-mail transacional (Resend)
+- [x] Definir provedor de e-mail transacional (SMTP com Gmail; Resend quando houver domínio próprio — ADR-011)
 - [ ] Deploy de staging
 - [ ] Teste real com sua namorada (usuária piloto)

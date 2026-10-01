@@ -18,7 +18,7 @@ Prontuário veterinário (cães e gatos) para profissionais autônomos. Monorepo
 ```bash
 npm install                          # na raiz
 cp .env.example .env                 # .env único na raiz, lido por backend e frontend
-docker compose up -d                 # Postgres local (porta 5432)
+docker compose up -d                 # Postgres local (porta 5432) e Mailpit (e-mails em http://localhost:8025)
 npm run build -w @meupaciente/shared # rebuild obrigatório depois de mudar DTOs em packages/shared
 
 # backend (em apps/backend)
@@ -78,9 +78,12 @@ Seed: `teste@meupaciente.com` / `teste123`.
 - `@meupaciente/shared` é CommonJS: o `vite.config.ts` o pré-processa (`optimizeDeps`), senão importar
   enums (ex.: `Sex`) quebra no navegador. Só tipos funcionariam sem isso.
 - `apps/backend/tsconfig.json` precisa de `"types": ["node", "jest"]` (sem `node`, o seed quebra).
-- E-mail (recuperação de senha): `modules/email` com `EmailSender`. Com `RESEND_API_KEY` (chave do
-  Resend) no `.env`, envia de verdade; sem ela, o e-mail sai no log do backend. `APP_URL` monta o
-  link e `EMAIL_FROM` é o remetente. O e2e troca o provedor por um que só captura (nunca envia).
+- E-mail (recuperação de senha): `modules/email` com `EmailSender`, escolhido no boot (ADR-011). Com
+  `SMTP_HOST`, envia por SMTP (produção: Gmail com senha de app; local: o Mailpit, com `SMTP_HOST=localhost`
+  e `SMTP_PORT=1025`); senão, com `RESEND_API_KEY`, pelo Resend; sem nenhum, sai no log do backend.
+  `APP_URL` monta o link e `EMAIL_FROM` é o remetente (vazio = `MeuPaciente <SMTP_USER>`). O envio passa
+  pelo `waitUntil` da Vercel, que pausaria a função ao responder. O e2e troca o provedor por um que só
+  captura (nunca envia).
 - Prisma fixado em 6.x (a 7 muda a sintaxe do datasource aprovada na arquitetura).
 - O painel de navegador do app costuma estar oculto: sem screenshots e com `document.hasFocus()` falso
   (eventos de foco não disparam). Para verificação visual, usar Chrome headless via DevTools Protocol
