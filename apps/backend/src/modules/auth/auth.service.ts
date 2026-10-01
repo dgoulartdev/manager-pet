@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { waitUntil } from '@vercel/functions';
 import { compare, hash } from 'bcryptjs';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { Prisma, User } from '@prisma/client';
@@ -132,9 +133,13 @@ export class AuthService {
 
     // Sem await: a resposta leva o mesmo tempo com e sem conta (não revela quem
     // está cadastrado). Falha do provedor fica no log; a pessoa pode pedir de novo.
-    void this.emailSender.send(message).catch((error: unknown) => {
-      this.logger.error(`Falha ao enviar o e-mail de recuperação de senha: ${String(error)}`);
-    });
+    // Na Vercel a função pausa ao responder e cortaria o envio no meio: o waitUntil
+    // a mantém viva até o e-mail sair. Fora da Vercel, ele não faz nada.
+    waitUntil(
+      this.emailSender.send(message).catch((error: unknown) => {
+        this.logger.error(`Falha ao enviar o e-mail de recuperação de senha: ${String(error)}`);
+      }),
+    );
   }
 
   async resetPassword(dto: ResetPasswordDto): Promise<void> {

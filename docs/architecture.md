@@ -637,6 +637,32 @@ A variável `SIGNUP_ALLOWED_EMAILS` (e-mails separados por vírgula, sem diferen
 - Remover o endpoint e criar as contas por script: exige acesso ao banco de produção a cada conta e código a restaurar quando o cadastro abrir
 - Código de convite: protege contra o cadastro antecipado, mas exige tabela, tela e fluxo novos para uma única usuária
 
+### ADR-011: E-mail por SMTP (Gmail) enquanto não houver domínio próprio
+
+**Status:** Aceito
+
+**Contexto:**
+A recuperação de senha usava o Resend, que só entrega para qualquer endereço com um domínio próprio verificado; sem ele, o remetente de teste só chega ao e-mail da conta Resend. A hospedagem prevista é a Vercel no domínio gratuito `.vercel.app`, sem domínio próprio — então o e-mail não chegaria à usuária piloto. Além disso, na Vercel a função pausa logo depois de responder, e o envio disparado sem `await` (de propósito: a resposta leva o mesmo tempo com e sem conta) seria cortado no meio, sem erro no log.
+
+**Decisão:**
+Novo provedor `SmtpEmailSender` (nodemailer) atrás do mesmo `EmailSender`, configurado por `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER` e `SMTP_PASSWORD` — em produção, uma conta Gmail criada só para o app, com senha de app. A escolha no boot é SMTP, depois Resend, depois log; com `SMTP_HOST`, o boot exige usuário e senha. O remetente padrão é `MeuPaciente <SMTP_USER>`, porque o Gmail só aceita o endereço da própria conta. O envio da recuperação passa pelo `waitUntil` de `@vercel/functions`, que mantém a função viva até o e-mail sair sem atrasar a resposta (fora da Vercel, não faz nada). No desenvolvimento, o Mailpit do docker compose recebe os e-mails sem entregar a ninguém.
+
+**Consequências positivas:**
+- O e-mail chega a qualquer endereço sem domínio próprio, de graça (o limite do Gmail, ~500 por dia, fica longe do uso)
+- O Resend continua pronto: com domínio verificado, basta tirar o `SMTP_HOST` e pôr a chave
+- Trocar de provedor SMTP é só configuração
+
+**Consequências negativas:**
+- A senha de app dá acesso total à conta Gmail: a conta precisa ser exclusiva do app, e a senha só pode existir nas variáveis da hospedagem (o repositório é público)
+- SMTP em função serverless é mais frágil que uma API HTTP (conexão longa: DNS, TLS, autenticação) — daí os timeouts curtos e o `waitUntil`
+- Depende de o Google manter as senhas de app; se acabarem, troca-se o provedor SMTP ou volta-se ao Resend com domínio
+- O código ganha uma dependência da Vercel (`waitUntil`), inofensiva em outros ambientes
+
+**Alternativas rejeitadas:**
+- Resend sem domínio: não entrega para a usuária piloto
+- Criar a conta Resend com o e-mail da piloto: usa o remetente de teste em produção, com cara de spam, e prende a conta ao e-mail dela
+- Comprar um domínio agora: resolveria com o Resend, mas a decisão foi seguir só com o `.vercel.app`
+
 ---
 
 ## 10. Visão de Produto e Princípios de Desenvolvimento

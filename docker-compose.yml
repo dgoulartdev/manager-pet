@@ -12,5 +12,19 @@ services:
     volumes:
       - meupaciente_pgdata:/var/lib/postgresql/data
 
+  # Caixa de entrada local: recebe o e-mail enviado por SMTP sem entregar a ninguém.
+  # Use SMTP_HOST=localhost e SMTP_PORT=1025; as mensagens aparecem em http://localhost:8025.
+  mailpit:
+    image: axllent/mailpit:v1
+    container_name: meupaciente-mail
+    restart: unless-stopped
+    environment:
+      # Aceita qualquer usuário e senha, sem TLS: só serve para o desenvolvimento.
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
 volumes:
   meupaciente_pgdata:
