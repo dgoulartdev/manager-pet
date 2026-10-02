@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, type DragEvent } from 'react';
 import { Camera } from 'lucide-react';
-import { ACCEPTED_PHOTO_TYPES, validatePhoto } from '../../lib/photo';
+import { ACCEPTED_PHOTO_TYPES, preparePhoto } from '../../lib/photo';
 import { Button } from '../Button/Button';
 import styles from './PhotoPicker.module.css';
 
@@ -12,8 +12,9 @@ interface PhotoPickerProps {
 }
 
 /**
- * Foto opcional do paciente. Valida tipo e tamanho aqui, antes de enviar:
- * a foto só sobe depois que o paciente é salvo (a API exige o id).
+ * Foto opcional do paciente. Confere o formato e reduz a foto aqui (lib/photo),
+ * então a prévia já mostra o que vai subir. A foto só sobe depois que o paciente
+ * é salvo (a API exige o id).
  */
 export function PhotoPicker({ file, onChange, currentUrl = null }: PhotoPickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -34,18 +35,21 @@ export function PhotoPicker({ file, onChange, currentUrl = null }: PhotoPickerPr
 
   const shownUrl = previewUrl ?? currentUrl;
 
-  function accept(candidate: File | undefined) {
+  async function accept(candidate: File | undefined) {
     if (!candidate) return;
-    const problem = validatePhoto(candidate);
-    setError(problem);
-    if (problem) return;
-    onChange(candidate);
+    const prepared = await preparePhoto(candidate);
+    if ('error' in prepared) {
+      setError(prepared.error);
+      return;
+    }
+    setError(null);
+    onChange(prepared.photo);
   }
 
   function handleDrop(event: DragEvent<HTMLButtonElement>) {
     event.preventDefault();
     setDragging(false);
-    accept(event.dataTransfer.files[0]);
+    void accept(event.dataTransfer.files[0]);
   }
 
   return (
@@ -83,7 +87,7 @@ export function PhotoPicker({ file, onChange, currentUrl = null }: PhotoPickerPr
           className={error ? styles.error : styles.hint}
           role={error ? 'alert' : undefined}
         >
-          {error ?? 'Opcional. JPG ou PNG, até 5 MB. Enviada logo depois de salvar.'}
+          {error ?? 'Opcional. JPG ou PNG. Enviada logo depois de salvar.'}
         </p>
         <div className={styles.actions}>
           <Button
@@ -118,7 +122,7 @@ export function PhotoPicker({ file, onChange, currentUrl = null }: PhotoPickerPr
         tabIndex={-1}
         aria-hidden="true"
         onChange={(event) => {
-          accept(event.target.files?.[0]);
+          void accept(event.target.files?.[0]);
           // Permite escolher o mesmo arquivo de novo depois de remover.
           event.target.value = '';
         }}

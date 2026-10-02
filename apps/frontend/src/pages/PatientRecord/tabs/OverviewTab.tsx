@@ -5,7 +5,7 @@ import { Sex, type PatientDetailDto } from '@meupaciente/shared';
 import { apiRequest } from '../../../lib/api';
 import { formatDate } from '../../../lib/dates';
 import { formatAge, formatPhone, pluralize } from '../../../lib/format';
-import { ACCEPTED_PHOTO_TYPES, validatePhoto } from '../../../lib/photo';
+import { ACCEPTED_PHOTO_TYPES, preparePhoto } from '../../../lib/photo';
 import { Alert } from '../../../components/Alert/Alert';
 import { Avatar } from '../../../components/Avatar/Avatar';
 import { Button, ButtonLink } from '../../../components/Button/Button';
@@ -119,13 +119,17 @@ function PhotoCard({ patient, onChanged }: { patient: PatientDetailDto; onChange
 
   async function upload(file: File | undefined) {
     if (!file) return;
-    const problem = validatePhoto(file);
-    setError(problem);
-    if (problem) return;
     setBusy('upload');
+    setError(null);
+    const prepared = await preparePhoto(file);
+    if ('error' in prepared) {
+      setError(prepared.error);
+      setBusy(null);
+      return;
+    }
     try {
       const body = new FormData();
-      body.append('photo', file);
+      body.append('photo', prepared.photo);
       await apiRequest(`/patients/${patient.id}/photo`, { method: 'PUT', body });
       onChanged();
     } catch {
@@ -176,7 +180,7 @@ function PhotoCard({ patient, onChanged }: { patient: PatientDetailDto; onChange
         className={error ? styles.photoError : styles.photoHint}
         role={error ? 'alert' : undefined}
       >
-        {error ?? 'JPG ou PNG, até 5 MB.'}
+        {error ?? 'JPG ou PNG.'}
       </p>
       <input
         ref={inputRef}
