@@ -4,6 +4,12 @@ import { hash } from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+  // O seed cria uma conta com senha conhecida: só pode rodar no banco local.
+  const host = new URL(process.env.DATABASE_URL ?? '').hostname;
+  if (!['localhost', '127.0.0.1'].includes(host)) {
+    throw new Error(`Seed recusado: o banco (${host}) não é o local.`);
+  }
+
   const passwordHash = await hash('teste123', 10);
 
   const user = await prisma.user.upsert({
