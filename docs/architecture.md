@@ -666,6 +666,37 @@ Novo provedor `SmtpEmailSender` (nodemailer) atrás do mesmo `EmailSender`, conf
 - Criar a conta Resend com o e-mail da piloto: usa o remetente de teste em produção, com cara de spam, e prende a conta ao e-mail dela
 - Comprar um domínio agora: resolveria com o Resend, mas a decisão foi seguir só com o `.vercel.app`
 
+### ADR-012: Hospedagem gratuita na Vercel, com Neon e Vercel Blob
+
+**Status:** Aceito
+
+**Contexto:**
+O primeiro uso real é de uma única veterinária, sem receita: a hospedagem precisa ser gratuita e sem servidor para manter. O backend é NestJS, o banco é PostgreSQL e as fotos precisam sobreviver aos deploys.
+
+**Decisão:**
+Dois projetos na Vercel (plano Hobby), do mesmo repositório: `meupaciente-api` (pasta `apps/backend`, NestJS detectado sem configuração, que vira uma função na região `gru1`, São Paulo) e `meupaciente` (pasta `apps/frontend`, Vite). Banco no Neon, criado pela integração da Vercel na região São Paulo; fotos no Vercel Blob (ADR-007); e-mail pelo Gmail (ADR-011); limpeza de tokens pelo Vercel Cron (ADR-006). Endereços `.vercel.app`, sem domínio próprio.
+- O `npm install` prepara o monorepo nos dois projetos: o `prepare` de `packages/shared` compila o pacote e o `postinstall` do backend roda o `prisma generate`.
+- As migrations rodam no `installCommand` de `apps/backend/vercel.json`, **só quando `VERCEL_ENV=production`** e pela URL direta do Neon (`DATABASE_URL_UNPOOLED`; a URL com pooler não serve para o Prisma Migrate). Fica no install, e não no build, porque o NestJS da Vercel não tem comando de build próprio, e o install sempre roda.
+- `apps/frontend/vercel.json` devolve o `index.html` em qualquer rota (o app é uma SPA).
+- O backend confia no proxy (`trust proxy`): a Vercel sobrescreve o `X-Forwarded-For`, e o limite de tentativas de login passa a contar por IP de quem acessa.
+
+**Consequências positivas:**
+- Custo zero; banco e função no mesmo lugar (São Paulo), perto da usuária
+- Deploy a cada push na `main`; prévias de branch não tocam o banco de produção
+- Sem servidor para atualizar ou proteger
+
+**Consequências negativas:**
+- O plano Hobby é só para uso não comercial: se o app passar a cobrar, migra para o Pro ou outra hospedagem
+- Função e banco "dormem" sem uso: a primeira abertura depois de um tempo leva alguns segundos
+- Limites do gratuito: 4,5 MB por requisição (por isso a foto é reduzida no navegador), 0,5 GB de banco, 1 GB de Blob, um Cron por dia
+- O Neon gratuito só volta 6 horas no tempo: o backup diário próprio continua pendente antes de haver dados reais
+
+**Alternativas rejeitadas:**
+- Render: banco gratuito expira em 30 dias e o backend leva cerca de 1 minuto para acordar
+- Google Cloud Run: exige cartão de crédito, Dockerfile e workflow de deploy
+- Máquina gratuita da Oracle: exige manter o servidor, e a Oracle recolhe máquinas ociosas
+- Prisma Postgres (sugerido pela Vercel): não tem região na América do Sul, então cada consulta iria aos EUA
+
 ---
 
 ## 10. Visão de Produto e Princípios de Desenvolvimento

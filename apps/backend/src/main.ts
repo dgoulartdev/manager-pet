@@ -8,6 +8,10 @@ import { UPLOADS_ROOT } from './modules/patients/storage/local-disk-patient-phot
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // Atrás do proxy da Vercel, o IP de quem acessa chega no X-Forwarded-For (que a
+  // Vercel sobrescreve, então não dá para forjar). Sem isso, o limite de tentativas
+  // do login veria só o IP da Vercel e todo mundo dividiria o mesmo limite.
+  app.set('trust proxy', true);
   app.setGlobalPrefix('v1');
   // Fotos de paciente (storage local do MVP) servidas fora do prefixo /v1.
   app.useStaticAssets(UPLOADS_ROOT, { prefix: '/uploads/' });

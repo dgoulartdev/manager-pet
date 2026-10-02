@@ -85,6 +85,9 @@ Seed: `teste@meupaciente.com` / `teste123`.
   pelo `waitUntil` da Vercel, que pausaria a função ao responder. O e2e troca o provedor por um que só
   captura (nunca envia).
 - Prisma fixado em 6.x (a 7 muda a sintaxe do datasource aprovada na arquitetura).
+- Deploy na Vercel (ADR-012): projetos `meupaciente-api` (`apps/backend`) e `meupaciente` (`apps/frontend`).
+  O `npm install` compila o `shared` (`prepare`) e gera o Prisma (`postinstall`); as migrations rodam no
+  `installCommand` de `apps/backend/vercel.json`, só em produção e pela `DATABASE_URL_UNPOOLED` do Neon.
 - O painel de navegador do app costuma estar oculto: sem screenshots e com `document.hasFocus()` falso
   (eventos de foco não disparam). Para verificação visual, usar Chrome headless via DevTools Protocol
   (`Emulation.setDeviceMetricsOverride`, `setEmulatedMedia` para o tema, `setFocusEmulationEnabled`)

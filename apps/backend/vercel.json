@@ -1,5 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["gru1"],
+  "installCommand": "npm install && if [ \"$VERCEL_ENV\" = \"production\" ]; then DATABASE_URL=\"$DATABASE_URL_UNPOOLED\" npm run db:migrate:deploy; fi",
   "crons": [
     {
       "path": "/v1/cron/token-cleanup",
