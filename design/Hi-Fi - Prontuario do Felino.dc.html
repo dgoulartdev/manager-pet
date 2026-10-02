@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #EEF2F7; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: #12615C; text-decoration: none; }
+  a:hover { color: #137A72; }
+</style>
+</helmet>
+
+<section style="padding:56px;font-family:'Plus Jakarta Sans',system-ui,sans-serif">
+  <div style="display:flex;align-items:baseline;gap:12px;margin:0 0 10px">
+    <span style="font-weight:700;font-size:14px;line-height:1.2;color:#1B222B">Prontuário do Felino · alta fidelidade</span>
+  </div>
+  <p style="margin:0 0 20px;max-width:96ch;font-size:15px;line-height:1.65;color:#4E5B71;text-wrap:pretty">Documento independente. Destino do clique numa linha da tabela da <a href="./Hi-Fi - Home.dc.html">Home</a> e do <span style="font-family:'JetBrains Mono',monospace;font-size:13px">201</span> em <a href="./Hi-Fi - Cadastro de Felino.dc.html">Cadastro de Felino</a>. Cinco seções: <strong style="font-weight:600;color:#1B222B">Dados básicos</strong>, <strong style="font-weight:600;color:#1B222B">Histórico</strong>, <strong style="font-weight:600;color:#1B222B">Vacinas</strong>, <strong style="font-weight:600;color:#1B222B">Pesagens</strong> e <strong style="font-weight:600;color:#1B222B">Evolução clínica</strong> — organizadas num cabeçalho fixo de paciente mais abas, para que o que mais se consulta em plantão fique visível sem rolagem.</p>
+
+  <div style="border:1px solid #FDDF8A;background:#FFF9EB;border-radius:12px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;max-width:1180px;margin:0 0 32px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B96A04" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:1px"><path d="M10.3 4.3 2.6 17.5A1.9 1.9 0 0 0 4.3 20.5h15.4a1.9 1.9 0 0 0 1.7-3L13.7 4.3a1.9 1.9 0 0 0-3.4 0Z"></path><path d="M12 9.5v4"></path><path d="M12 17v.01"></path></svg>
+    <div><div style="font-weight:700;font-size:14px;line-height:1.4;color:#7A3B0D">Vacinas ainda não existem na API</div><div style="font-weight:500;font-size:13.5px;line-height:1.55;color:#944B07;margin-top:2px">O <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">openapi.yaml</span> cobre Patients, Tutors, Locations e Appointments. Não há recurso de imunização. A seção foi desenhada com o schema mínimo proposto no bloco de handoff — e nada além dele foi inventado nas outras seções.</div></div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 40px">
+    <div style="padding:7px 13px;border-radius:9999px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:12.5px;line-height:1;color:#4E5B71">Header fixo + 4 abas</div>
+    <div style="padding:7px 13px;border-radius:9999px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:12.5px;line-height:1;color:#4E5B71">Evolução clínica em painel lateral</div>
+    <div style="padding:7px 13px;border-radius:9999px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:12.5px;line-height:1;color:#4E5B71">Desktop 1280×800 · Mobile 390×844</div>
+    <div style="padding:7px 13px;border-radius:9999px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:12.5px;line-height:1;color:#4E5B71">Vazio · carregando · erro por seção</div>
+  </div>
+
+  <!-- ============ 01 DADOS BÁSICOS ============ -->
+  <div style="display:flex;flex-direction:column;gap:20px;margin:0 0 56px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;color:#137A72;text-transform:uppercase">Tela 08 · aba 1</div>
+      <div style="height:1px;flex:1;background:#D3DAE5"></div>
+      <div style="font-weight:700;font-size:20px;line-height:1.2;color:#1B222B">Dados básicos</div>
+    </div>
+
+    <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">DESKTOP · 1280 × 800</div>
+        <div data-screen-label="08 Prontuário · dados básicos" style="width:1280px;height:800px;border-radius:16px;overflow:hidden;display:grid;grid-template-columns:248px 1fr;background:#F7F9FB;box-shadow:0 24px 56px rgba(27,34,43,.14),0 4px 12px rgba(27,34,43,.08)">
+
+          <div style="background:#FFFFFF;border-right:1px solid #E9EDF3;padding:24px 16px;display:flex;flex-direction:column;gap:24px">
+            <div style="display:flex;align-items:center;gap:10px;padding:0 8px">
+              <div style="width:32px;height:32px;border-radius:10px;background:#137A72;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.11 6.5 2.11A9.28 9.28 0 0 1 12 5Z"></path><path d="M8 14v.5"></path><path d="M16 14v.5"></path></svg></div>
+              <div style="font-weight:700;font-size:16px;line-height:1;color:#1B222B">Felinos</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="height:44px;border-radius:10px;padding:0 12px;display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path></svg><span style="font-weight:500;font-size:14.5px;line-height:1;color:#4E5B71">Início</span></div>
+              <div style="height:44px;border-radius:10px;padding:0 12px;display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"></rect><path d="M8 3v3"></path><path d="M16 3v3"></path><path d="M3.5 9.5h17"></path></svg><span style="font-weight:500;font-size:14.5px;line-height:1;color:#4E5B71">Agenda</span></div>
+              <div style="height:44px;border-radius:10px;background:#D5F2EE;padding:0 12px;display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12615C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h9l3.5 3.5v13.5H6z"></path><path d="M9.5 11h6"></path><path d="M9.5 15h4"></path></svg><span style="font-weight:600;font-size:14.5px;line-height:1;color:#12615C">Pacientes</span></div>
+              <div style="height:44px;border-radius:10px;padding:0 12px;display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg><span style="font-weight:500;font-size:14.5px;line-height:1;color:#4E5B71">Tutores</span></div>
+            </div>
+            <div style="margin-top:auto;border-top:1px solid #E9EDF3;padding-top:12px;display:flex;align-items:center;gap:10px">
+              <div style="width:34px;height:34px;border-radius:9999px;background:#D5F2EE;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;line-height:1;color:#12615C">AL</div>
+              <div><div style="font-weight:600;font-size:13.5px;line-height:1.2;color:#1B222B">Dra. Ana Lima</div><div style="font-weight:500;font-size:12px;line-height:1.3;color:#8391AB">CRMV-SP 34.221</div></div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;overflow:hidden">
+            <!-- header do paciente -->
+            <div style="background:#FFFFFF;border-bottom:1px solid #E9EDF3;padding:20px 32px 0;display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <a href="./Hi-Fi - Home.dc.html" style="font-weight:500;font-size:13px;line-height:1;color:#64738C">Pacientes</a>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#AEB9CB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg>
+                <span style="font-weight:600;font-size:13px;line-height:1;color:#1B222B">Miso</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px">
+                <div style="width:64px;height:64px;border-radius:20px;background:#FFF1E6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;line-height:1;color:#944B07;flex:none">MI</div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <h1 style="margin:0;font-weight:700;font-size:26px;line-height:1.2;letter-spacing:-.015em;color:#1B222B">Miso</h1>
+                    <span style="height:24px;display:inline-flex;align-items:center;gap:5px;padding:0 10px;border-radius:9999px;background:#FEF2F2;color:#8A1F1F;font-weight:600;font-size:12px;line-height:1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A1F1F" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.5v.01"></path></svg>Vacina atrasada</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:10px;font-weight:500;font-size:13.5px;line-height:1.4;color:#64738C">
+                    <span>Macho</span><span style="color:#D3DAE5">·</span><span>SRD</span><span style="color:#D3DAE5">·</span><span>3 anos e 4 meses</span><span style="color:#D3DAE5">·</span><span>Rajado cinza</span><span style="color:#D3DAE5">·</span><span>Tutor: <a href="#" style="font-weight:600">Rafael Bueno</a></span>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;flex:none">
+                  <div style="height:40px;border-radius:10px;border:1px solid #D3DAE5;background:#FFFFFF;padding:0 16px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;line-height:1;color:#4E5B71"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4E5B71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16z"></path><path d="m14 6 4 4"></path></svg>Editar</div>
+                  <div style="height:40px;border-radius:10px;background:#137A72;padding:0 16px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;line-height:1;color:#FFFFFF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Novo atendimento</div>
+                  <div style="width:40px;height:40px;border-radius:10px;border:1px solid #D3DAE5;background:#FFFFFF;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4E5B71" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5.5" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="12" cy="18.5" r="1.2"></circle></svg></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:28px">
+                <div style="height:44px;display:flex;align-items:center;border-bottom:2px solid #137A72;font-weight:700;font-size:14.5px;line-height:1;color:#12615C">Dados básicos</div>
+                <div style="height:44px;display:flex;align-items:center;gap:8px;border-bottom:2px solid transparent;font-weight:500;font-size:14.5px;line-height:1;color:#64738C">Histórico<span style="height:20px;min-width:20px;padding:0 6px;border-radius:9999px;background:#E9EDF3;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11.5px;line-height:1;color:#4E5B71">12</span></div>
+                <div style="height:44px;display:flex;align-items:center;gap:8px;border-bottom:2px solid transparent;font-weight:500;font-size:14.5px;line-height:1;color:#64738C">Vacinas<span style="height:20px;min-width:20px;padding:0 6px;border-radius:9999px;background:#E9EDF3;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11.5px;line-height:1;color:#4E5B71">4</span></div>
+                <div style="height:44px;display:flex;align-items:center;gap:8px;border-bottom:2px solid transparent;font-weight:500;font-size:14.5px;line-height:1;color:#64738C">Pesagens<span style="height:20px;min-width:20px;padding:0 6px;border-radius:9999px;background:#E9EDF3;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11.5px;line-height:1;color:#4E5B71">6</span></div>
+              </div>
+            </div>
+
+            <div style="flex:1;padding:24px 32px;display:flex;flex-direction:column;gap:20px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+                <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12.5px;line-height:1;color:#64738C">Peso atual</div><div style="display:flex;align-items:baseline;gap:8px"><div style="font-weight:700;font-size:24px;line-height:1;color:#1B222B">4,4 kg</div><div style="font-weight:600;font-size:12.5px;line-height:1;color:#944B07">−0,1 kg</div></div><div style="font-weight:500;font-size:12px;line-height:1.3;color:#8391AB">medido em 12/07/2026</div></div>
+                <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12.5px;line-height:1;color:#64738C">Último atendimento</div><div style="font-weight:700;font-size:24px;line-height:1;color:#1B222B">26 dias</div><div style="font-weight:500;font-size:12px;line-height:1.3;color:#8391AB">Gastrite aguda · Dra. Ana</div></div>
+                <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12.5px;line-height:1;color:#64738C">Dose em atraso</div><div style="display:flex;align-items:baseline;gap:8px"><div style="font-weight:700;font-size:24px;line-height:1;color:#8A1F1F">FeLV</div><div style="font-weight:600;font-size:12.5px;line-height:1;color:#A72020">desde 08/05/23</div></div><div style="font-weight:500;font-size:12px;line-height:1.3;color:#8391AB">2ª dose · próxima: antirrábica 14/11</div></div>
+                <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12.5px;line-height:1;color:#64738C">Alerta ativo</div><div style="display:flex;align-items:center;gap:8px"><span style="height:26px;display:inline-flex;align-items:center;padding:0 10px;border-radius:9999px;background:#FEF2F2;color:#8A1F1F;font-weight:600;font-size:12.5px;line-height:1">Dieta restrita</span></div><div style="font-weight:500;font-size:12px;line-height:1.3;color:#8391AB">registrado na evolução de 12/07</div></div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+                <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;overflow:hidden">
+                  <div style="height:52px;padding:0 20px;border-bottom:1px solid #E9EDF3;display:flex;align-items:center;justify-content:space-between"><div style="font-weight:700;font-size:15px;line-height:1;color:#1B222B">Identificação</div><span style="font-weight:500;font-size:12.5px;line-height:1;color:#8391AB">atualizado em 12/07/2026</span></div>
+                  <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px 24px">
+                    <div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Nome</div><div style="font-weight:600;font-size:15px;line-height:1.3;color:#1B222B">Miso</div></div>
+                    <div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Espécie</div><div style="font-weight:500;font-size:15px;line-height:1.3;color:#1B222B">Felis catus</div></div>
+                    <div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Sexo</div><div style="font-weight:500;font-size:15px;line-height:1.3;color:#1B222B">Macho</div></div>
+                    <div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Raça</div><div style="font-weight:500;font-size:15px;line-height:1.3;color:#1B222B">SRD (sem raça definida)</div></div>
+                    <div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Nascimento</div><div style="font-weight:500;font-size:15px;line-height:1.3;color:#1B222B">15/03/2023 <span style="color:#8391AB">· 3a 4m</span></div></div>
+                    <div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Pelagem</div><div style="font-weight:500;font-size:15px;line-height:1.3;color:#1B222B">Rajado cinza</div></div>
+                  </div>
+                </div>
+
+                <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;overflow:hidden">
+                  <div style="height:52px;padding:0 20px;border-bottom:1px solid #E9EDF3;display:flex;align-items:center;justify-content:space-between"><div style="font-weight:700;font-size:15px;line-height:1;color:#1B222B">Tutor</div><a href="#" style="font-weight:600;font-size:13px;line-height:1">Ver perfil</a></div>
+                  <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:44px;height:44px;border-radius:9999px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;line-height:1;color:#5B3FBF">RB</div>
+                      <div><div style="font-weight:600;font-size:15px;line-height:1.3;color:#1B222B">Rafael Bueno</div><div style="font-weight:500;font-size:13px;line-height:1.4;color:#8391AB">2 felinos cadastrados</div></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                      <div style="display:flex;align-items:center;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 5.5c0 8 6 14 14 14l1.5-3.5-4-1.5-2 2c-2.4-1.2-4.3-3.1-5.5-5.5l2-2L9 5H5.5z"></path></svg><span style="font-weight:500;font-size:14px;line-height:1;color:#3F4A5C">(11) 99999-8888</span></div>
+                      <div style="display:flex;align-items:center;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"></rect><path d="m3.8 6.8 8.2 5.7 8.2-5.7"></path></svg><span style="font-weight:500;font-size:14px;line-height:1;color:#3F4A5C">rafael.bueno@email.com</span></div>
+                    </div>
+                    <div style="height:40px;border-radius:10px;border:1px solid #D3DAE5;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:14px;line-height:1;color:#4E5B71">Trocar tutor</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">MOBILE · 390 × 844</div>
+        <div data-screen-label="08 Prontuário · mobile" style="width:390px;height:844px;border-radius:36px;background:#F7F9FB;box-shadow:0 24px 56px rgba(27,34,43,.14);overflow:hidden;display:flex;flex-direction:column">
+          <div style="height:52px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:14px;line-height:1;color:#1B222B;background:#FFFFFF"><span>9:41</span><span style="font-weight:600;font-size:12px;line-height:1;font-family:'JetBrains Mono',monospace;color:#64738C">5G ▮▮▮</span></div>
+          <div style="background:#FFFFFF;border-bottom:1px solid #E9EDF3;padding:0 8px 0 12px;display:flex;align-items:center;justify-content:space-between;height:52px">
+            <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B222B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg></div>
+            <div style="font-weight:700;font-size:16px;line-height:1;color:#1B222B">Miso</div>
+            <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4E5B71" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5.5" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="12" cy="18.5" r="1.2"></circle></svg></div>
+          </div>
+
+          <div style="background:#FFFFFF;padding:16px 20px 0;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid #E9EDF3">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="width:56px;height:56px;border-radius:18px;background:#FFF1E6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:19px;line-height:1;color:#944B07;flex:none">MI</div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-weight:700;font-size:20px;line-height:1.2;color:#1B222B">Miso</div><span style="height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:9999px;background:#FEF2F2;color:#8A1F1F;font-weight:600;font-size:11.5px;line-height:1">Vacina atrasada</span></div>
+                <div style="font-weight:500;font-size:13px;line-height:1.45;color:#64738C;margin-top:2px">Macho · SRD · 3a 4m<br />Tutor: Rafael Bueno</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:22px;overflow:hidden">
+              <div style="height:42px;display:flex;align-items:center;border-bottom:2px solid #137A72;font-weight:700;font-size:14px;line-height:1;color:#12615C;flex:none">Dados</div>
+              <div style="height:42px;display:flex;align-items:center;border-bottom:2px solid transparent;font-weight:500;font-size:14px;line-height:1;color:#64738C;flex:none">Histórico</div>
+              <div style="height:42px;display:flex;align-items:center;border-bottom:2px solid transparent;font-weight:500;font-size:14px;line-height:1;color:#64738C;flex:none">Vacinas</div>
+              <div style="height:42px;display:flex;align-items:center;border-bottom:2px solid transparent;font-weight:500;font-size:14px;line-height:1;color:#64738C;flex:none">Pesagens</div>
+            </div>
+          </div>
+
+          <div style="flex:1;padding:16px 20px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+            <div style="display:flex;gap:10px">
+              <div style="flex:1;background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:12px"><div style="font-weight:600;font-size:11.5px;line-height:1.2;color:#64738C">Peso atual</div><div style="font-weight:700;font-size:19px;line-height:1.2;color:#1B222B;margin-top:4px">4,4 kg</div></div>
+              <div style="flex:1;background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:12px"><div style="font-weight:600;font-size:11.5px;line-height:1.2;color:#64738C">Último atend.</div><div style="font-weight:700;font-size:19px;line-height:1.2;color:#1B222B;margin-top:4px">26 dias</div></div>
+              <div style="flex:1;background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:12px"><div style="font-weight:600;font-size:11.5px;line-height:1.2;color:#64738C">Dose atrasada</div><div style="font-weight:700;font-size:19px;line-height:1.2;color:#8A1F1F;margin-top:4px">FeLV</div></div>
+            </div>
+
+            <div style="background:#FEF2F2;border:1px solid #FDC9C9;border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C82A2A" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.5v.01"></path></svg>
+              <div style="font-weight:600;font-size:13.5px;line-height:1.45;color:#8A1F1F">2ª dose de FeLV vencida em 08/05/2023<br /><span style="font-weight:500;color:#A72020">Dieta restrita — ração gastrointestinal</span></div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;overflow:hidden">
+              <div style="height:46px;padding:0 16px;border-bottom:1px solid #E9EDF3;display:flex;align-items:center;font-weight:700;font-size:14.5px;line-height:1;color:#1B222B">Identificação</div>
+              <div style="padding:14px 16px;display:flex;flex-direction:column">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0"><span style="font-weight:500;font-size:13.5px;line-height:1;color:#64738C">Espécie</span><span style="font-weight:600;font-size:13.5px;line-height:1;color:#1B222B">Felis catus</span></div>
+                <div style="height:1px;background:#F1F4F8"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0"><span style="font-weight:500;font-size:13.5px;line-height:1;color:#64738C">Sexo</span><span style="font-weight:600;font-size:13.5px;line-height:1;color:#1B222B">Macho</span></div>
+                <div style="height:1px;background:#F1F4F8"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0"><span style="font-weight:500;font-size:13.5px;line-height:1;color:#64738C">Nascimento</span><span style="font-weight:600;font-size:13.5px;line-height:1;color:#1B222B">15/03/2023</span></div>
+                <div style="height:1px;background:#F1F4F8"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0"><span style="font-weight:500;font-size:13.5px;line-height:1;color:#64738C">Pelagem</span><span style="font-weight:600;font-size:13.5px;line-height:1;color:#1B222B">Rajado cinza</span></div>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+              <div style="width:40px;height:40px;border-radius:9999px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;line-height:1;color:#5B3FBF">RB</div>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14.5px;line-height:1.2;color:#1B222B">Rafael Bueno</div><div style="font-weight:500;font-size:12.5px;line-height:1.4;color:#8391AB">(11) 99999-8888</div></div>
+              <div style="width:44px;height:44px;border-radius:12px;border:1px solid #D3DAE5;display:flex;align-items:center;justify-content:center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#12615C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 5.5c0 8 6 14 14 14l1.5-3.5-4-1.5-2 2c-2.4-1.2-4.3-3.1-5.5-5.5l2-2L9 5H5.5z"></path></svg></div>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF;border-top:1px solid #E9EDF3;padding:12px 20px 24px;display:flex;flex-direction:column;gap:10px">
+            <div style="height:52px;border-radius:12px;background:#137A72;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:16px;line-height:1;color:#FFFFFF"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Novo atendimento</div>
+            <div style="width:140px;height:5px;border-radius:9999px;background:#D3DAE5;margin:0 auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:24px 28px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1700px">
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Campos exibidos</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Do <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">PatientDetail</span>: name, species, sex, breed, color, birth_date (com idade derivada), photo_url, updated_at. Do tutor aninhado: name, phone, email. Nada fora do schema.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Ações</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Editar (<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">PATCH /patients/{id}</span>), Novo atendimento, Trocar tutor, Ver perfil do tutor, ligar/e-mail no mobile, ⋯ com Trocar foto, Exportar prontuário e Excluir paciente (destrutivo, com confirmação por digitação do nome).</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Layout</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Header fixo do paciente + 4 abas. Faixa de 4 cards-resumo, depois grid 1fr/340px: Identificação (definition list em 2 colunas) e Tutor. Mobile: header compacto, abas roláveis, 3 cards, lista de linhas rotuladas.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Responsividade</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">≥1280 como no frame · 1024–1279 cards 2×2 e coluna do tutor abaixo · &lt;768 header compacto, abas com rolagem horizontal, ações no botão fixo inferior e no ⋯.</div></div>
+    </div>
+  </div>
+
+  <!-- ============ 02 HISTÓRICO + EVOLUÇÃO ============ -->
+  <div style="display:flex;flex-direction:column;gap:20px;margin:0 0 56px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;color:#137A72;text-transform:uppercase">Tela 08 · aba 2</div>
+      <div style="height:1px;flex:1;background:#D3DAE5"></div>
+      <div style="font-weight:700;font-size:20px;line-height:1.2;color:#1B222B">Histórico + Evolução clínica</div>
+    </div>
+    <p style="margin:0;max-width:92ch;font-size:14.5px;line-height:1.65;color:#4E5B71">Timeline à esquerda, evolução do atendimento selecionado à direita. Ler a evolução sem perder o lugar na linha do tempo é o gesto mais frequente do plantão — por isso as duas coisas dividem a tela em vez de virarem navegações separadas.</p>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">DESKTOP · 1280 × 800 · atendimento de 12/07 selecionado</div>
+      <div data-screen-label="08b Histórico · desktop" style="width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#F7F9FB;box-shadow:0 24px 56px rgba(27,34,43,.14);display:flex;flex-direction:column">
+        <div style="background:#FFFFFF;border-bottom:1px solid #E9EDF3;padding:16px 32px 0;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:44px;height:44px;border-radius:14px;background:#FFF1E6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;line-height:1;color:#944B07">MI</div>
+            <div style="flex:1"><div style="font-weight:700;font-size:19px;line-height:1.2;color:#1B222B">Miso</div><div style="font-weight:500;font-size:13px;line-height:1.4;color:#64738C">Macho · SRD · 3a 4m · Rafael Bueno</div></div>
+            <div style="height:38px;border-radius:10px;border:1px solid #D3DAE5;padding:0 14px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;line-height:1;color:#4E5B71"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4E5B71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7.5 10.5 4.5 4.5 4.5-4.5"></path><path d="M4 20h16"></path></svg>Exportar PDF</div>
+            <div style="height:38px;border-radius:10px;background:#137A72;padding:0 16px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;line-height:1;color:#FFFFFF"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Novo atendimento</div>
+          </div>
+          <div style="display:flex;gap:28px">
+            <div style="height:42px;display:flex;align-items:center;border-bottom:2px solid transparent;font-weight:500;font-size:14.5px;line-height:1;color:#64738C">Dados básicos</div>
+            <div style="height:42px;display:flex;align-items:center;gap:8px;border-bottom:2px solid #137A72;font-weight:700;font-size:14.5px;line-height:1;color:#12615C">Histórico<span style="height:20px;min-width:20px;padding:0 6px;border-radius:9999px;background:#D5F2EE;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11.5px;line-height:1;color:#12615C">12</span></div>
+            <div style="height:42px;display:flex;align-items:center;border-bottom:2px solid transparent;font-weight:500;font-size:14.5px;line-height:1;color:#64738C">Vacinas</div>
+            <div style="height:42px;display:flex;align-items:center;border-bottom:2px solid transparent;font-weight:500;font-size:14.5px;line-height:1;color:#64738C">Pesagens</div>
+          </div>
+        </div>
+
+        <div style="flex:1;display:grid;grid-template-columns:400px 1fr;overflow:hidden">
+          <div style="border-right:1px solid #E9EDF3;background:#FFFFFF;display:flex;flex-direction:column;overflow:hidden">
+            <div style="height:56px;padding:0 20px;border-bottom:1px solid #E9EDF3;display:flex;align-items:center;gap:8px">
+              <div style="flex:1;height:36px;border:1px solid #D3DAE5;border-radius:9px;padding:0 10px;display:flex;align-items:center;gap:8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8391AB" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg><span style="font-weight:500;font-size:13.5px;line-height:1;color:#8391AB">Buscar no histórico</span></div>
+              <div style="height:36px;border:1px solid #D3DAE5;border-radius:9px;padding:0 10px;display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px;line-height:1;color:#4E5B71">2026<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></div>
+            </div>
+
+            <div style="flex:1;padding:16px 20px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase;margin-bottom:12px">Julho de 2026</div>
+
+              <div style="display:flex;gap:14px">
+                <div style="display:flex;flex-direction:column;align-items:center;flex:none;width:12px"><div style="width:12px;height:12px;border-radius:9999px;background:#137A72;box-shadow:0 0 0 3px #D5F2EE"></div><div style="width:2px;flex:1;background:#E9EDF3"></div></div>
+                <div style="flex:1;background:#F0FAF8;border:1px solid #9FDDD5;border-radius:12px;padding:14px;margin-bottom:12px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="font-weight:700;font-size:14.5px;line-height:1.3;color:#1B222B">Gastrite aguda</div><div style="font-weight:600;font-size:12.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#12615C">12/07</div></div>
+                  <div style="font-weight:500;font-size:13px;line-height:1.5;color:#4E5B71;margin-top:4px">Vômito há 2 dias · 4,4 kg</div>
+                  <div style="display:flex;gap:6px;margin-top:10px"><span style="height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:6px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:11.5px;line-height:1;color:#4E5B71">Clínica Vida Animal</span><span style="height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:6px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:11.5px;line-height:1;color:#4E5B71">Com receita</span></div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:14px">
+                <div style="display:flex;flex-direction:column;align-items:center;flex:none;width:12px"><div style="width:12px;height:12px;border-radius:9999px;background:#FFFFFF;border:2px solid #D3DAE5"></div><div style="width:2px;flex:1;background:#E9EDF3"></div></div>
+                <div style="flex:1;border:1px solid #E9EDF3;border-radius:12px;padding:14px;margin-bottom:12px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="font-weight:700;font-size:14.5px;line-height:1.3;color:#1B222B">Retorno · reavaliação</div><div style="font-weight:600;font-size:12.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#64738C">03/07</div></div>
+                  <div style="font-weight:500;font-size:13px;line-height:1.5;color:#4E5B71;margin-top:4px">Sem novas crises · 4,5 kg</div>
+                </div>
+              </div>
+
+              <div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase;margin:4px 0 12px">Maio de 2026</div>
+
+              <div style="display:flex;gap:14px">
+                <div style="display:flex;flex-direction:column;align-items:center;flex:none;width:12px"><div style="width:12px;height:12px;border-radius:9999px;background:#FFFFFF;border:2px solid #D3DAE5"></div><div style="width:2px;flex:1;background:#E9EDF3"></div></div>
+                <div style="flex:1;border:1px solid #E9EDF3;border-radius:12px;padding:14px;margin-bottom:12px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="font-weight:700;font-size:14.5px;line-height:1.3;color:#1B222B">Check-up anual</div><div style="font-weight:600;font-size:12.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#64738C">18/05</div></div>
+                  <div style="font-weight:500;font-size:13px;line-height:1.5;color:#4E5B71;margin-top:4px">Exames sem alterações · 4,2 kg</div>
+                  <div style="display:flex;gap:6px;margin-top:10px"><span style="height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:6px;background:#F7F9FB;border:1px solid #E9EDF3;font-weight:600;font-size:11.5px;line-height:1;color:#64738C">Domiciliar</span></div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:14px">
+                <div style="display:flex;flex-direction:column;align-items:center;flex:none;width:12px"><div style="width:12px;height:12px;border-radius:9999px;background:#FFFFFF;border:2px solid #D3DAE5"></div></div>
+                <div style="flex:1;border:1px solid #E9EDF3;border-radius:12px;padding:14px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="font-weight:700;font-size:14.5px;line-height:1.3;color:#1B222B">Aplicação de vacina</div><div style="font-weight:600;font-size:12.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#64738C">02/05</div></div>
+                  <div style="font-weight:500;font-size:13px;line-height:1.5;color:#4E5B71;margin-top:4px">V4 felina · reforço · 4,0 kg</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;overflow:hidden;background:#F7F9FB">
+            <div style="height:64px;background:#FFFFFF;border-bottom:1px solid #E9EDF3;padding:0 28px;display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-weight:700;font-size:16px;line-height:1.2;color:#1B222B">Atendimento de 12 de julho de 2026</div><div style="font-weight:500;font-size:12.5px;line-height:1.4;color:#8391AB;margin-top:2px">Clínica Vida Animal · Dra. Ana Lima · registrado às 14h32</div></div>
+              <div style="display:flex;gap:8px">
+                <div style="height:36px;border-radius:9px;border:1px solid #D3DAE5;padding:0 14px;display:flex;align-items:center;font-weight:600;font-size:13.5px;line-height:1;color:#4E5B71">Editar</div>
+                <div style="width:36px;height:36px;border-radius:9px;border:1px solid #D3DAE5;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4E5B71" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5.5" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="12" cy="18.5" r="1.2"></circle></svg></div>
+              </div>
+            </div>
+
+            <div style="flex:1;padding:20px 28px;display:flex;flex-direction:column;gap:14px;overflow:hidden">
+              <div style="display:flex;gap:12px">
+                <div style="flex:1;background:#FFFFFF;border:1px solid #E9EDF3;border-radius:12px;padding:14px"><div style="font-weight:600;font-size:11.5px;line-height:1;color:#64738C">Peso no atendimento</div><div style="font-weight:700;font-size:20px;line-height:1.2;color:#1B222B;margin-top:5px">4,4 kg</div></div>
+                <div style="flex:1;background:#FFFFFF;border:1px solid #E9EDF3;border-radius:12px;padding:14px"><div style="font-weight:600;font-size:11.5px;line-height:1;color:#64738C">Local</div><div style="font-weight:700;font-size:14.5px;line-height:1.3;color:#1B222B;margin-top:5px">Clínica Vida Animal</div></div>
+                <div style="flex:1;background:#FFFFFF;border:1px solid #E9EDF3;border-radius:12px;padding:14px"><div style="font-weight:600;font-size:11.5px;line-height:1;color:#64738C">Retorno sugerido</div><div style="font-weight:700;font-size:14.5px;line-height:1.3;color:#1B222B;margin-top:5px">19/07/2026</div></div>
+              </div>
+
+              <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:20px 24px;display:flex;flex-direction:column;gap:18px;flex:1;overflow:hidden">
+                <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Queixa principal</div><div style="font-weight:500;font-size:14.5px;line-height:1.6;color:#1B222B">Vômito há 2 dias, sem sangue, associado a apatia leve.</div></div>
+                <div style="height:1px;background:#F1F4F8"></div>
+                <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Anamnese</div><div style="font-weight:500;font-size:14.5px;line-height:1.6;color:#1B222B">Quadro iniciou após troca de ração seca por marca nova. Tutor relata ingestão hídrica normal e ausência de diarreia. Sem acesso à rua.</div></div>
+                <div style="height:1px;background:#F1F4F8"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+                  <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Diagnóstico</div><div style="font-weight:600;font-size:14.5px;line-height:1.6;color:#1B222B">Gastrite aguda</div></div>
+                  <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Tratamento</div><div style="font-weight:500;font-size:14.5px;line-height:1.6;color:#1B222B">Omeprazol 1 mg/kg por 7 dias</div></div>
+                </div>
+                <div style="height:1px;background:#F1F4F8"></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:#8391AB;text-transform:uppercase">Prescrição</div>
+                  <div style="border:1px solid #E9EDF3;background:#F7F9FB;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between">
+                    <div style="font-weight:500;font-size:14px;line-height:1.55;color:#1B222B">Omeprazol comprimido 10 mg — 1× ao dia — 7 dias<br /><span style="color:#64738C">Retorno da ração anterior em 48 h.</span></div>
+                    <div style="height:34px;border-radius:8px;border:1px solid #D3DAE5;background:#FFFFFF;padding:0 12px;display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px;line-height:1;color:#4E5B71;flex:none">Imprimir</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:24px 28px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1700px">
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Campos exibidos</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Timeline: date, diagnosis (ou chief_complaint como fallback), weight_kg, local resolvido de location_type/location_id/ad_hoc_location_name. Evolução: chief_complaint, history, diagnosis, treatment, prescription, notes, created_at.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Ações</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Selecionar atendimento, buscar por texto, filtrar por ano, Editar (<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">PATCH</span>), Excluir (<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">DELETE</span>, confirmação), Imprimir prescrição, Exportar prontuário em PDF, Novo atendimento.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Layout</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Master–detail 400px / resto. Timeline agrupada por mês, mais recente no topo, item selecionado em primary-50 com borda. Evolução em blocos rotulados, com prescrição destacada por ser o que mais se imprime.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Responsividade</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">&lt;1024 o master–detail vira navegação em dois passos: timeline em lista cheia; tocar abre a evolução como página com voltar. Campos nulos não renderizam rótulo vazio — a seção simplesmente não aparece.</div></div>
+    </div>
+  </div>
+
+  <!-- ============ 03 VACINAS + PESAGENS ============ -->
+  <div style="display:flex;flex-direction:column;gap:20px;margin:0 0 56px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;color:#137A72;text-transform:uppercase">Tela 08 · abas 3 e 4</div>
+      <div style="height:1px;flex:1;background:#D3DAE5"></div>
+      <div style="font-weight:700;font-size:20px;line-height:1.2;color:#1B222B">Vacinas · Pesagens</div>
+    </div>
+
+    <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">ABA VACINAS · área de conteúdo 1032 × 620</div>
+        <div data-screen-label="08c Vacinas" style="width:1032px;height:620px;background:#F7F9FB;border:1px solid #E9EDF3;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 56px rgba(27,34,43,.12)">
+          <div style="padding:24px 28px;display:flex;flex-direction:column;gap:16px;flex:1;overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-weight:700;font-size:17px;line-height:1.2;color:#1B222B">Carteira de vacinação</div><div style="font-weight:500;font-size:13.5px;line-height:1.5;color:#64738C;margin-top:3px">4 registros · 1 dose em atraso · próximo reforço em 14/11/2026</div></div>
+              <div style="height:40px;border-radius:10px;background:#137A72;padding:0 16px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;line-height:1;color:#FFFFFF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Registrar vacina</div>
+            </div>
+
+            <div style="border:1px solid #FDC9C9;background:#FEF2F2;border-radius:12px;padding:12px 16px;display:flex;gap:10px;align-items:center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C82A2A" stroke-width="2" stroke-linecap="round" style="flex:none"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.5v.01"></path></svg>
+              <div style="flex:1;font-weight:600;font-size:13.5px;line-height:1.45;color:#8A1F1F">2ª dose de FeLV vencida há mais de 3 anos — protocolo interrompido. <span style="font-weight:500;color:#A72020">Antirrábica vence em 99 dias; lembrete automático 15 dias antes.</span></div>
+              <div style="height:32px;border-radius:8px;background:#FFFFFF;border:1px solid #FDC9C9;padding:0 12px;display:flex;align-items:center;font-weight:600;font-size:13px;line-height:1;color:#8A1F1F;flex:none">Reiniciar protocolo</div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;overflow:hidden;flex:1">
+              <div style="height:40px;padding:0 20px;background:#F7F9FB;border-bottom:1px solid #E9EDF3;display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr 1.2fr 40px;align-items:center;gap:16px;font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase"><div>Vacina</div><div>Dose</div><div>Aplicação</div><div>Próxima dose</div><div>Situação</div><div></div></div>
+
+              <div style="padding:0 20px;height:60px;display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr 1.2fr 40px;align-items:center;gap:16px;border-bottom:1px solid #F1F4F8">
+                <div><div style="font-weight:600;font-size:14.5px;line-height:1.2;color:#1B222B">Antirrábica</div><div style="font-weight:500;font-size:12.5px;line-height:1.4;color:#8391AB">Lote RB-2291</div></div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">Anual</div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">14/11/2025</div>
+                <div style="font-weight:600;font-size:14px;line-height:1;color:#7A3B0D">14/11/2026</div>
+                <div><span style="height:26px;display:inline-flex;align-items:center;padding:0 10px;border-radius:9999px;background:#FFF9EB;color:#7A3B0D;font-weight:600;font-size:12.5px;line-height:1">Vence em 99 dias</span></div>
+                <div style="display:flex;justify-content:flex-end"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#AEB9CB" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5.5" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="12" cy="18.5" r="1.2"></circle></svg></div>
+              </div>
+
+              <div style="padding:0 20px;height:60px;display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr 1.2fr 40px;align-items:center;gap:16px;border-bottom:1px solid #F1F4F8">
+                <div><div style="font-weight:600;font-size:14.5px;line-height:1.2;color:#1B222B">V4 felina (quádrupla)</div><div style="font-weight:500;font-size:12.5px;line-height:1.4;color:#8391AB">Lote V4-8830</div></div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">Reforço</div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">02/05/2026</div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">02/05/2027</div>
+                <div><span style="height:26px;display:inline-flex;align-items:center;padding:0 10px;border-radius:9999px;background:#ECFDF3;color:#0D6943;font-weight:600;font-size:12.5px;line-height:1">Em dia</span></div>
+                <div style="display:flex;justify-content:flex-end"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#AEB9CB" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5.5" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="12" cy="18.5" r="1.2"></circle></svg></div>
+              </div>
+
+              <div style="padding:0 20px;height:60px;display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr 1.2fr 40px;align-items:center;gap:16px;border-bottom:1px solid #F1F4F8">
+                <div><div style="font-weight:600;font-size:14.5px;line-height:1.2;color:#1B222B">V4 felina (quádrupla)</div><div style="font-weight:500;font-size:12.5px;line-height:1.4;color:#8391AB">Lote V4-7712</div></div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">2ª dose</div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">28/05/2023</div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#8391AB">—</div>
+                <div><span style="height:26px;display:inline-flex;align-items:center;padding:0 10px;border-radius:9999px;background:#F1F4F8;color:#4E5B71;font-weight:600;font-size:12.5px;line-height:1">Concluída</span></div>
+                <div style="display:flex;justify-content:flex-end"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#AEB9CB" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5.5" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="12" cy="18.5" r="1.2"></circle></svg></div>
+              </div>
+
+              <div style="padding:0 20px;height:60px;display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr 1.2fr 40px;align-items:center;gap:16px">
+                <div><div style="font-weight:600;font-size:14.5px;line-height:1.2;color:#1B222B">Leucemia felina (FeLV)</div><div style="font-weight:500;font-size:12.5px;line-height:1.4;color:#8391AB">Lote FL-1043</div></div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">1ª dose</div>
+                <div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">10/04/2023</div>
+                <div style="font-weight:600;font-size:14px;line-height:1;color:#8A1F1F">08/05/2023</div>
+                <div><span style="height:26px;display:inline-flex;align-items:center;padding:0 10px;border-radius:9999px;background:#FEF2F2;color:#8A1F1F;font-weight:600;font-size:12.5px;line-height:1">2ª dose não aplicada</span></div>
+                <div style="display:flex;justify-content:flex-end"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#AEB9CB" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5.5" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="12" cy="18.5" r="1.2"></circle></svg></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">ABA PESAGENS · área de conteúdo 620 × 620</div>
+        <div data-screen-label="08d Pesagens" style="width:620px;height:620px;background:#F7F9FB;border:1px solid #E9EDF3;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 56px rgba(27,34,43,.12)">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px;flex:1;overflow:hidden">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+              <div><div style="font-weight:700;font-size:17px;line-height:1.2;color:#1B222B">Curva de peso</div><div style="font-weight:500;font-size:13.5px;line-height:1.5;color:#64738C;margin-top:3px">6 medições em 14 meses</div></div>
+              <div style="height:32px;border:1px solid #D3DAE5;border-radius:9999px;background:#FFFFFF;padding:3px;display:flex;gap:3px">
+                <div style="border-radius:9999px;background:#1B222B;color:#FFFFFF;padding:0 12px;display:flex;align-items:center;font-weight:600;font-size:12.5px;line-height:1">12 m</div>
+                <div style="border-radius:9999px;padding:0 12px;display:flex;align-items:center;font-weight:600;font-size:12.5px;line-height:1;color:#4E5B71">Tudo</div>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:20px 16px 12px" data-om-raster="true">
+              <svg width="100%" viewBox="0 0 560 200" style="display:block">
+                <line x1="30" y1="20" x2="540" y2="20" stroke="#F1F4F8" stroke-width="1"></line>
+                <line x1="30" y1="85" x2="540" y2="85" stroke="#F1F4F8" stroke-width="1"></line>
+                <line x1="30" y1="150" x2="540" y2="150" stroke="#E9EDF3" stroke-width="1"></line>
+                <text x="0" y="24" font-family="JetBrains Mono, monospace" font-size="11" fill="#8391AB">4,8</text>
+                <text x="0" y="89" font-family="JetBrains Mono, monospace" font-size="11" fill="#8391AB">3,8</text>
+                <text x="0" y="154" font-family="JetBrains Mono, monospace" font-size="11" fill="#8391AB">2,8</text>
+                <path d="M30 130.5 L128 98 L226 72 L324 59 L422 39.5 L520 46 L520 150 L30 150 Z" fill="#D5F2EE" opacity=".55"></path>
+                <polyline points="30,130.5 128,98 226,72 324,59 422,39.5 520,46" fill="none" stroke="#137A72" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                <circle cx="30" cy="130.5" r="4.5" fill="#FFFFFF" stroke="#137A72" stroke-width="2.5"></circle>
+                <circle cx="128" cy="98" r="4.5" fill="#FFFFFF" stroke="#137A72" stroke-width="2.5"></circle>
+                <circle cx="226" cy="72" r="4.5" fill="#FFFFFF" stroke="#137A72" stroke-width="2.5"></circle>
+                <circle cx="324" cy="59" r="4.5" fill="#FFFFFF" stroke="#137A72" stroke-width="2.5"></circle>
+                <circle cx="422" cy="39.5" r="4.5" fill="#FFFFFF" stroke="#137A72" stroke-width="2.5"></circle>
+                <circle cx="520" cy="46" r="6" fill="#137A72" stroke="#FFFFFF" stroke-width="2.5"></circle>
+                <text x="30" y="176" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="500" fill="#8391AB" text-anchor="middle">mai/25</text>
+                <text x="128" y="176" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="500" fill="#8391AB" text-anchor="middle">ago/25</text>
+                <text x="226" y="176" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="500" fill="#8391AB" text-anchor="middle">nov/25</text>
+                <text x="324" y="176" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="500" fill="#8391AB" text-anchor="middle">fev/26</text>
+                <text x="422" y="176" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="500" fill="#8391AB" text-anchor="middle">mai/26</text>
+                <text x="520" y="176" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="600" fill="#12615C" text-anchor="middle">jul/26</text>
+              </svg>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;overflow:hidden;flex:1">
+              <div style="height:38px;padding:0 16px;background:#F7F9FB;border-bottom:1px solid #E9EDF3;display:grid;grid-template-columns:1fr 1fr 1.4fr;align-items:center;gap:12px;font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase"><div>Data</div><div>Peso</div><div>Variação</div></div>
+              <div style="padding:0 16px;height:48px;display:grid;grid-template-columns:1fr 1fr 1.4fr;align-items:center;gap:12px;border-bottom:1px solid #F1F4F8"><div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">12/07/2026</div><div style="font-weight:700;font-size:14px;line-height:1;color:#1B222B">4,4 kg</div><div style="font-weight:600;font-size:13.5px;line-height:1;color:#944B07">−0,1 kg · −2,2%</div></div>
+              <div style="padding:0 16px;height:48px;display:grid;grid-template-columns:1fr 1fr 1.4fr;align-items:center;gap:12px;border-bottom:1px solid #F1F4F8"><div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">03/07/2026</div><div style="font-weight:700;font-size:14px;line-height:1;color:#1B222B">4,5 kg</div><div style="font-weight:600;font-size:13.5px;line-height:1;color:#0D6943">+0,3 kg · +7,1%</div></div>
+              <div style="padding:0 16px;height:48px;display:grid;grid-template-columns:1fr 1fr 1.4fr;align-items:center;gap:12px"><div style="font-weight:500;font-size:14px;line-height:1;color:#4E5B71">18/05/2026</div><div style="font-weight:700;font-size:14px;line-height:1;color:#1B222B">4,2 kg</div><div style="font-weight:600;font-size:13.5px;line-height:1;color:#0D6943">+0,2 kg · +5,0%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:24px 28px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1700px">
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Vacinas · campos e ações</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Vacina, dose, data de aplicação, próxima dose, lote, situação. Ações: registrar, editar, excluir, reiniciar protocolo, enviar lembrete ao tutor. <strong style="font-weight:600;color:#1B222B">Regra de derivação:</strong> atrasada se <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">next_due_at &lt; hoje</span>; a vencer se em até 120 dias; em dia caso contrário; concluída quando <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">next_due_at</span> é nulo. O pill do header assume a pior situação da carteira — por isso Miso aparece como “Vacina atrasada”. Situação nunca depende só da cor.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Vacinas · schema proposto</div><div style="font-size:14px;line-height:1.6;color:#4E5B71"><span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">Vaccination { id, patient_id, vaccine_name, dose_label, applied_at, next_due_at?, batch?, notes? }</span> com <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">GET/POST /patients/{id}/vaccinations</span>. Sem isso, a aba fica desabilitada com aviso, não quebrada.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Pesagens · origem</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Série montada de <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">weight_kg</span> dos atendimentos (<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">GET /patients/{id}/appointments</span>), ignorando os nulos. Não é um recurso novo — é uma leitura diferente dos mesmos dados. Faixa 0,1–30 kg conforme a API.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Responsividade</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Tabela de vacinas vira cards empilhados abaixo de 768px (vacina + situação no topo, datas embaixo). O gráfico mantém proporção 16:6 com no máximo 6 rótulos no eixo; ponto ativo por toque, não hover.</div></div>
+    </div>
+  </div>
+
+  <!-- ============ 04 ESTADOS ============ -->
+  <div style="display:flex;flex-direction:column;gap:20px;margin:0 0 56px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;color:#137A72;text-transform:uppercase">Estados</div>
+      <div style="height:1px;flex:1;background:#D3DAE5"></div>
+      <div style="font-weight:700;font-size:20px;line-height:1.2;color:#1B222B">Vazio · carregando · erro</div>
+    </div>
+
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <div style="width:400px;background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-weight:700;font-size:15px;line-height:1.3;color:#1B222B">Histórico vazio</div>
+        <div style="border:1px solid #E9EDF3;border-radius:14px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
+          <div style="width:56px;height:56px;border-radius:9999px;background:#D5F2EE;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#12615C" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h9l3.5 3.5v13.5H6z"></path><path d="M9.5 11h6"></path><path d="M9.5 15h4"></path></svg></div>
+          <div><div style="font-weight:700;font-size:15px;line-height:1.3;color:#1B222B">Nenhum atendimento ainda</div><div style="font-weight:500;font-size:13.5px;line-height:1.55;color:#64738C;margin-top:4px">O histórico de Miso começa no primeiro registro. Peso e evolução entram junto.</div></div>
+          <div style="height:40px;border-radius:10px;background:#137A72;padding:0 18px;display:flex;align-items:center;font-weight:700;font-size:14px;line-height:1;color:#FFFFFF">Registrar atendimento</div>
+        </div>
+      </div>
+
+      <div style="width:400px;background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-weight:700;font-size:15px;line-height:1.3;color:#1B222B">Carregando · skeleton</div>
+        <div style="border:1px solid #E9EDF3;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:14px;background:#E9EDF3"></div><div style="flex:1;display:flex;flex-direction:column;gap:7px"><div style="height:12px;width:52%;border-radius:6px;background:#E9EDF3"></div><div style="height:10px;width:72%;border-radius:6px;background:#F1F4F8"></div></div></div>
+          <div style="height:1px;background:#F1F4F8"></div>
+          <div style="display:flex;flex-direction:column;gap:10px"><div style="height:11px;width:100%;border-radius:6px;background:#E9EDF3"></div><div style="height:11px;width:88%;border-radius:6px;background:#F1F4F8"></div><div style="height:11px;width:64%;border-radius:6px;background:#F1F4F8"></div></div>
+          <div style="height:1px;background:#F1F4F8"></div>
+          <div style="display:flex;gap:10px"><div style="flex:1;height:52px;border-radius:10px;background:#F1F4F8"></div><div style="flex:1;height:52px;border-radius:10px;background:#F1F4F8"></div></div>
+        </div>
+        <span style="font-weight:500;font-size:12.5px;line-height:1.5;color:#64738C">Skeleton respeita a silhueta real do conteúdo. Header do paciente carrega primeiro; abas só depois de <span style="font-family:'JetBrains Mono',monospace;font-size:12px">PatientDetail</span> resolver.</span>
+      </div>
+
+      <div style="width:400px;background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-weight:700;font-size:15px;line-height:1.3;color:#1B222B">Erro por seção</div>
+        <div style="border:1px solid #FDC9C9;background:#FEF2F2;border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C82A2A" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.5v.01"></path></svg>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;line-height:1.4;color:#8A1F1F">Não foi possível carregar o histórico</div><div style="font-weight:500;font-size:13.5px;line-height:1.55;color:#A72020;margin-top:2px">Os dados básicos de Miso continuam disponíveis acima.</div><div style="height:34px;border-radius:8px;background:#FFFFFF;border:1px solid #FDC9C9;padding:0 12px;display:inline-flex;align-items:center;font-weight:600;font-size:13px;line-height:1;color:#8A1F1F;margin-top:10px">Tentar novamente</div></div>
+        </div>
+        <div style="border:1px solid #E9EDF3;background:#F7F9FB;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-weight:700;font-size:13.5px;line-height:1.4;color:#1B222B">Paciente inexistente · 404</div>
+          <div style="font-weight:500;font-size:13px;line-height:1.55;color:#64738C">Página inteira substituída por estado de erro com botão “Voltar para pacientes”. 403 usa a mesma estrutura, com texto de permissão.</div>
+        </div>
+        <div style="border:1px solid #E9EDF3;background:#F7F9FB;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-weight:700;font-size:13.5px;line-height:1.4;color:#1B222B">Aba sem endpoint</div>
+          <div style="font-weight:500;font-size:13px;line-height:1.55;color:#64738C">Enquanto Vacinas não existir na API, a aba aparece desabilitada com tooltip “Disponível em breve” — nunca uma tela quebrada.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:28px 32px;max-width:1180px;display:flex;flex-direction:column;gap:18px">
+    <div style="font-weight:700;font-size:18px;line-height:1.3;color:#1B222B">Decisões de UX/UI — e por quê</div>
+    <div style="display:grid;grid-template-columns:210px 1fr;gap:16px 24px;align-items:start">
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Header fixo + abas</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">Quem é o paciente, quanto pesa e qual o alerta ativo não podem sair de vista ao navegar entre seções. Abas também isolam o carregamento: uma seção lenta não segura as outras.</div>
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Quatro cards-resumo no topo</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">Peso atual, último atendimento, próxima vacina e alerta respondem quase toda consulta rápida de plantão sem abrir aba nenhuma.</div>
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Evolução como painel, não página</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">Comparar dois atendimentos é rotina. Master–detail mantém a timeline visível e troca só o conteúdo, poupando um ir-e-voltar por comparação.</div>
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Pesagens como leitura, não recurso</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">O peso já é gravado no atendimento. Criar um cadastro separado duplicaria a fonte da verdade e abriria espaço para divergência.</div>
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Vacinas explicitamente sinalizada</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">Desenhar uma seção sem backend e não avisar produziria uma estimativa errada no handoff. O schema mínimo vai junto para que a decisão seja de produto, não descoberta em sprint.</div>
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Preparado para expansão</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">Exames, internação e anexos entram como novas abas sem redesenho: o header, os cards e o padrão master–detail já são o contêiner. Abas passam de 4 a 6 com rolagem horizontal no mobile.</div>
+    </div>
+  </div>
+
+  <p style="margin:32px 0 0;font-size:14px;line-height:1.6;color:#64738C;max-width:88ch">Próximas telas sugeridas: <strong style="font-weight:600;color:#1B222B">Novo atendimento</strong> (formulário que alimenta histórico, pesagens e evolução) e <strong style="font-weight:600;color:#1B222B">Lista completa de pacientes</strong> com filtros e paginação.</p>
+</section>
+</x-dc>
+</body>
+</html>

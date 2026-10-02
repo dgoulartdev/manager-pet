@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #EEF2F7; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: #12615C; text-decoration: none; }
+  a:hover { color: #137A72; }
+</style>
+</helmet>
+
+<section style="padding:56px;font-family:'Plus Jakarta Sans',system-ui,sans-serif">
+  <div style="display:flex;align-items:baseline;gap:12px;margin:0 0 10px">
+    <span style="font-weight:700;font-size:14px;line-height:1.2;color:#1B222B">Cadastro de Felino · alta fidelidade</span>
+  </div>
+  <p style="margin:0 0 24px;max-width:96ch;font-size:15px;line-height:1.65;color:#4E5B71;text-wrap:pretty">Documento independente. Destino dos CTAs <strong style="font-weight:600;color:#1B222B">“Novo felino”</strong> e <strong style="font-weight:600;color:#1B222B">“Cadastrar primeiro felino”</strong> da Home. Campos, obrigatoriedade e limites vieram de <span style="font-family:'JetBrains Mono',monospace;font-size:13px">CreatePatientRequest</span> no <span style="font-family:'JetBrains Mono',monospace;font-size:13px">openapi.yaml</span>; nenhum campo foi inventado. Tokens, componentes e escala tipográfica idênticos aos documentos <a href="./Hi-Fi - Fluxo de Entrada.dc.html">Fluxo de Entrada</a> e <a href="./Hi-Fi - Home.dc.html">Home</a>, sem dependência entre os arquivos.</p>
+
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 40px">
+    <div style="padding:7px 13px;border-radius:9999px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:12.5px;line-height:1;color:#4E5B71">Obrigatórios: tutor_id · name</div>
+    <div style="padding:7px 13px;border-radius:9999px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:12.5px;line-height:1;color:#4E5B71">Opcionais: species · sex · breed · color · birth_date</div>
+    <div style="padding:7px 13px;border-radius:9999px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:12.5px;line-height:1;color:#4E5B71">Foto: PUT separado, pós-201</div>
+    <div style="padding:7px 13px;border-radius:9999px;background:#FFFFFF;border:1px solid #D3DAE5;font-weight:600;font-size:12.5px;line-height:1;color:#4E5B71">Desktop 1280×800 · Mobile 390×844</div>
+  </div>
+
+  <!-- ============ 01 DESKTOP · FORMULÁRIO ============ -->
+  <div style="display:flex;flex-direction:column;gap:20px;margin:0 0 56px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;color:#137A72;text-transform:uppercase">Tela 07</div>
+      <div style="height:1px;flex:1;background:#D3DAE5"></div>
+      <div style="font-weight:700;font-size:20px;line-height:1.2;color:#1B222B">Cadastrar felino</div>
+    </div>
+
+    <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">DESKTOP · 1280 × 800 · preenchido, pronto para salvar</div>
+        <div data-screen-label="07 Cadastro felino · desktop" style="width:1280px;height:800px;border-radius:16px;overflow:hidden;display:grid;grid-template-columns:248px 1fr;background:#F7F9FB;box-shadow:0 24px 56px rgba(27,34,43,.14),0 4px 12px rgba(27,34,43,.08)">
+
+          <div style="background:#FFFFFF;border-right:1px solid #E9EDF3;padding:24px 16px;display:flex;flex-direction:column;gap:24px">
+            <div style="display:flex;align-items:center;gap:10px;padding:0 8px">
+              <div style="width:32px;height:32px;border-radius:10px;background:#137A72;display:flex;align-items:center;justify-content:center">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.11 6.5 2.11A9.28 9.28 0 0 1 12 5Z"></path><path d="M8 14v.5"></path><path d="M16 14v.5"></path></svg>
+              </div>
+              <div style="font-weight:700;font-size:16px;line-height:1;color:#1B222B">Felinos</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="height:44px;border-radius:10px;padding:0 12px;display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path></svg><span style="font-weight:500;font-size:14.5px;line-height:1;color:#4E5B71">Início</span></div>
+              <div style="height:44px;border-radius:10px;padding:0 12px;display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"></rect><path d="M8 3v3"></path><path d="M16 3v3"></path><path d="M3.5 9.5h17"></path></svg><span style="font-weight:500;font-size:14.5px;line-height:1;color:#4E5B71">Agenda</span></div>
+              <div style="height:44px;border-radius:10px;background:#D5F2EE;padding:0 12px;display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12615C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h9l3.5 3.5v13.5H6z"></path><path d="M9.5 11h6"></path><path d="M9.5 15h4"></path></svg><span style="font-weight:600;font-size:14.5px;line-height:1;color:#12615C">Pacientes</span></div>
+              <div style="height:44px;border-radius:10px;padding:0 12px;display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg><span style="font-weight:500;font-size:14.5px;line-height:1;color:#4E5B71">Tutores</span></div>
+            </div>
+            <div style="margin-top:auto;border-top:1px solid #E9EDF3;padding-top:12px;display:flex;align-items:center;gap:10px">
+              <div style="width:34px;height:34px;border-radius:9999px;background:#D5F2EE;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;line-height:1;color:#12615C">AL</div>
+              <div><div style="font-weight:600;font-size:13.5px;line-height:1.2;color:#1B222B">Dra. Ana Lima</div><div style="font-weight:500;font-size:12px;line-height:1.3;color:#8391AB">CRMV-SP 34.221</div></div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;overflow:hidden">
+            <div style="height:72px;background:#FFFFFF;border-bottom:1px solid #E9EDF3;padding:0 32px;display:flex;align-items:center;gap:8px">
+              <a href="./Hi-Fi - Home.dc.html" style="font-weight:500;font-size:13.5px;line-height:1;color:#64738C">Pacientes</a>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#AEB9CB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg>
+              <span style="font-weight:600;font-size:13.5px;line-height:1;color:#1B222B">Novo felino</span>
+            </div>
+
+            <div style="flex:1;padding:28px 32px 0;display:flex;flex-direction:column;gap:20px;overflow:hidden">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <h1 style="margin:0;font-weight:700;font-size:24px;line-height:1.25;letter-spacing:-.015em;color:#1B222B">Cadastrar felino</h1>
+                <p style="margin:0;font-weight:400;font-size:14.5px;line-height:1.5;color:#4E5B71">Só nome e tutor são obrigatórios — o restante pode ser completado no primeiro atendimento.</p>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start">
+
+                <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:20px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="font-weight:700;font-size:15px;line-height:1;color:#1B222B">Identificação</div>
+                    <div style="height:1px;flex:1;background:#F1F4F8"></div>
+                  </div>
+
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Nome <span style="color:#C82A2A">*</span></label>
+                      <div style="height:44px;border:1px solid #1F988D;box-shadow:0 0 0 3px rgba(31,152,141,.35);border-radius:10px;padding:0 14px;display:flex;align-items:center;font-weight:500;font-size:15px;line-height:1;color:#1B222B">Miso</div>
+                      <div style="display:flex;justify-content:space-between"><span style="font-weight:500;font-size:12.5px;line-height:1.4;color:#64738C">Como o tutor chama o animal.</span><span style="font-weight:500;font-size:12px;line-height:1.4;font-family:'JetBrains Mono',monospace;color:#8391AB">4/120</span></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Espécie</label>
+                      <div style="height:44px;border:1px solid #D3DAE5;border-radius:10px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;background:#FFFFFF">
+                        <span style="font-weight:500;font-size:15px;line-height:1;color:#1B222B">Felis catus</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+                      </div>
+                      <span style="font-weight:500;font-size:12.5px;line-height:1.4;color:#64738C">Pré-selecionado. Alterável para casos atípicos.</span>
+                    </div>
+                  </div>
+
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Sexo</label>
+                      <div style="height:44px;border:1px solid #D3DAE5;border-radius:10px;background:#F7F9FB;padding:3px;display:grid;grid-template-columns:repeat(3,1fr);gap:3px">
+                        <div style="border-radius:8px;background:#FFFFFF;box-shadow:0 1px 2px rgba(27,34,43,.10);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13.5px;line-height:1;color:#1B222B">Macho</div>
+                        <div style="border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:13.5px;line-height:1;color:#64738C">Fêmea</div>
+                        <div style="border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:13.5px;line-height:1;color:#64738C">Não sei</div>
+                      </div>
+                      <span style="font-weight:500;font-size:12.5px;line-height:1.4;color:#64738C">Envia MALE · FEMALE · UNKNOWN.</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Data de nascimento</label>
+                      <div style="height:44px;border:1px solid #D3DAE5;border-radius:10px;padding:0 14px;display:flex;align-items:center;justify-content:space-between">
+                        <span style="font-weight:500;font-size:15px;line-height:1;color:#1B222B">15/03/2023</span>
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"></rect><path d="M8 3v3"></path><path d="M16 3v3"></path><path d="M3.5 9.5h17"></path></svg>
+                      </div>
+                      <span style="font-weight:500;font-size:12.5px;line-height:1.4;color:#0D6943">3 anos e 4 meses — calculado automaticamente.</span>
+                    </div>
+                  </div>
+
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Raça</label>
+                      <div style="height:44px;border:1px solid #D3DAE5;border-radius:10px;padding:0 14px;display:flex;align-items:center;justify-content:space-between"><span style="font-weight:500;font-size:15px;line-height:1;color:#1B222B">SRD (sem raça definida)</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Pelagem</label>
+                      <div style="height:44px;border:1px solid #D3DAE5;border-radius:10px;padding:0 14px;display:flex;align-items:center;font-weight:500;font-size:15px;line-height:1;color:#1B222B">Rajado cinza</div>
+                    </div>
+                  </div>
+
+                  <div style="display:flex;align-items:center;gap:8px;padding-top:4px">
+                    <div style="font-weight:700;font-size:15px;line-height:1;color:#1B222B">Tutor <span style="color:#C82A2A">*</span></div>
+                    <div style="height:1px;flex:1;background:#F1F4F8"></div>
+                  </div>
+
+                  <div style="border:1px solid #D3DAE5;border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;background:#FFFFFF">
+                    <div style="width:40px;height:40px;border-radius:9999px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;line-height:1;color:#5B3FBF">RB</div>
+                    <div style="flex:1;min-width:0">
+                      <div style="font-weight:600;font-size:14.5px;line-height:1.2;color:#1B222B">Rafael Bueno</div>
+                      <div style="font-weight:500;font-size:13px;line-height:1.4;color:#8391AB">(11) 99999-8888 · rafael.bueno@email.com</div>
+                    </div>
+                    <div style="height:34px;border-radius:8px;border:1px solid #D3DAE5;padding:0 12px;display:flex;align-items:center;font-weight:600;font-size:13px;line-height:1;color:#4E5B71">Trocar</div>
+                  </div>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center">
+                    <div style="font-weight:700;font-size:14px;line-height:1;color:#1B222B;align-self:flex-start">Foto</div>
+                    <div style="width:120px;height:120px;border-radius:9999px;border:2px dashed #D3DAE5;background:#F7F9FB;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8391AB" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h3l1.5-2.5h7L17 8.5h3v11H4z"></path><circle cx="12" cy="13.5" r="3.5"></circle></svg>
+                      <span style="font-weight:600;font-size:12px;line-height:1.3;color:#8391AB">Arraste ou clique</span>
+                    </div>
+                    <div style="height:38px;width:100%;border-radius:9px;border:1px solid #D3DAE5;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13.5px;line-height:1;color:#4E5B71">Escolher arquivo</div>
+                    <span style="font-weight:500;font-size:12px;line-height:1.45;color:#8391AB">JPG ou PNG, até 5 MB. Enviada logo após o cadastro.</span>
+                  </div>
+
+                  <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px">
+                    <div style="font-weight:700;font-size:14px;line-height:1;color:#1B222B">Depois de salvar</div>
+                    <div style="display:flex;gap:10px;align-items:flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="m5 12 5 5L20 7"></path></svg><span style="font-weight:500;font-size:13px;line-height:1.5;color:#4E5B71">O prontuário de Miso é aberto direto</span></div>
+                    <div style="display:flex;gap:10px;align-items:flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="m5 12 5 5L20 7"></path></svg><span style="font-weight:500;font-size:13px;line-height:1.5;color:#4E5B71">Você pode registrar peso e vacinas na hora</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:76px;background:#FFFFFF;border-top:1px solid #E9EDF3;padding:0 32px;display:flex;align-items:center;justify-content:space-between">
+              <span style="font-weight:500;font-size:13px;line-height:1.4;color:#64738C">Rascunho salvo automaticamente há 12 segundos</span>
+              <div style="display:flex;gap:12px">
+                <div style="height:44px;border-radius:10px;border:1px solid #D3DAE5;background:#FFFFFF;padding:0 20px;display:flex;align-items:center;font-weight:600;font-size:14.5px;line-height:1;color:#4E5B71">Cancelar</div>
+                <div style="height:44px;border-radius:10px;background:#FFFFFF;border:1px solid #137A72;padding:0 20px;display:flex;align-items:center;font-weight:600;font-size:14.5px;line-height:1;color:#12615C">Salvar e cadastrar outro</div>
+                <div style="height:44px;border-radius:10px;background:#137A72;padding:0 24px;display:flex;align-items:center;font-weight:700;font-size:14.5px;line-height:1;color:#FFFFFF">Salvar felino</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOBILE -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">MOBILE · 390 × 844 · em preenchimento</div>
+        <div data-screen-label="07 Cadastro felino · mobile" style="width:390px;height:844px;border-radius:36px;background:#F7F9FB;box-shadow:0 24px 56px rgba(27,34,43,.14);overflow:hidden;display:flex;flex-direction:column">
+          <div style="height:52px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:14px;line-height:1;color:#1B222B;background:#FFFFFF"><span>9:41</span><span style="font-weight:600;font-size:12px;line-height:1;font-family:'JetBrains Mono',monospace;color:#64738C">5G ▮▮▮</span></div>
+          <div style="height:56px;background:#FFFFFF;border-bottom:1px solid #E9EDF3;padding:0 8px 0 12px;display:flex;align-items:center;gap:6px">
+            <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B222B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg></div>
+            <div style="font-weight:700;font-size:16.5px;line-height:1;color:#1B222B">Cadastrar felino</div>
+          </div>
+
+          <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:14px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:14px;background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:12px 14px">
+              <div style="width:64px;height:64px;border-radius:9999px;border:2px dashed #D3DAE5;background:#F7F9FB;display:flex;align-items:center;justify-content:center;flex:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8391AB" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h3l1.5-2.5h7L17 8.5h3v11H4z"></path><circle cx="12" cy="13.5" r="3.5"></circle></svg></div>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px;line-height:1.3;color:#1B222B">Adicionar foto</div><div style="font-weight:500;font-size:12.5px;line-height:1.45;color:#8391AB">Opcional · ajuda a identificar na lista</div></div>
+              <div style="width:44px;height:44px;border-radius:12px;border:1px solid #D3DAE5;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4E5B71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h3l1.5-2.5h7L17 8.5h3v11H4z"></path><circle cx="12" cy="13.5" r="3.5"></circle></svg></div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:18px">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Nome <span style="color:#C82A2A">*</span></label>
+                <div style="height:52px;border:1px solid #1F988D;box-shadow:0 0 0 3px rgba(31,152,141,.35);border-radius:12px;padding:0 16px;display:flex;align-items:center;font-weight:500;font-size:16px;line-height:1;color:#1B222B">Miso</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Tutor <span style="color:#C82A2A">*</span></label>
+                <div style="height:52px;border:1px solid #D3DAE5;border-radius:12px;padding:0 16px;display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-weight:500;font-size:16px;line-height:1;color:#8391AB">Buscar tutor</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Sexo</label>
+                <div style="height:48px;border:1px solid #D3DAE5;border-radius:12px;background:#F7F9FB;padding:3px;display:grid;grid-template-columns:repeat(3,1fr);gap:3px">
+                  <div style="border-radius:9px;background:#FFFFFF;box-shadow:0 1px 2px rgba(27,34,43,.10);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;line-height:1;color:#1B222B">Macho</div>
+                  <div style="border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;line-height:1;color:#64738C">Fêmea</div>
+                  <div style="border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;line-height:1;color:#64738C">Não sei</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Data de nascimento</label>
+                <div style="height:52px;border:1px solid #D3DAE5;border-radius:12px;padding:0 16px;display:flex;align-items:center;justify-content:space-between"><span style="font-weight:500;font-size:16px;line-height:1;color:#1B222B">15/03/2023</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"></rect><path d="M3.5 9.5h17"></path></svg></div>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-weight:600;font-size:14.5px;line-height:1.3;color:#1B222B">Raça, pelagem e espécie</div><div style="font-weight:500;font-size:12.5px;line-height:1.45;color:#8391AB">Opcional · 3 campos</div></div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF;border-top:1px solid #E9EDF3;padding:14px 20px 26px;display:flex;flex-direction:column;gap:12px">
+            <div style="height:52px;border-radius:12px;background:#E9EDF3;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;line-height:1;color:#8391AB">Salvar felino</div>
+            <div style="text-align:center;font-weight:500;font-size:12.5px;line-height:1.4;color:#8391AB">Selecione um tutor para habilitar</div>
+            <div style="width:140px;height:5px;border-radius:9999px;background:#D3DAE5;margin:0 auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:24px 28px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1700px">
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Componentes</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Breadcrumb, Input/text com contador, Select, Segmented/3 (sexo), DatePicker, Combobox de tutor, Card/tutor selecionado, Uploader circular, Footer de ações sticky, Accordion (mobile), Button primary/secondary/ghost.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Comportamento</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Espécie pré-preenchida com “Felis catus”. Idade derivada de <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">birth_date</span>; datas futuras bloqueadas. Salvar só habilita com nome e tutor. Rascunho local a cada 5 s; Cancelar com confirmação se houver alteração.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">API</div><div style="font-size:14px;line-height:1.6;color:#4E5B71"><span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">POST /patients</span> → 201 · foto em <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">PUT /patients/{id}/photo</span> logo depois, com barra de progresso; falha na foto não desfaz o cadastro. Busca de tutor: <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">GET /tutors?q=</span>. Novo tutor: <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">POST /tutors</span>.</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">Acessibilidade</div><div style="font-size:14px;line-height:1.6;color:#4E5B71">Obrigatórios marcados com asterisco e <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">aria-required</span>. Erros ligados por <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">aria-describedby</span> e anunciados em live region. Combobox segue o padrão ARIA. Alvos mobile ≥ 44px; campos 52px evitam zoom no iOS.</div></div>
+    </div>
+  </div>
+
+  <!-- ============ 02 SELEÇÃO DE TUTOR ============ -->
+  <div style="display:flex;flex-direction:column;gap:20px;margin:0 0 56px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;color:#137A72;text-transform:uppercase">Tela 07 · sub-fluxo</div>
+      <div style="height:1px;flex:1;background:#D3DAE5"></div>
+      <div style="font-weight:700;font-size:20px;line-height:1.2;color:#1B222B">Vincular tutor</div>
+    </div>
+    <p style="margin:0;max-width:92ch;font-size:14.5px;line-height:1.65;color:#4E5B71"><span style="font-family:'JetBrains Mono',monospace;font-size:13px">tutor_id</span> é obrigatório na criação, então o cadastro travaria sempre que o tutor ainda não existisse. O combobox resolve os dois casos na mesma interação: busca quem já existe e cria quem não existe, sem sair do formulário.</p>
+
+    <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">DESKTOP · combobox aberto com resultados</div>
+        <div data-screen-label="07b Combobox tutor" style="width:620px;background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px;box-shadow:0 24px 56px rgba(27,34,43,.12)">
+          <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Tutor <span style="color:#C82A2A">*</span></label>
+          <div style="height:44px;border:1px solid #1F988D;box-shadow:0 0 0 3px rgba(31,152,141,.35);border-radius:10px;padding:0 14px;display:flex;align-items:center;gap:10px">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg>
+            <span style="font-weight:500;font-size:15px;line-height:1;color:#1B222B">rafa</span><span style="width:1.5px;height:18px;background:#137A72"></span>
+          </div>
+          <div style="border:1px solid #E9EDF3;border-radius:12px;overflow:hidden;box-shadow:0 8px 20px rgba(27,34,43,.08)">
+            <div style="padding:10px 14px;background:#F7F9FB;border-bottom:1px solid #E9EDF3;font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:#8391AB;text-transform:uppercase">2 tutores encontrados</div>
+            <div style="padding:12px 14px;display:flex;align-items:center;gap:12px;background:#F0FAF8;border-bottom:1px solid #F1F4F8">
+              <div style="width:36px;height:36px;border-radius:9999px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;line-height:1;color:#5B3FBF">RB</div>
+              <div style="flex:1"><div style="font-weight:600;font-size:14.5px;line-height:1.2;color:#1B222B">Rafael Bueno</div><div style="font-weight:500;font-size:13px;line-height:1.4;color:#8391AB">(11) 99999-8888 · 2 felinos</div></div>
+              <span style="font-weight:600;font-size:11.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#12615C">Enter</span>
+            </div>
+            <div style="padding:12px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F1F4F8">
+              <div style="width:36px;height:36px;border-radius:9999px;background:#FFF1E6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;line-height:1;color:#944B07">RA</div>
+              <div style="flex:1"><div style="font-weight:600;font-size:14.5px;line-height:1.2;color:#1B222B">Rafaela Nunes Prado</div><div style="font-weight:500;font-size:13px;line-height:1.4;color:#8391AB">(11) 98123-4477 · 1 felino</div></div>
+            </div>
+            <div style="padding:12px 14px;display:flex;align-items:center;gap:12px;background:#FFFFFF">
+              <div style="width:36px;height:36px;border-radius:9999px;background:#D5F2EE;display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12615C" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></div>
+              <div style="flex:1"><div style="font-weight:600;font-size:14.5px;line-height:1.2;color:#12615C">Cadastrar “rafa” como novo tutor</div><div style="font-weight:500;font-size:13px;line-height:1.4;color:#8391AB">Abre um formulário curto sem perder o que já foi digitado</div></div>
+            </div>
+          </div>
+          <span style="font-weight:500;font-size:12.5px;line-height:1.5;color:#64738C">Busca por nome ou telefone, com debounce de 300 ms. Setas navegam, Esc fecha.</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">DESKTOP · modal novo tutor</div>
+        <div data-screen-label="07c Modal novo tutor" style="width:520px;background:#FFFFFF;border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:20px;box-shadow:0 32px 64px rgba(27,34,43,.22)">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+            <div><h2 style="margin:0;font-weight:700;font-size:21px;line-height:1.25;letter-spacing:-.01em;color:#1B222B">Novo tutor</h2><p style="margin:6px 0 0;font-weight:400;font-size:14px;line-height:1.55;color:#4E5B71">Só o nome é obrigatório. Contato pode ser completado depois.</p></div>
+            <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2.2" stroke-linecap="round"><path d="m6 6 12 12"></path><path d="M18 6 6 18"></path></svg></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Nome completo <span style="color:#C82A2A">*</span></label>
+            <div style="height:44px;border:1px solid #1F988D;box-shadow:0 0 0 3px rgba(31,152,141,.35);border-radius:10px;padding:0 14px;display:flex;align-items:center;font-weight:500;font-size:15px;line-height:1;color:#1B222B">Rafaela Souza</div>
+            <span style="font-weight:500;font-size:12.5px;line-height:1.4;color:#64738C">Entre 2 e 120 caracteres.</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="display:flex;flex-direction:column;gap:8px"><label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Telefone</label><div style="height:44px;border:1px solid #D3DAE5;border-radius:10px;padding:0 14px;display:flex;align-items:center;font-weight:500;font-size:15px;line-height:1;color:#1B222B">(11) 97788-1200</div></div>
+            <div style="display:flex;flex-direction:column;gap:8px"><label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">E-mail</label><div style="height:44px;border:1px solid #C82A2A;background:#FEF2F2;border-radius:10px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;font-weight:500;font-size:15px;line-height:1;color:#1B222B">rafaela@<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C82A2A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.5v.01"></path></svg></div><span style="font-weight:500;font-size:12.5px;line-height:1.4;color:#A72020">Informe um e-mail válido ou deixe em branco.</span></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:12px;padding-top:4px">
+            <div style="height:44px;border-radius:10px;border:1px solid #D3DAE5;padding:0 18px;display:flex;align-items:center;font-weight:600;font-size:14.5px;line-height:1;color:#4E5B71">Cancelar</div>
+            <div style="height:44px;border-radius:10px;background:#137A72;padding:0 20px;display:flex;align-items:center;font-weight:700;font-size:14.5px;line-height:1;color:#FFFFFF">Criar e vincular</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:600;font-size:10.5px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB;letter-spacing:.05em">DESKTOP · busca sem resultado</div>
+        <div data-screen-label="07d Combobox vazio" style="width:520px;background:#FFFFFF;border:1px solid #E9EDF3;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px;box-shadow:0 24px 56px rgba(27,34,43,.12)">
+          <label style="font-weight:600;font-size:13px;line-height:1;color:#3F4A5C">Tutor <span style="color:#C82A2A">*</span></label>
+          <div style="height:44px;border:1px solid #1F988D;box-shadow:0 0 0 3px rgba(31,152,141,.35);border-radius:10px;padding:0 14px;display:flex;align-items:center;gap:10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64738C" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg><span style="font-weight:500;font-size:15px;line-height:1;color:#1B222B">Heloísa Vasques</span></div>
+          <div style="border:1px solid #E9EDF3;border-radius:12px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
+            <div style="width:48px;height:48px;border-radius:9999px;background:#F7F9FB;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8391AB" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg></div>
+            <div><div style="font-weight:600;font-size:14.5px;line-height:1.3;color:#1B222B">Nenhum tutor com esse nome</div><div style="font-weight:500;font-size:13px;line-height:1.5;color:#64738C;margin-top:2px">Verifique a grafia ou cadastre agora — leva 15 segundos.</div></div>
+            <div style="height:40px;border-radius:10px;background:#137A72;padding:0 18px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;line-height:1;color:#FFFFFF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Cadastrar Heloísa Vasques</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 03 ESTADOS ============ -->
+  <div style="display:flex;flex-direction:column;gap:20px;margin:0 0 56px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-weight:600;font-size:11px;line-height:1;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;color:#137A72;text-transform:uppercase">Estados</div>
+      <div style="height:1px;flex:1;background:#D3DAE5"></div>
+      <div style="font-weight:700;font-size:20px;line-height:1.2;color:#1B222B">Validação, envio e retorno</div>
+    </div>
+
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <div style="background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:28px;width:520px;display:flex;flex-direction:column;gap:20px">
+        <div style="font-weight:700;font-size:16px;line-height:1.3;color:#1B222B">Campo Nome · seis estados</div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB">DEFAULT</div><div style="height:44px;border:1px solid #D3DAE5;border-radius:10px;padding:0 14px;display:flex;align-items:center;font-weight:500;font-size:15px;line-height:1;color:#8391AB">Ex.: Miso</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB">HOVER</div><div style="height:44px;border:1px solid #AEB9CB;border-radius:10px;padding:0 14px;display:flex;align-items:center;font-weight:500;font-size:15px;line-height:1;color:#1B222B">Miso</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB">FOCUS</div><div style="height:44px;border:1px solid #1F988D;box-shadow:0 0 0 3px rgba(31,152,141,.35);border-radius:10px;padding:0 14px;display:flex;align-items:center;font-weight:500;font-size:15px;line-height:1;color:#1B222B">Miso<span style="width:1.5px;height:18px;background:#137A72;margin-left:2px"></span></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB">ERROR · 422 name required</div><div style="height:44px;border:1px solid #C82A2A;background:#FEF2F2;border-radius:10px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;font-weight:500;font-size:15px;line-height:1;color:#8391AB">Ex.: Miso<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C82A2A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.5v.01"></path></svg></div><div style="font-weight:500;font-size:13px;line-height:1.4;color:#A72020">Informe o nome do felino.</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB">SUCCESS</div><div style="height:44px;border:1px solid #0D8452;background:#ECFDF3;border-radius:10px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;font-weight:500;font-size:15px;line-height:1;color:#1B222B">Miso<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0D8452" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m8.5 12 2.5 2.5 4.5-5"></path></svg></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:12px;line-height:1;font-family:'JetBrains Mono',monospace;color:#8391AB">DISABLED · durante o envio</div><div style="height:44px;border:1px solid #E9EDF3;background:#E9EDF3;border-radius:10px;padding:0 14px;display:flex;align-items:center;font-weight:500;font-size:15px;line-height:1;color:#8391AB">Miso</div></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:24px;width:560px">
+        <div style="background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-weight:700;font-size:16px;line-height:1.3;color:#1B222B">Uploader de foto</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:88px;height:88px;border-radius:9999px;border:2px dashed #D3DAE5;background:#F7F9FB"></div><span style="font-weight:600;font-size:12px;line-height:1.3;color:#64738C">Vazio</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:88px;height:88px;border-radius:9999px;border:2px dashed #1F988D;background:#F0FAF8"></div><span style="font-weight:600;font-size:12px;line-height:1.3;color:#12615C">Arrastando</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:88px;height:88px;border-radius:9999px;background:#D5F2EE;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;line-height:1;color:#12615C">72%</div><span style="font-weight:600;font-size:12px;line-height:1.3;color:#64738C">Enviando</span></div>
+          </div>
+          <div style="border:1px solid #FDDF8A;background:#FFF9EB;border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B96A04" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:1px"><path d="M10.3 4.3 2.6 17.5A1.9 1.9 0 0 0 4.3 20.5h15.4a1.9 1.9 0 0 0 1.7-3L13.7 4.3a1.9 1.9 0 0 0-3.4 0Z"></path><path d="M12 9.5v4"></path><path d="M12 17v.01"></path></svg>
+            <div><div style="font-weight:700;font-size:13.5px;line-height:1.4;color:#7A3B0D">Felino cadastrado, foto não enviada</div><div style="font-weight:500;font-size:13px;line-height:1.5;color:#944B07;margin-top:2px">O arquivo tem 8,3 MB — o limite é 5 MB. Tente de novo pelo prontuário.</div></div>
+          </div>
+        </div>
+
+        <div style="background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-weight:700;font-size:16px;line-height:1.3;color:#1B222B">Botão Salvar e feedback</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="height:44px;border-radius:10px;background:#137A72;color:#FFFFFF;font-weight:700;font-size:14.5px;line-height:1;display:flex;align-items:center;justify-content:center">Salvar felino</div>
+            <div style="height:44px;border-radius:10px;background:#12615C;color:#FFFFFF;font-weight:700;font-size:14.5px;line-height:1;display:flex;align-items:center;justify-content:center">hover</div>
+            <div style="height:44px;border-radius:10px;background:#137A72;color:#FFFFFF;font-weight:700;font-size:14.5px;line-height:1;display:flex;align-items:center;justify-content:center;gap:10px;opacity:.9"><span style="width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#FFFFFF;border-radius:9999px;display:block"></span>Salvando…</div>
+            <div style="height:44px;border-radius:10px;background:#E9EDF3;color:#8391AB;font-weight:700;font-size:14.5px;line-height:1;display:flex;align-items:center;justify-content:center">disabled</div>
+          </div>
+          <div style="border:1px solid #A6EEC6;background:#ECFDF3;border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D8452" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="12" cy="12" r="9"></circle><path d="m8.5 12 2.5 2.5 4.5-5"></path></svg>
+            <div style="flex:1"><div style="font-weight:700;font-size:14px;line-height:1.4;color:#0F5437">Miso cadastrado</div><div style="font-weight:500;font-size:13.5px;line-height:1.5;color:#0D6943;margin-top:2px">Prontuário aberto. Registre peso ou vacina quando quiser.</div></div>
+            <span style="font-weight:600;font-size:13px;line-height:1;color:#0D6943">Desfazer</span>
+          </div>
+          <div style="border:1px solid #FDC9C9;background:#FEF2F2;border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C82A2A" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.5v.01"></path></svg>
+            <div><div style="font-weight:700;font-size:14px;line-height:1.4;color:#8A1F1F">Não foi possível salvar</div><div style="font-weight:500;font-size:13.5px;line-height:1.5;color:#A72020;margin-top:2px">Sem conexão com o servidor. Seus dados continuam aqui — tente novamente.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#FFFFFF;border:1px solid #D3DAE5;border-radius:16px;padding:28px 32px;max-width:1180px;display:flex;flex-direction:column;gap:18px">
+    <div style="font-weight:700;font-size:18px;line-height:1.3;color:#1B222B">Decisões de produto — e por quê</div>
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:16px 24px;align-items:start">
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Página, não modal</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">São sete campos mais foto e um sub-fluxo de tutor. Em modal, o combobox e o modal de novo tutor se empilhariam — dois níveis de sobreposição. Página também permite rascunho e URL própria.</div>
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Espécie pré-preenchida</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">O campo é opcional e nullable na API, mas o produto é de felinos: “Felis catus” cobre praticamente todos os casos. Continua editável, então não perdemos flexibilidade.</div>
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Criar tutor sem sair</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">Com <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px">tutor_id</span> obrigatório, exigir um cadastro prévio jogaria fora o formulário em andamento. O modal cria o tutor e o vincula na volta.</div>
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">Opcionais colapsados no mobile</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">Raça, pelagem e espécie ficam num accordion: a tela cabe sem rolagem para o caminho mínimo. No desktop, onde há espaço, todos ficam visíveis.</div>
+      <div style="font-weight:600;font-size:13.5px;line-height:1.4;color:#1B222B">“Salvar e cadastrar outro”</div>
+      <div style="font-size:14px;line-height:1.6;color:#4E5B71">Cenário real de abrigo: várias fichas em sequência, quase sempre do mesmo tutor. O botão mantém o tutor selecionado e limpa o resto.</div>
+    </div>
+  </div>
+
+  <p style="margin:32px 0 0;font-size:14px;line-height:1.6;color:#64738C;max-width:88ch">Próxima tela sugerida: <strong style="font-weight:600;color:#1B222B">prontuário do felino</strong> — destino imediato após o 201 e do clique na linha da tabela da Home.</p>
+</section>
+</x-dc>
+</body>
+</html>
