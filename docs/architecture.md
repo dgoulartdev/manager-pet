@@ -562,6 +562,9 @@ Definir a interface `PatientPhotoStorage` (`save`/`remove`) como fronteira do m�
 - Base64 no banco: sobrevive a redeploy, mas infla banco/payload e seria descartado por inteiro ao migrar para R2 (a interface de disco é o degrau natural para object storage)
 - R2/S3 agora: correto para produção, mas antecipa infraestrutura que a trajetória define como pós-MVP
 
+**Atualização (2026-10-02) — Vercel Blob em produção:**
+Com a hospedagem na Vercel, o disco nem é gravável (a função só escreve em `/tmp`, que é temporário). Entrou `VercelBlobPatientPhotoStorage`: `put` público com sufixo aleatório (endereço impossível de adivinhar, que muda a cada troca — o CDN nunca serve a foto antiga) e `del` da anterior, pelo SDK `@vercel/blob`. O `PatientsModule` escolhe o Blob quando a Vercel põe `BLOB_STORE_ID` ou `BLOB_READ_WRITE_TOKEN` no ambiente (ao conectar o Blob ao projeto); sem elas — no desenvolvimento —, segue o disco local. O plano gratuito tem 1 GB; para caber nele e no limite de 4,5 MB por requisição da Vercel, o frontend reduz a foto antes de enviar (`lib/photo.ts`: lado maior até 1280 px, JPEG — uma foto de celular de ~10 MB vira ~300 KB). Os exames do futuro módulo de documentos (ADR-005) iriam como blobs privados.
+
 ---
 
 ### ADR-008: Rebranding para MeuPaciente e generalização de espécie

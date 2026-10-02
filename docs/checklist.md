@@ -53,6 +53,8 @@
 - [x] `PUT /patients/:id/photo`
 - [x] `DELETE /patients/:id/photo`
 - [x] Definir estratégia de storage de foto (mesmo que temporária) — ADR-007
+- [x] Fotos persistentes em produção no Vercel Blob (disco local no desenvolvimento) e reduzidas no navegador antes do envio — ADR-007
+- [ ] Criar o Vercel Blob, conectar ao projeto da API e testar um envio real
 
 ## 7. Módulo Appointments
 - [x] `GET /appointments` (paginado, filtros: patient_id, location_id, date_from/to)
