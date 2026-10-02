@@ -2,6 +2,9 @@
 // pra não sujar/depender dos dados de desenvolvimento em `public`.
 export const E2E_SCHEMA = 'test_e2e';
 
+// Segredo da rota do Vercel Cron nos testes (o setup o põe no process.env).
+export const E2E_CRON_SECRET = 'segredo-do-cron-no-e2e';
+
 export function buildTestDatabaseUrl(baseUrl: string): string {
   const url = new URL(baseUrl);
   url.searchParams.set('schema', E2E_SCHEMA);
