@@ -29,6 +29,7 @@
     "@nestjs/platform-express": "^10.4.6",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "^6.19.3",
+    "@vercel/blob": "^2.8.0",
     "@vercel/functions": "^3.9.9",
     "bcryptjs": "^3.0.3",
     "class-transformer": "^0.5.1",
