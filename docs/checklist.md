@@ -115,7 +115,8 @@
 
 ## 11. Pré-lançamento
 - [ ] Redigir documentos legais (termos de uso e política de privacidade/LGPD) — ainda não existem no repositório
-- [ ] Definir provedor de hosting (backend + banco + storage de fotos persistente — ADR-007)
+- [x] Definir provedor de hosting (Vercel + Neon + Vercel Blob — ADR-012)
+- [ ] Backup diário próprio do banco, criptografado (o Neon gratuito só volta 6 horas)
 - [x] Definir provedor de e-mail transacional (SMTP com Gmail; Resend quando houver domínio próprio — ADR-011)
 - [x] Restringir o cadastro a e-mails autorizados (ADR-010) — no deploy, definir `SIGNUP_ALLOWED_EMAILS` e criar a conta da piloto logo em seguida
 - [ ] Deploy de staging
