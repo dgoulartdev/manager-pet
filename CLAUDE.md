@@ -9,7 +9,8 @@ Prontuário veterinário (cães e gatos) para profissionais autônomos. Monorepo
 - `docs/architecture.md` — escopo do MVP, schema, padrões de API e ADRs (leia antes de decisões estruturais).
 - `docs/openapi.yaml` — contrato da API (OpenAPI 3.1). Validar com `npx @redocly/cli@1 lint docs/openapi.yaml`.
 - `docs/checklist.md` — progresso item a item. Atualize ao concluir uma tela/feature.
-- `design/` — telas do Claude Design. **O Design System é regra; as telas Hi-Fi são só guia.**
+- `design/` — telas do Claude Design, **só locais** (no `.gitignore`, fora do repositório público).
+  **O Design System é regra; as telas Hi-Fi são só guia.**
   A Hi-Fi foi feita para "Gerenciamento Felinos" (marca antiga) e cita dados que a API não tem:
   adaptar para MeuPaciente (cães e gatos) e nunca mostrar números/promessas que o sistema não sustenta.
 
