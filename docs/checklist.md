@@ -54,7 +54,7 @@
 - [x] `DELETE /patients/:id/photo`
 - [x] Definir estratégia de storage de foto (mesmo que temporária) — ADR-007
 - [x] Fotos persistentes em produção no Vercel Blob (disco local no desenvolvimento) e reduzidas no navegador antes do envio — ADR-007
-- [ ] Criar o Vercel Blob, conectar ao projeto da API e testar um envio real
+- [x] Criar o Vercel Blob, conectar ao projeto da API e testar um envio real (fotos reais enviadas em produção)
 
 ## 7. Módulo Appointments
 - [x] `GET /appointments` (paginado, filtros: patient_id, location_id, date_from/to)
@@ -82,7 +82,7 @@
 
 ## 8.1 Pendências do backend
 - [x] Integrar provedor de e-mail no `forgot-password` (SMTP ou Resend, atrás de `EmailSender`; sem nenhum, o link vai para o log — ADR-011)
-- [ ] Criar a conta Gmail do app (verificação em duas etapas + senha de app) e configurar `SMTP_*` na hospedagem
+- [x] Criar a conta Gmail do app (verificação em duas etapas + senha de app) e configurar `SMTP_*` na hospedagem (recuperação de senha testada em produção)
 - [x] Rotina de limpeza de refresh/reset tokens expirados (ADR-006: Vercel Cron diário às 3h de Brasília, `GET /cron/token-cleanup` com `CRON_SECRET`)
 
 ## 9. Testes
@@ -119,5 +119,5 @@
 - [ ] Backup diário próprio do banco, criptografado (o Neon gratuito só volta 6 horas)
 - [x] Definir provedor de e-mail transacional (SMTP com Gmail; Resend quando houver domínio próprio — ADR-011)
 - [x] Restringir o cadastro a e-mails autorizados (ADR-010) — no deploy, definir `SIGNUP_ALLOWED_EMAILS` e criar a conta da piloto logo em seguida
-- [ ] Deploy de staging
+- [x] Deploy de staging — dispensado: deploy direto em produção, com prévias de branch que não tocam o banco (ADR-012)
 - [ ] Teste real com sua namorada (usuária piloto)
