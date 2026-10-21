@@ -7,6 +7,7 @@ import { TutorsModule } from './modules/tutors/tutors.module';
 import { LocationsModule } from './modules/locations/locations.module';
 import { PatientsModule } from './modules/patients/patients.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
+import { DocumentsModule } from './modules/documents/documents.module';
 import { VaccinesModule } from './modules/vaccines/vaccines.module';
 import { TokenCleanupModule } from './modules/token-cleanup/token-cleanup.module';
 import { validateEnv } from './config/env.validation';
@@ -24,6 +25,7 @@ import { validateEnv } from './config/env.validation';
     LocationsModule,
     PatientsModule,
     AppointmentsModule,
+    DocumentsModule,
     VaccinesModule,
     TokenCleanupModule,
   ],
