@@ -1,10 +1,16 @@
 import { useState } from 'react';
-import { ArrowLeft, ClipboardList, Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
+import { ArrowLeft, ClipboardList, FileText, Pencil, Plus, Syringe, Trash2 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { LocationType, type AppointmentDto, type VaccineDto } from '@meupaciente/shared';
+import {
+  LocationType,
+  type AppointmentDto,
+  type DocumentDto,
+  type VaccineDto,
+} from '@meupaciente/shared';
 import { apiRequest } from '../../../lib/api';
 import { appointmentTitle, describeLocation } from '../../../lib/appointments';
 import { formatDate, formatDayMonth, formatLongDate, formatMonthYear } from '../../../lib/dates';
+import { describeDocumentFormat, formatFileSize } from '../../../lib/document';
 import { pluralize } from '../../../lib/format';
 import { formatWeight } from '../../../lib/weights';
 import { Alert } from '../../../components/Alert/Alert';
@@ -17,11 +23,12 @@ import styles from './HistoryTab.module.css';
 interface HistoryTabProps {
   appointments: AppointmentDto[]; // mais recente primeiro (ordem da API)
   locationNames: Map<string, string>;
-  // Vacinas do paciente: cada atendimento mostra as que foram aplicadas nele.
+  // Vacinas e exames do paciente: cada atendimento mostra os vinculados a ele.
   vaccines: VaccineDto[] | undefined;
+  documents: DocumentDto[] | undefined;
   patientId: string;
   newAppointmentPath: string;
-  // Depois de excluir um atendimento: recarrega a lista (e as vacinas, que perdem o vínculo).
+  // Depois de excluir um atendimento: recarrega a lista (e vacinas/exames, que perdem o vínculo).
   onChanged: () => void;
 }
 
@@ -44,6 +51,7 @@ export function HistoryTab({
   appointments,
   locationNames,
   vaccines,
+  documents,
   patientId,
   newAppointmentPath,
   onChanged,
@@ -134,6 +142,7 @@ export function HistoryTab({
           appointment={selected}
           locationNames={locationNames}
           vaccines={vaccines?.filter((vaccine) => vaccine.appointment_id === selected.id)}
+          documents={documents?.filter((doc) => doc.appointment_id === selected.id)}
           editPath={`/pacientes/${patientId}/atendimentos/${selected.id}/editar`}
           onDeleted={onChanged}
         />
@@ -146,13 +155,15 @@ function AppointmentDetail({
   appointment,
   locationNames,
   vaccines,
+  documents,
   editPath,
   onDeleted,
 }: {
   appointment: AppointmentDto;
   locationNames: Map<string, string>;
-  // Vacinas aplicadas neste atendimento; indefinido enquanto carregam.
+  // Vacinas e exames deste atendimento; indefinido enquanto carregam.
   vaccines: VaccineDto[] | undefined;
+  documents: DocumentDto[] | undefined;
   editPath: string;
   onDeleted: () => void;
 }) {
@@ -178,6 +189,7 @@ function AppointmentDetail({
             <DeleteAppointment
               appointment={appointment}
               linkedVaccines={vaccines?.length ?? 0}
+              linkedDocuments={documents?.length ?? 0}
               onDeleted={onDeleted}
             />
           </div>
@@ -201,6 +213,9 @@ function AppointmentDetail({
           </div>
         </dl>
         {vaccines && <AppointmentVaccines appointmentId={appointment.id} vaccines={vaccines} />}
+        {documents && (
+          <AppointmentDocuments appointmentId={appointment.id} documents={documents} />
+        )}
       </header>
 
       {sections.length === 0 ? (
@@ -230,10 +245,12 @@ function AppointmentDetail({
 function DeleteAppointment({
   appointment,
   linkedVaccines,
+  linkedDocuments,
   onDeleted,
 }: {
   appointment: AppointmentDto;
   linkedVaccines: number;
+  linkedDocuments: number;
   onDeleted: () => void;
 }) {
   const showToast = useToast();
@@ -280,6 +297,11 @@ function DeleteAppointment({
             ? 'A vacina registrada nele continua na carteira.'
             : linkedVaccines > 1
               ? `As ${pluralize(linkedVaccines, 'vacina registrada', 'vacinas registradas')} nele continuam na carteira.`
+              : null,
+          linkedDocuments === 1
+            ? 'O exame vinculado continua no prontuário.'
+            : linkedDocuments > 1
+              ? `Os ${pluralize(linkedDocuments, 'exame vinculado', 'exames vinculados')} continuam no prontuário.`
               : null,
           'Não é possível desfazer.',
         ]
@@ -343,6 +365,49 @@ function AppointmentVaccines({
           >
             <Plus size={16} strokeWidth={2} aria-hidden="true" />
             Registrar vacina
+          </Link>
+        </li>
+      </ul>
+    </section>
+  );
+}
+
+/**
+ * Exames vinculados ao atendimento. Cada item permite editar na aba Exames;
+ * o atalho abre o diálogo de anexo já vinculado a este atendimento.
+ */
+function AppointmentDocuments({
+  appointmentId,
+  documents,
+}: {
+  appointmentId: string;
+  documents: DocumentDto[];
+}) {
+  return (
+    <section className={styles.vaccines} aria-labelledby="atendimento-exames">
+      <h4 id="atendimento-exames" className={styles.sectionLabel}>
+        Exames e documentos
+      </h4>
+      <ul className={styles.vaccineList}>
+        {documents.map((doc) => (
+          <li key={doc.id}>
+            <Link to={`?aba=exames&exame=${doc.id}`} replace className={styles.vaccineChip}>
+              <FileText size={16} strokeWidth={1.75} aria-hidden="true" />
+              {doc.name}
+              <span className={styles.vaccineBatch}>
+                {describeDocumentFormat(doc.mime_type)} · {formatFileSize(doc.size_bytes)}
+              </span>
+            </Link>
+          </li>
+        ))}
+        <li>
+          <Link
+            to={`?aba=exames&anexar=${appointmentId}`}
+            replace
+            className={styles.registerVaccine}
+          >
+            <Plus size={16} strokeWidth={2} aria-hidden="true" />
+            Anexar exame
           </Link>
         </li>
       </ul>
