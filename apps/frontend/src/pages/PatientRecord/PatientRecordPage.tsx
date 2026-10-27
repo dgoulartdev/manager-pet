@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ChevronRight, Plus, RotateCw, SearchX } from 'lucide-react';
 import type {
   AppointmentListResponse,
+  DocumentListResponse,
   LocationListResponse,
   PatientDetailDto,
   VaccineListResponse,
@@ -21,6 +22,7 @@ import { panelId, tabId, Tabs } from '../../components/Tabs/Tabs';
 import { SummaryCards } from './SummaryCards';
 import { OverviewTab } from './tabs/OverviewTab';
 import { HistoryTab } from './tabs/HistoryTab';
+import { ExamsTab } from './tabs/ExamsTab';
 import { VaccinesTab } from './tabs/VaccinesTab';
 import { WeightTab } from './tabs/WeightTab';
 import styles from './PatientRecordPage.module.css';
@@ -29,8 +31,8 @@ import styles from './PatientRecordPage.module.css';
 const HISTORY_LIMIT = 100;
 const TABS_ID = 'prontuario';
 
-type TabKey = 'dados' | 'historico' | 'vacinas' | 'pesagens';
-const TAB_KEYS: TabKey[] = ['dados', 'historico', 'vacinas', 'pesagens'];
+type TabKey = 'dados' | 'historico' | 'exames' | 'vacinas' | 'pesagens';
+const TAB_KEYS: TabKey[] = ['dados', 'historico', 'exames', 'vacinas', 'pesagens'];
 
 const HEADER_STATUS: Partial<Record<VaccineStatus, { tone: BadgeTone; label: string }>> = {
   overdue: { tone: 'error', label: 'Vacina atrasada' },
@@ -48,6 +50,9 @@ export function PatientRecordPage() {
   const appointmentsQuery = useApiQuery<AppointmentListResponse>(
     `/appointments?patient_id=${patientId}&per_page=${HISTORY_LIMIT}`,
   );
+  const documentsQuery = useApiQuery<DocumentListResponse>(
+    `/documents?patient_id=${patientId}&per_page=${HISTORY_LIMIT}`,
+  );
   const vaccinesQuery = useApiQuery<VaccineListResponse>(
     `/vaccines?patient_id=${patientId}&per_page=${HISTORY_LIMIT}`,
   );
@@ -57,6 +62,7 @@ export function PatientRecordPage() {
   useDocumentTitle(patient?.name ?? 'Prontuário');
 
   const appointments = appointmentsQuery.data?.data;
+  const documents = documentsQuery.data?.data;
   const vaccines = useMemo(
     () => (vaccinesQuery.data ? withVaccineStatus(vaccinesQuery.data.data) : undefined),
     [vaccinesQuery.data],
@@ -164,6 +170,7 @@ export function PatientRecordPage() {
         items={[
           { id: 'dados', label: 'Dados' },
           { id: 'historico', label: 'Histórico', count: appointments?.length },
+          { id: 'exames', label: 'Exames', count: documents?.length },
           { id: 'vacinas', label: 'Vacinas', count: vaccines?.length },
           {
             id: 'pesagens',
@@ -184,6 +191,7 @@ export function PatientRecordPage() {
             patient={patient}
             appointmentsCount={appointments?.length}
             vaccinesCount={vaccines?.length}
+            documentsCount={documents?.length}
             onPhotoChanged={patientQuery.retry}
           />
         )}
@@ -194,13 +202,27 @@ export function PatientRecordPage() {
                 appointments={appointments}
                 locationNames={locationNames}
                 vaccines={vaccines}
+                documents={documents}
                 patientId={patient.id}
                 newAppointmentPath={newAppointmentPath}
                 onChanged={() => {
                   appointmentsQuery.retry();
-                  // A API desfaz o vínculo das vacinas do atendimento excluído.
+                  // A API desfaz o vínculo das vacinas e dos exames do atendimento excluído.
                   vaccinesQuery.retry();
+                  documentsQuery.retry();
                 }}
+              />
+            )}
+          </SectionState>
+        )}
+        {tab === 'exames' && (
+          <SectionState query={documentsQuery} what="os exames">
+            {documents && (
+              <ExamsTab
+                patient={patient}
+                documents={documents}
+                appointments={appointments}
+                onChanged={documentsQuery.retry}
               />
             )}
           </SectionState>

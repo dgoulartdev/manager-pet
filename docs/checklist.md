@@ -72,6 +72,14 @@
 - [x] `DELETE /vaccines/:id`
 - [x] Validar que `appointment_id`, quando informado, pertence ao mesmo paciente da vacina
 
+## 7.2 Módulo Documents (Exames)
+- [x] `GET /documents` (paginado, filtros por `patient_id` e `appointment_id`)
+- [x] `POST /documents` (upload multipart PDF/JPG/PNG até 4,5 MB, com validação de magic bytes e armazenamento no Vercel Blob / disco local)
+- [x] `GET /documents/:id`
+- [x] `PATCH /documents/:id`
+- [x] `DELETE /documents/:id` (remove arquivo do storage e registro do banco; exclusão de paciente remove todos os exames em cascata)
+- [x] Validar que `appointment_id`, quando informado, pertence ao mesmo paciente do exame
+
 ## 8. Validação e erros transversais
 - [x] `ValidationPipe` global
 - [x] Exception filter no formato RFC 7807 (catch-all + mapeamento Prisma)
@@ -86,7 +94,8 @@
 - [x] Rotina de limpeza de refresh/reset tokens expirados (ADR-006: Vercel Cron diário às 3h de Brasília, `GET /cron/token-cleanup` com `CRON_SECRET`)
 
 ## 9. Testes
-- [x] Testes unitários dos services críticos (auth, appointments, vaccines)
+- [x] Testes unitários dos services críticos (auth, appointments, vaccines, documents)
+- [x] Testes unitários da otimização diagnóstica de exames acima de 4,5 MB (`fileCompression.ts`)
 - [x] Testes unitários de validação de DTOs e do filtro RFC 7807
 - [x] Testes e2e dos fluxos principais (register→login→CRUD→logout)
 - [ ] Testes unitários dos services de users, tutors, locations e patients
@@ -110,6 +119,7 @@
 - [x] Editar e excluir atendimento (a partir do histórico)
 - [x] Tela: vacinas do paciente (carteira com situação + registro)
 - [x] Vacinas: editar/excluir e vínculo a um atendimento (visível na carteira e no histórico)
+- [x] Tela: exames do paciente (aba Exames no prontuário + anexos por atendimento no histórico + otimização diagnóstica de arquivos > 4,5 MB)
 - [x] Tela: tutores e locais (lista com busca, cadastro, edição e exclusão respeitando os vínculos)
 - [x] Tela: perfil do usuário (dados + troca de senha, mantendo a sessão deste aparelho)
 

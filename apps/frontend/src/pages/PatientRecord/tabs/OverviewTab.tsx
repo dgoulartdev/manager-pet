@@ -23,6 +23,7 @@ interface OverviewTabProps {
   patient: PatientDetailDto;
   appointmentsCount: number | undefined;
   vaccinesCount: number | undefined;
+  documentsCount?: number | undefined;
   onPhotoChanged: () => void;
 }
 
@@ -30,6 +31,7 @@ export function OverviewTab({
   patient,
   appointmentsCount,
   vaccinesCount,
+  documentsCount,
   onPhotoChanged,
 }: OverviewTabProps) {
   const age = formatAge(patient.birth_date);
@@ -106,6 +108,7 @@ export function OverviewTab({
         patient={patient}
         appointmentsCount={appointmentsCount}
         vaccinesCount={vaccinesCount}
+        documentsCount={documentsCount}
       />
     </div>
   );
@@ -202,13 +205,19 @@ interface DeletePatientProps {
   patient: PatientDetailDto;
   appointmentsCount: number | undefined;
   vaccinesCount: number | undefined;
+  documentsCount?: number | undefined;
 }
 
 /**
  * Exclusão (DS: destruição é rara e explícita). A confirmação diz a
- * consequência real — a API apaga em cascata atendimentos e vacinas.
+ * consequência real — a API apaga em cascata atendimentos, exames e vacinas.
  */
-function DeletePatient({ patient, appointmentsCount, vaccinesCount }: DeletePatientProps) {
+function DeletePatient({
+  patient,
+  appointmentsCount,
+  vaccinesCount,
+  documentsCount,
+}: DeletePatientProps) {
   const navigate = useNavigate();
   const showToast = useToast();
   const [open, setOpen] = useState(false);
@@ -217,10 +226,11 @@ function DeletePatient({ patient, appointmentsCount, vaccinesCount }: DeletePati
 
   const consequences = [
     appointmentsCount ? pluralize(appointmentsCount, 'atendimento', 'atendimentos') : null,
+    documentsCount ? pluralize(documentsCount, 'exame', 'exames') : null,
     vaccinesCount ? pluralize(vaccinesCount, 'vacina', 'vacinas') : null,
   ].filter(Boolean);
   const description = consequences.length
-    ? `Isso apaga também ${consequences.join(' e ')} registrados. Não é possível desfazer.`
+    ? `Isso apaga também ${consequences.join(', ')} registrados. Não é possível desfazer.`
     : 'O prontuário será apagado. Não é possível desfazer.';
 
   async function confirm() {

@@ -51,6 +51,8 @@ tags:
     description: Atendimentos veterinários
   - name: Vaccines
     description: Vacinas aplicadas aos pacientes
+  - name: Documents
+    description: Exames e documentos clínicos dos pacientes
   - name: Cron
     description: Tarefas agendadas, chamadas pela plataforma de hospedagem
 
@@ -1079,6 +1081,139 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  # ── DOCUMENTS ─────────────────────────────────────────────────────────────
+
+  /documents:
+    get:
+      tags: [Documents]
+      summary: Listar exames e documentos clínicos
+      operationId: listDocuments
+      description: |
+        Endpoint para listagem de exames e documentos clínicos. Use `patient_id`
+        para listar todos os exames de um paciente ou `appointment_id` para
+        listar os exames vinculados a um atendimento específico.
+        Ordem: data do exame mais recente primeiro; no mesmo dia, o registrado
+        por último primeiro.
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: patient_id
+          in: query
+          description: Filtrar por paciente
+          schema:
+            type: string
+            format: uuid
+        - name: appointment_id
+          in: query
+          description: Filtrar por atendimento
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Lista paginada de documentos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    post:
+      tags: [Documents]
+      summary: Enviar exame ou documento clínico
+      operationId: createDocument
+      description: |
+        Recebe um arquivo PDF, JPG ou PNG (máximo de 4,5 MB — 4.718.592 bytes,
+        limite de payload de funções serverless na Vercel) junto com os
+        metadados do exame via `multipart/form-data`. Valida os magic bytes do
+        arquivo antes de persistir no storage.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateDocumentUploadRequest"
+      responses:
+        "201":
+          description: Exame registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /documents/{document_id}:
+    parameters:
+      - $ref: "#/components/parameters/DocumentId"
+
+    get:
+      tags: [Documents]
+      summary: Obter exame ou documento por ID
+      operationId: getDocument
+      responses:
+        "200":
+          description: Documento retornado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Documents]
+      summary: Atualizar metadados de exame ou documento
+      operationId: updateDocument
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDocumentRequest"
+      responses:
+        "200":
+          description: Documento atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      tags: [Documents]
+      summary: Remover exame ou documento (inclui exclusão no storage)
+      operationId: deleteDocument
+      responses:
+        "204":
+          description: Documento removido
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /cron/token-cleanup:
     get:
       tags: [Cron]
@@ -1174,6 +1309,14 @@ components:
 
     VaccineId:
       name: vaccine_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    DocumentId:
+      name: document_id
       in: path
       required: true
       schema:
@@ -1962,6 +2105,148 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/VaccineListItem"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    # -- Document --------------------------------------------------------------
+
+    Document:
+      type: object
+      required:
+        - id
+        - patient_id
+        - name
+        - file_url
+        - mime_type
+        - size_bytes
+        - exam_date
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        patient_id:
+          type: string
+          format: uuid
+        appointment_id:
+          type: [string, "null"]
+          format: uuid
+          description: Atendimento ao qual o exame está vinculado, se houver
+        name:
+          type: string
+          example: "Raio-X Torácico"
+        type:
+          type: [string, "null"]
+          example: "Raio-X"
+        file_url:
+          type: string
+          format: uri
+          readOnly: true
+          example: "https://cdn.meupaciente.com.br/documents/uuid/doc.pdf"
+        mime_type:
+          type: string
+          enum:
+            - application/pdf
+            - image/jpeg
+            - image/png
+          readOnly: true
+          example: "application/pdf"
+        size_bytes:
+          type: integer
+          minimum: 1
+          maximum: 4718592
+          readOnly: true
+          example: 1345678
+        exam_date:
+          type: string
+          format: date
+          example: "2026-10-20"
+        notes:
+          type: [string, "null"]
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    DocumentDetail:
+      allOf:
+        - $ref: "#/components/schemas/Document"
+        - type: object
+          properties:
+            patient:
+              $ref: "#/components/schemas/Patient"
+
+    CreateDocumentUploadRequest:
+      type: object
+      required: [file, patient_id, name, exam_date]
+      properties:
+        file:
+          type: string
+          format: binary
+          description: Arquivo PDF, JPG ou PNG, máximo 4,5 MB (4.718.592 bytes)
+        patient_id:
+          type: string
+          format: uuid
+        appointment_id:
+          type: [string, "null"]
+          format: uuid
+          description: Deve pertencer ao mesmo paciente informado
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        type:
+          type: [string, "null"]
+          maxLength: 60
+        exam_date:
+          type: string
+          format: date
+        notes:
+          type: [string, "null"]
+
+    UpdateDocumentRequest:
+      type: object
+      properties:
+        appointment_id:
+          type: [string, "null"]
+          format: uuid
+          description: Deve pertencer ao mesmo paciente do documento
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        type:
+          type: [string, "null"]
+          maxLength: 60
+        exam_date:
+          type: string
+          format: date
+        notes:
+          type: [string, "null"]
+
+    DocumentListItem:
+      allOf:
+        - $ref: "#/components/schemas/Document"
+        - type: object
+          required: [patient]
+          properties:
+            patient:
+              $ref: "#/components/schemas/PatientSummary"
+
+    DocumentListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentListItem"
         pagination:
           $ref: "#/components/schemas/Pagination"
 

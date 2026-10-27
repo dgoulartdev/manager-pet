@@ -11,6 +11,8 @@ import { ListPatientsQueryDto } from '../modules/patients/dto/list-patients-quer
 import { CreateVaccineDto } from '../modules/vaccines/dto/create-vaccine.dto';
 import { UpdateVaccineDto } from '../modules/vaccines/dto/update-vaccine.dto';
 import { ListVaccinesQueryDto } from '../modules/vaccines/dto/list-vaccines-query.dto';
+import { CreateDocumentDto } from '../modules/documents/dto/create-document.dto';
+import { UpdateDocumentDto } from '../modules/documents/dto/update-document.dto';
 
 // Valida um objeto como o ValidationPipe global faria e devolve os campos com erro.
 async function invalidFields(
@@ -36,6 +38,8 @@ describe('Validação de DTOs', () => {
       [UpdateAppointmentDto, 'location_type'],
       [UpdateVaccineDto, 'name'],
       [UpdateVaccineDto, 'application_date'],
+      [UpdateDocumentDto, 'name'],
+      [UpdateDocumentDto, 'exam_date'],
     ] as const)('%p.%s = null é rejeitado', async (dtoClass, field) => {
       const fields = await invalidFields(dtoClass, { [field]: null });
       expect(fields).toEqual([field]);
@@ -86,6 +90,7 @@ describe('Validação de DTOs', () => {
       [UpdatePatientDto, 'birth_date'],
       [UpdateVaccineDto, 'application_date'],
       [UpdateVaccineDto, 'next_dose_date'],
+      [UpdateDocumentDto, 'exam_date'],
       [ListAppointmentsQueryDto, 'date_from'],
       [ListAppointmentsQueryDto, 'date_to'],
       [ListVaccinesQueryDto, 'next_dose_to'],
@@ -151,6 +156,40 @@ describe('Validação de DTOs', () => {
       expect(await invalidFields(UpdateVaccineDto, { name: '' })).toEqual([
         'name',
       ]);
+    });
+  });
+
+  describe('exames e documentos', () => {
+    const PATIENT_ID = '660e8400-e29b-41d4-a716-446655440001';
+
+    it('aceita CreateDocumentDto válido com ou sem appointment_id', async () => {
+      expect(
+        await invalidFields(CreateDocumentDto, {
+          patient_id: PATIENT_ID,
+          name: 'Raio-X Torácico',
+          type: 'Raio-X',
+          exam_date: '2026-10-20',
+        }),
+      ).toEqual([]);
+    });
+
+    it('rejeita nome vazio ou data inválida no cadastro de documento', async () => {
+      const fields = await invalidFields(CreateDocumentDto, {
+        patient_id: PATIENT_ID,
+        name: '',
+        exam_date: '20/10/2026',
+      });
+      expect(fields).toEqual(expect.arrayContaining(['name', 'exam_date']));
+    });
+
+    it('aceita limpar appointment_id, type e notes com null em UpdateDocumentDto', async () => {
+      expect(
+        await invalidFields(UpdateDocumentDto, {
+          appointment_id: null,
+          type: null,
+          notes: null,
+        }),
+      ).toEqual([]);
     });
   });
 });

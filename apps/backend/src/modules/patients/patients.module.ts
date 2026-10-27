@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DocumentsModule } from '../documents/documents.module';
 import { PatientsController } from './patients.controller';
 import { PatientsService } from './patients.service';
 import { PATIENT_PHOTO_STORAGE, PatientPhotoStorage } from './storage/patient-photo-storage';
@@ -7,6 +8,7 @@ import { LocalDiskPatientPhotoStorage } from './storage/local-disk-patient-photo
 import { VercelBlobPatientPhotoStorage } from './storage/vercel-blob-patient-photo-storage';
 
 @Module({
+  imports: [DocumentsModule],
   controllers: [PatientsController],
   providers: [
     PatientsService,

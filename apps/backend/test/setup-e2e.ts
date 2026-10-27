@@ -14,6 +14,11 @@ export default function setup(): void {
   process.env.DATABASE_URL = testUrl;
   // Os testes cadastram e-mails aleatórios: a lista de cadastro do .env não vale aqui.
   delete process.env.SIGNUP_ALLOWED_EMAILS;
+  // Garante que os testes e2e nunca enviem arquivos para o Vercel Blob real.
+  delete process.env.BLOB_READ_WRITE_TOKEN;
+  delete process.env.BLOB_STORE_ID;
+  delete process.env.DOCUMENTS_BLOB_READ_WRITE_TOKEN;
+  delete process.env.DOCUMENTS_BLOB_STORE_ID;
   // Segredo próprio do e2e para a rota do Vercel Cron, independente do .env.
   process.env.CRON_SECRET = E2E_CRON_SECRET;
 
