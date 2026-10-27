@@ -1,3 +1,5 @@
+import { MAX_BLOB_UPLOAD_BYTES } from '@meupaciente/shared';
+
 // Mesmos formatos da API (PUT /patients/{id}/photo).
 export const ACCEPTED_PHOTO_TYPES = ['image/jpeg', 'image/png'];
 
@@ -20,7 +22,13 @@ export async function preparePhoto(file: File): Promise<PreparedPhoto> {
     return { error: 'Formato não aceito. Escolha uma imagem JPG ou PNG.' };
   }
   try {
-    return { photo: await shrinkPhoto(file) };
+    const photo = await shrinkPhoto(file);
+    if (photo.size > MAX_BLOB_UPLOAD_BYTES) {
+      return {
+        error: 'A imagem excede o limite de 4,5 MB mesmo após a otimização.',
+      };
+    }
+    return { photo };
   } catch {
     return { error: 'Não foi possível abrir esta imagem. Escolha outra.' };
   }

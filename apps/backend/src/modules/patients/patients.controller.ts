@@ -16,6 +16,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MAX_BLOB_UPLOAD_BYTES } from '@meupaciente/shared';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../../common/types/authenticated-user';
 import { PatientsService } from './patients.service';
@@ -24,7 +25,7 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 import { ListPatientsQueryDto } from './dto/list-patients-query.dto';
 import { UploadedPhoto } from './storage/patient-photo-storage';
 
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024; // 5MB (ver OpenAPI)
+const MAX_PHOTO_BYTES = MAX_BLOB_UPLOAD_BYTES; // 4,5MB (limite serverless da Vercel)
 const ACCEPTED_MIME = ['image/jpeg', 'image/png'];
 
 @Controller('patients')

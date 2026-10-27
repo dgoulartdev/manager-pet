@@ -27,6 +27,7 @@ import {
   PatientPhotoStorage,
   UploadedPhoto,
 } from './storage/patient-photo-storage';
+import { DocumentsService } from '../documents/documents.service';
 
 @Injectable()
 export class PatientsService {
@@ -34,6 +35,7 @@ export class PatientsService {
     private readonly prisma: PrismaService,
     @Inject(PATIENT_PHOTO_STORAGE)
     private readonly photoStorage: PatientPhotoStorage,
+    private readonly documentsService: DocumentsService,
   ) {}
 
   async create(userId: string, dto: CreatePatientDto): Promise<PatientDto> {
@@ -126,13 +128,14 @@ export class PatientsService {
   async remove(userId: string, id: string): Promise<void> {
     const patient = await this.getOwned(userId, id);
 
-    // Apaga o arquivo de foto (se houver) antes de remover o registro.
+    // Apaga o arquivo de foto e os documentos do storage antes de remover o registro.
     if (patient.photo_url) {
       await this.photoStorage.remove(patient.photo_url);
     }
+    await this.documentsService.removeAllForPatient(userId, id);
 
-    // Os atendimentos (e seus documentos) são removidos em cascata pelo banco
-    // (FK ON DELETE CASCADE — ver migration inicial).
+    // Os atendimentos, vacinas e documentos são removidos em cascata pelo banco
+    // (FK ON DELETE CASCADE).
     await this.prisma.patient.delete({ where: { id } });
   }
 

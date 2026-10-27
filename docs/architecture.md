@@ -223,6 +223,7 @@ model Patient {
   tutor        Tutor         @relation(fields: [tutor_id], references: [id])
   appointments Appointment[]
   vaccines     Vaccine[]
+  documents    Document[]
 
   @@index([user_id])
   @@index([tutor_id])
@@ -316,25 +317,33 @@ model PasswordResetToken {
 }
 
 // ---------------------------------------------------------------------------
-// RESERVADO — Módulo de documentos/exames (pós-MVP)
-// Tabela criada agora para evitar migration com dados em produção no futuro.
-// Nenhum endpoint exposto no MVP.
+// Exames e documentos clínicos vinculados ao paciente (com vínculo opcional
+// a um atendimento específico, mesmo padrão de Vaccine — ADR-009).
 // ---------------------------------------------------------------------------
 
 model Document {
-  id             String      @id @default(uuid())
+  id             String       @id @default(uuid())
   user_id        String
-  appointment_id String
+  patient_id     String
+  appointment_id String?
   name           String
-  type           String?     // "exame_sangue", "raio_x", "laudo", etc.
-  url            String      // URL do arquivo no storage externo (S3/R2)
-  created_at     DateTime    @default(now())
+  type           String?      // "Exame de sangue", "Raio-X", "Ultrassonografia", "Laudo", etc.
+  url            String       // URL do arquivo no storage (Vercel Blob ou disco local)
+  mime_type      String       // "application/pdf", "image/jpeg", "image/png"
+  size_bytes     Int
+  exam_date      DateTime
+  notes          String?      @db.Text
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
 
-  user        User        @relation(fields: [user_id], references: [id])
-  appointment Appointment @relation(fields: [appointment_id], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [user_id], references: [id])
+  patient     Patient      @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointment_id], references: [id], onDelete: SetNull)
 
   @@index([user_id])
+  @@index([patient_id])
   @@index([appointment_id])
+  @@index([exam_date])
   @@map("documents")
 }
 
@@ -495,22 +504,25 @@ Usar `/appointments?patient_id=X` para todos os filtros relacionais.
 
 ---
 
-### ADR-005: Tabela `Document` reservada no MVP sem endpoints expostos
+### ADR-005: Tabela `Document` e módulo de exames com otimização diagnóstica
 
-**Status:** Aceito
+**Status:** Aceito (atualizado em 2026-10-21)
 
 **Contexto:**
-Upload de documentos e exames está fora do MVP, mas é a primeira funcionalidade planejada para pós-MVP. Adicionar a tabela depois com dados em produção exige migration com risco.
+No início do MVP, a tabela `Document` foi criada como reservada sem endpoints expostos. Na evolução para suportar anexos de exames clínicos (laudos em PDF, radiografias e ultrassonografias em PDF/JPEG/PNG), identificou-se que:
+1. Exames podem ser trazidos de laboratórios externos fora de um atendimento específico, exigindo vínculo direto ao paciente (`patient_id` obrigatório, `onDelete: Cascade`) e vínculo opcional ao atendimento (`appointment_id` anulável, `onDelete: SetNull`), espelhando o padrão de `Vaccine` (ADR-009).
+2. O ambiente serverless da Vercel impõe um limite rígido de 4,5 MB (`4.718.592` bytes) no corpo das requisições HTTP. Enquanto hemogramas em PDF pesam ~65 KB, exames de imagem (raios X e ultrassonografias) podem chegar a 7 MB ou mais.
 
 **Decisão:**
-Criar a tabela `Document` no schema Prisma desde o início, sem nenhum endpoint ou módulo NestJS associado no MVP.
-
-**Consequências positivas:**
-- Migration futura é simples (apenas novo módulo, tabela já existe)
-- Sem risco de alterar schema com dados de produção
-
-**Consequências negativas:**
-- Tabela "vazia" em produção durante o MVP (sem impacto real)
+- Atualizar `Document` com `patient_id` obrigatório, `appointment_id` opcional (`onDelete: SetNull`), `exam_date`, `mime_type`, `size_bytes`, `notes` e `updated_at`, expondo `GET/POST /v1/documents` e `GET/PATCH/DELETE /v1/documents/:id`.
+- Armazenar arquivos atrás da abstração `DocumentStorage` (`VercelBlobDocumentStorage` em produção na mesma store sob o prefixo `documents/<patientId>/` com sufixo aleatório; `LocalDiskDocumentStorage` em desenvolvimento).
+- Implementar em `apps/frontend/src/lib/fileCompression.ts` uma rotina reutilizável de otimização diagnóstica para arquivos que excedam 4,5 MB:
+  - Arquivos $\le 4,5\text{ MB}$ são enviados intactos, byte a byte, sem qualquer reprocessamento.
+  - Arquivos $> 4,5\text{ MB}$ passam por otimização específica por formato validado via magic bytes:
+    - **PDF (`application/pdf`):** preserva integralmente textos, vetores, carimbos, assinaturas visuais e metadados (`/Info`), recomprimindo streams lossless com Deflate e otimizando imagens embutidas (`/DCTDecode` sobredimensionadas) apenas em patamares clínicos seguros ($\ge 2048\text{ px}$ e qualidade $\ge 0,90$), reconstruindo a tabela `xref`.
+    - **JPEG (`image/jpeg`) e PNG opaco (`image/png` sem transparência):** reduz suavemente em degraus diagnósticos ($\text{lado maior} \in [3200, 2800, 2560, 2048]\text{ px}$ e $\text{qualidade} \in [0,94, 0,92, 0,90]$), nunca abaixo de $2048\text{ px}$ ou qualidade $0,90$.
+    - **PNG com transparência real:** mantém formato PNG sem perda de canal alfa.
+  - Se mesmo no limite mínimo de segurança diagnóstica o arquivo continuar acima de 4,5 MB, o upload é interrompido no cliente e no servidor (`413 Payload Too Large`) com orientação clara ao veterinário, jamais degradando o exame para forçar o envio.
 
 ---
 

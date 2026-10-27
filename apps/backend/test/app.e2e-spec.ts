@@ -7,6 +7,10 @@ import { ProblemDetailsFilter } from '../src/common/filters/problem-details.filt
 import { validationExceptionFactory } from '../src/common/validation-exception-factory';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { EMAIL_SENDER, EmailMessage } from '../src/modules/email/email-sender';
+import {
+  DOCUMENT_STORAGE,
+  UploadedDocumentFile,
+} from '../src/modules/documents/storage/document-storage';
 import { E2E_CRON_SECRET } from './test-db';
 
 // Fluxo principal completo: register -> login -> CRUD (tutor/local/paciente/
@@ -26,8 +30,11 @@ describe('Fluxo principal (e2e)', () => {
   let locationId: string;
   let patientId: string;
   let appointmentId: string;
+  let documentId: string;
   // E-mails "enviados" no teste: nada sai pelo provedor real, mesmo com a chave no .env.
   const sentEmails: EmailMessage[] = [];
+  // Arquivos de exame salvos/removidos em memória durante o e2e (sem tocar disco nem Blob).
+  const storedDocuments = new Map<string, UploadedDocumentFile>();
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -35,6 +42,17 @@ describe('Fluxo principal (e2e)', () => {
     })
       .overrideProvider(EMAIL_SENDER)
       .useValue({ send: async (message: EmailMessage) => void sentEmails.push(message) })
+      .overrideProvider(DOCUMENT_STORAGE)
+      .useValue({
+        save: async (id: string, file: UploadedDocumentFile) => {
+          const url = `https://blob.test/documents/${id}.pdf`;
+          storedDocuments.set(url, file);
+          return url;
+        },
+        remove: async (url: string) => {
+          storedDocuments.delete(url);
+        },
+      })
       .compile();
 
     app = moduleRef.createNestApplication();
@@ -336,11 +354,86 @@ describe('Fluxo principal (e2e)', () => {
       .expect(404);
   });
 
-  it('remove o atendimento criado', async () => {
+  it('rejeita upload de exame com assinatura binária inválida (422)', async () => {
+    await request(app.getHttpServer())
+      .post('/v1/documents')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .field('patient_id', patientId)
+      .field('name', 'Falso PDF')
+      .field('exam_date', '2026-07-20')
+      .attach('file', Buffer.from('Isto nao e um PDF valido'), {
+        filename: 'falso.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(422);
+  });
+
+  it('envia, lista e atualiza um exame vinculado ao paciente e ao atendimento', async () => {
+    const pdfBuffer = Buffer.from('%PDF-1.7\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n');
+
+    const created = await request(app.getHttpServer())
+      .post('/v1/documents')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .field('patient_id', patientId)
+      .field('appointment_id', appointmentId)
+      .field('name', 'Hemograma completo')
+      .field('type', 'Exame de sangue')
+      .field('exam_date', '2026-07-20')
+      .field('notes', 'Leucograma normal')
+      .attach('file', pdfBuffer, {
+        filename: 'hemograma.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(201);
+
+    documentId = created.body.id;
+    expect(created.body).toMatchObject({
+      patient_id: patientId,
+      appointment_id: appointmentId,
+      name: 'Hemograma completo',
+      type: 'Exame de sangue',
+      mime_type: 'application/pdf',
+      size_bytes: pdfBuffer.byteLength,
+      exam_date: '2026-07-20',
+      notes: 'Leucograma normal',
+    });
+    expect(storedDocuments.size).toBe(1);
+
+    const byPatient = await request(app.getHttpServer())
+      .get(`/v1/documents?patient_id=${patientId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(byPatient.body.data).toHaveLength(1);
+    expect(byPatient.body.data[0].patient.id).toBe(patientId);
+
+    const updated = await request(app.getHttpServer())
+      .patch(`/v1/documents/${documentId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: 'Hemograma completo + Plaquetas' })
+      .expect(200);
+    expect(updated.body.name).toBe('Hemograma completo + Plaquetas');
+  });
+
+  it('remove o atendimento criado e preserva o exame desvinculando appointment_id', async () => {
     await request(app.getHttpServer())
       .delete(`/v1/appointments/${appointmentId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(204);
+
+    const detail = await request(app.getHttpServer())
+      .get(`/v1/documents/${documentId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(detail.body.appointment_id).toBeNull();
+  });
+
+  it('remove o exame e apaga o arquivo no storage', async () => {
+    await request(app.getHttpServer())
+      .delete(`/v1/documents/${documentId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(204);
+
+    expect(storedDocuments.size).toBe(0);
   });
 
   it('remove o local depois que nenhum atendimento o usa', async () => {
