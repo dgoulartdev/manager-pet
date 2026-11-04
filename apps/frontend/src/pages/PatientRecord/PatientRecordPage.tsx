@@ -128,7 +128,13 @@ export function PatientRecordPage() {
       </nav>
 
       <header className={styles.header}>
-        <Avatar name={patient.name} kind="patient" photoUrl={patient.photo_url} size="xl" />
+        <Avatar
+          name={patient.name}
+          kind="patient"
+          photoUrl={patient.photo_url}
+          size="xl"
+          expandable
+        />
         <div className={styles.identity}>
           <div className={styles.nameRow}>
             <h1 className={styles.name}>{patient.name}</h1>

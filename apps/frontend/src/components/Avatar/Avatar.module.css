@@ -51,3 +51,76 @@
   border-radius: inherit;
   object-fit: cover;
 }
+
+.expandable {
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.expandable:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.expandable:active {
+  transform: scale(0.97);
+}
+
+.lightbox {
+  max-width: calc(100vw - var(--space-8));
+  max-height: calc(100dvh - var(--space-8));
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.lightbox::backdrop {
+  background: var(--color-overlay);
+}
+
+.lightboxContent {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightboxImage {
+  display: block;
+  max-width: min(640px, calc(100vw - var(--space-8)));
+  max-height: calc(100dvh - var(--space-12));
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-xl);
+  background: var(--color-card);
+  box-shadow: var(--shadow-xl);
+  object-fit: contain;
+}
+
+.close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.close:hover {
+  background: var(--color-hover);
+}
