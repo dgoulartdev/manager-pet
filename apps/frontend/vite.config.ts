@@ -29,6 +29,9 @@ export default defineConfig({
       workbox: {
         // Inclui as fontes no cache offline (o padrão só guarda js, css e html).
         globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
       },
       manifest: {
         name: 'MeuPaciente',
