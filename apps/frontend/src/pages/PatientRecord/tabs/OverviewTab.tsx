@@ -161,7 +161,13 @@ function PhotoCard({ patient, onChanged }: { patient: PatientDetailDto; onChange
         Foto
       </h2>
       <div className={styles.photo}>
-        <Avatar name={patient.name} kind="patient" photoUrl={patient.photo_url} size="xl" />
+        <Avatar
+          name={patient.name}
+          kind="patient"
+          photoUrl={patient.photo_url}
+          size="xl"
+          expandable
+        />
         <div className={styles.photoActions}>
           <Button
             variant="secondary"
